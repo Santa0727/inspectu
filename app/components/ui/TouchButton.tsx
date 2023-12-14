@@ -20,14 +20,14 @@ const TouchButton = ({
   size,
 }: Props) => {
   const btnStyle =
-    scheme === 'secondary'
+    scheme === 'primary'
+      ? styles.primary_btn
+      : scheme === 'secondary'
       ? styles.sec_btn
       : scheme === 'danger'
       ? styles.danger_btn
       : scheme === 'success'
       ? styles.success_btn
-      : scheme === 'primary'
-      ? styles.primary_btn
       : {};
 
   return (
@@ -54,7 +54,7 @@ const TouchButton = ({
 const styles = StyleSheet.create({
   btn: {
     borderRadius: 3,
-    backgroundColor: '#172f84',
+    backgroundColor: '#414BB2',
     textAlign: 'center',
     minHeight: 20,
     paddingVertical: 12,

@@ -5,6 +5,7 @@ import {
   Platform,
   StyleSheet,
   Text,
+  TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
@@ -15,6 +16,7 @@ import { AuthStackParamList } from '../navigation/AppNavigator';
 import { useDispatch } from 'react-redux';
 import { isEmailFormat } from '../config/helper';
 import { authLogin } from '../store/auth/auth.actions';
+import MainContainer from '../components/container/MainContainer';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'SignIn'>;
 
@@ -25,19 +27,24 @@ const LoginScreen = ({ navigation }: Props) => {
   const [password, setPassword] = useState('');
   const [valid, setValid] = useState({ email: '', password: '' });
   const [disabled, setDisabled] = useState(false);
+  const [hidePass, setHidePass] = useState(true);
 
   const isValid = () => {
     let tmp = { email: '', password: '' };
+    let res = true;
     if (!email) {
       tmp.email = 'Email is required';
+      res = false;
     } else if (!isEmailFormat(email)) {
       tmp.email = 'Invalid email format';
+      res = false;
     }
     if (!password) {
       tmp.password = 'Password is required';
+      res = false;
     }
     setValid(tmp);
-    return email && password;
+    return res;
   };
   const confirmClick = async () => {
     if (!isValid()) return;
@@ -52,67 +59,51 @@ const LoginScreen = ({ navigation }: Props) => {
   };
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <KeyboardAvoidingView
-        style={styles.view}
-        behavior={Platform.OS === 'android' ? 'height' : 'padding'}>
-        <Text style={styles.title}>Sign In</Text>
-        <View style={{ width: '100%' }}>
-          <Input
-            label="Email"
-            placeholder="Please enter your email"
-            type="email-address"
-            autoCapitalize="none"
-            value={email}
-            onChange={(v) => {
-              setEmail(v);
-              setValid((prv) => ({ ...prv, email: '' }));
-            }}
-            error={valid.email}
-          />
-          <Input
-            label="Password"
-            placeholder="Please enter your email"
-            type="visible-password"
-            autoCapitalize="none"
-            security={true}
-            value={password}
-            onChange={(v) => {
-              setPassword(v);
-              setValid((prv) => ({ ...prv, password: '' }));
-            }}
-            error={valid.password}
-          />
-        </View>
-        <View
-          style={{
-            marginTop: 20,
-            marginBottom: 10,
-            width: '100%',
-            paddingHorizontal: 10,
-          }}>
-          <TouchButton
-            label="Sign in"
-            onPress={confirmClick}
-            disabled={disabled}
-          />
-        </View>
-        <View
-          style={{
-            marginTop: 10,
-            marginBottom: 10,
-            width: '100%',
-            paddingHorizontal: 10,
-          }}>
-          <TouchButton
-            label="Go to sign up"
-            scheme="secondary"
-            onPress={() => navigation.navigate('SignUp')}
-            disabled={disabled}
-          />
-        </View>
-      </KeyboardAvoidingView>
-    </TouchableWithoutFeedback>
+    <MainContainer>
+      <Text style={styles.title}>Login</Text>
+      <View style={{ width: '100%' }}>
+        <Input
+          label="Email"
+          placeholder="Please enter your email"
+          type="email-address"
+          autoCapitalize="none"
+          value={email}
+          onChange={(v) => {
+            setEmail(v);
+            setValid((prv) => ({ ...prv, email: '' }));
+          }}
+          icon="email"
+          error={valid.email}
+        />
+        <Input
+          label="Password"
+          placeholder="Please enter your password"
+          type="visible-password"
+          autoCapitalize="none"
+          security={hidePass}
+          value={password}
+          onChange={(v) => {
+            setPassword(v);
+            setValid((prv) => ({ ...prv, password: '' }));
+          }}
+          error={valid.password}
+          icon={hidePass ? 'eye-on' : 'eye-off'}
+          onIconTouch={() => setHidePass(!hidePass)}
+        />
+      </View>
+      <View
+        style={{
+          marginTop: 20,
+          marginBottom: 10,
+          width: '100%',
+          paddingHorizontal: 10,
+        }}>
+        <TouchableOpacity style={{ marginBottom: 30 }}>
+          <Text style={styles.link}>Forgot password</Text>
+        </TouchableOpacity>
+        <TouchButton label="Login" onPress={confirmClick} disabled={disabled} />
+      </View>
+    </MainContainer>
   );
 };
 
@@ -127,6 +118,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     paddingBottom: 50,
+    marginTop: '20%',
+  },
+  link: {
+    fontSize: 22,
+    textDecorationLine: 'underline',
+    fontWeight: '400',
   },
 });
 
