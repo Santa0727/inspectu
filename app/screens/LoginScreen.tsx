@@ -1,14 +1,5 @@
 import { useState } from 'react';
-import {
-  Keyboard,
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  View,
-} from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Input from '../components/ui/Input';
 import TouchButton from '../components/ui/TouchButton';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -98,10 +89,16 @@ const LoginScreen = ({ navigation }: Props) => {
           width: '100%',
           paddingHorizontal: 10,
         }}>
-        <TouchableOpacity style={{ marginBottom: 30 }}>
+        <TouchableOpacity style={{ marginBottom: 30, marginHorizontal: 10 }}>
           <Text style={styles.link}>Forgot password</Text>
         </TouchableOpacity>
-        <TouchButton label="Login" onPress={confirmClick} disabled={disabled} />
+        <View style={{ marginVertical: 20 }}>
+          <TouchButton
+            label="Login"
+            onPress={confirmClick}
+            disabled={disabled}
+          />
+        </View>
       </View>
     </MainContainer>
   );
