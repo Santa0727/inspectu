@@ -1,72 +1,42 @@
-import { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
-import { selectProfile } from '../store/auth/auth.selector';
-import TouchButton from '../components/ui/TouchButton';
-import { authLogout } from '../store/auth/auth.actions';
+import { StyleSheet } from 'react-native';
 import { MainStackParamList } from '../navigation/AppNavigator';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import MainContainer from '../components/container/MainContainer';
+import InspectsTable from '../components/manage/InspectsTable';
+
+const upcoming_demo = [
+    { id: 1, location: 'School A', date: '23-10-2023' },
+    { id: 2, location: 'School B', date: '24-11-2023' },
+    { id: 3, location: 'School C', date: '01-12-2023' },
+  ],
+  past_demo = [
+    { id: 1, location: 'School A', date: '01-09-2023', status: 'Approved' },
+    {
+      id: 2,
+      location: 'School B',
+      date: '12-09-2023',
+      status: 'Pending review',
+    },
+    {
+      id: 3,
+      location: 'School C',
+      date: '24-09-2023',
+      status: 'Pending review',
+    },
+  ];
 
 type Props = NativeStackScreenProps<MainStackParamList, 'Home'>;
 
 const HomeScreen = ({ navigation }: Props) => {
-  const dispatch = useDispatch<any>();
-  const profile = useSelector(selectProfile);
-
-  const [disabled, setDisabled] = useState(false);
-
-  const logoutClick = async () => {
-    setDisabled(true);
-    await dispatch(authLogout());
-    setDisabled(false);
-  };
-
   return (
-    <View style={styles.view}>
-      <Text style={styles.title}>
-        {!profile
-          ? 'Invalid access'
-          : `Hello ${profile.name} (${profile.email})`}
-      </Text>
-      <View style={{ width: '80%', marginVertical: 15 }}>
-        <TouchButton
-          label="View Profile"
-          onPress={() => navigation.navigate('Profile')}
-          disabled={disabled}
-        />
-      </View>
-      <View style={{ width: '80%', marginVertical: 15 }}>
-        <TouchButton
-          label="List users"
-          onPress={() => navigation.navigate('Users')}
-          disabled={disabled}
-        />
-      </View>
-      <View style={{ width: '80%', marginVertical: 15 }}>
-        <TouchButton
-          label="List schools"
-          onPress={() => navigation.navigate('Schools')}
-          disabled={disabled}
-        />
-      </View>
-      <View style={{ width: '80%', marginVertical: 20 }}>
-        <TouchButton
-          label="Sign Out"
-          scheme="secondary"
-          onPress={logoutClick}
-          disabled={disabled}
-        />
-      </View>
-    </View>
+    <MainContainer>
+      <InspectsTable items={upcoming_demo} status="upcoming" />
+      <InspectsTable items={past_demo} status="past" />
+    </MainContainer>
   );
 };
 
 const styles = StyleSheet.create({
-  view: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   title: {
     fontSize: 28,
     textAlign: 'center',
