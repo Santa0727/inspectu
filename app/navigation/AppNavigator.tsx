@@ -55,12 +55,12 @@ const MainNavigator = () => {
   return (
     <MainStack.Navigator>
       <MainStack.Screen
-        options={{ headerShown: true }}
+        options={{ headerShown: false }}
         name="Home"
         component={HomeScreen}
       />
       <MainStack.Screen
-        options={{ headerShown: true }}
+        options={{ headerShown: false }}
         name="Profile"
         component={ProfileScreen}
       />

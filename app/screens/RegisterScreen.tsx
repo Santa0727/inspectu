@@ -7,7 +7,7 @@ import { AuthStackParamList } from '../navigation/AppNavigator';
 import { useDispatch } from 'react-redux';
 import { isEmailFormat } from '../config/helper';
 import { authRegister } from '../store/auth/auth.actions';
-import MainContainer from '../components/container/MainContainer';
+import AppContainer from '../components/container/AppContainer';
 
 interface IForm {
   name: string;
@@ -74,7 +74,7 @@ const RegisterScreen = ({ navigation }: Props) => {
   };
 
   return (
-    <MainContainer>
+    <AppContainer>
       <Text style={styles.title}>Sign Up</Text>
       <View style={{ width: '100%' }}>
         <Input
@@ -140,7 +140,7 @@ const RegisterScreen = ({ navigation }: Props) => {
           disabled={disabled}
         />
       </View>
-    </MainContainer>
+    </AppContainer>
   );
 };
 

@@ -7,7 +7,7 @@ import { AuthStackParamList } from '../navigation/AppNavigator';
 import { useDispatch } from 'react-redux';
 import { isEmailFormat } from '../config/helper';
 import { authLogin } from '../store/auth/auth.actions';
-import MainContainer from '../components/container/MainContainer';
+import AppContainer from '../components/container/AppContainer';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'SignIn'>;
 
@@ -50,7 +50,7 @@ const LoginScreen = ({ navigation }: Props) => {
   };
 
   return (
-    <MainContainer>
+    <AppContainer>
       <Text style={styles.title}>Login</Text>
       <View style={{ width: '100%' }}>
         <Input
@@ -100,7 +100,7 @@ const LoginScreen = ({ navigation }: Props) => {
           />
         </View>
       </View>
-    </MainContainer>
+    </AppContainer>
   );
 };
 
