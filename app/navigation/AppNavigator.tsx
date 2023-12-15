@@ -12,6 +12,7 @@ import UserDetailScreen from '../screens/UserDetailScreen';
 import { useEffect } from 'react';
 import { loadMyProfile } from '../store/auth/auth.actions';
 import SchoolListScreen from '../screens/SchoolListScreen';
+import InspectionScreen from '../screens/InspectionScreen';
 
 export type AuthStackParamList = {
   SignIn: undefined;
@@ -41,6 +42,7 @@ export type MainStackParamList = {
   Users: undefined;
   UserDetail: { user: IUser };
   Schools: undefined;
+  Inspect: undefined;
 };
 
 const MainStack = createNativeStackNavigator<MainStackParamList>();
@@ -78,6 +80,11 @@ const MainNavigator = () => {
         options={{ headerShown: true }}
         name="Schools"
         component={SchoolListScreen}
+      />
+      <MainStack.Screen
+        options={{ headerShown: false }}
+        name="Inspect"
+        component={InspectionScreen}
       />
     </MainStack.Navigator>
   );

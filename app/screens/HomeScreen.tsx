@@ -1,4 +1,3 @@
-import { StyleSheet } from 'react-native';
 import { MainStackParamList } from '../navigation/AppNavigator';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import MainContainer from '../components/container/MainContainer';
@@ -27,23 +26,15 @@ const upcoming_demo = [
 
 type Props = NativeStackScreenProps<MainStackParamList, 'Home'>;
 
-const HomeScreen = ({ navigation }: Props) => {
-  return (
-    <MainContainer>
-      <InspectsTable items={upcoming_demo} status="upcoming" />
-      <InspectsTable items={past_demo} status="past" />
-    </MainContainer>
-  );
-};
-
-const styles = StyleSheet.create({
-  title: {
-    fontSize: 28,
-    textAlign: 'center',
-    fontWeight: '600',
-    paddingHorizontal: 30,
-    marginVertical: 30,
-  },
-});
+const HomeScreen = ({ navigation }: Props) => (
+  <MainContainer>
+    <InspectsTable
+      items={upcoming_demo}
+      status="upcoming"
+      goToInspect={() => navigation.navigate('Inspect')}
+    />
+    <InspectsTable items={past_demo} status="past" />
+  </MainContainer>
+);
 
 export default HomeScreen;

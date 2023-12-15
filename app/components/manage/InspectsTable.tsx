@@ -10,9 +10,10 @@ interface IItem {
 interface Props {
   items: IItem[];
   status: 'upcoming' | 'past';
+  goToInspect?: () => void;
 }
 
-const InspectsTable = ({ items, status }: Props) => (
+const InspectsTable = ({ items, status, goToInspect }: Props) => (
   <View style={styles.table}>
     <Text style={styles.title}>{`${status} inspections`}</Text>
     <View style={styles.tbody}>
@@ -33,22 +34,35 @@ const InspectsTable = ({ items, status }: Props) => (
       </View>
       {items.map((x) => (
         <View key={x.id} style={styles.tr}>
-          <View
-            style={[
-              styles.td_cell,
-              { borderRightWidth: 1, borderColor: '#A9A9A9' },
-            ]}>
+          <View style={styles.td_cell}>
             <Text style={styles.td_txt}>{x.location}</Text>
           </View>
-          <View style={styles.td_cell}>
-            <Text style={styles.td_txt}>{x.date}</Text>
-          </View>
           <View
             style={[
               styles.td_cell,
-              { borderLeftWidth: 1, borderColor: '#A9A9A9' },
+              {
+                borderLeftWidth: 1,
+                borderRightWidth: 1,
+                borderColor: '#A9A9A9',
+              },
             ]}>
-            <Text style={styles.td_txt}>{x.status}</Text>
+            <Text style={styles.td_txt}>{x.date}</Text>
+          </View>
+          <View style={[styles.td_cell, { paddingVertical: 3 }]}>
+            {x.status ? (
+              <View>
+                <Text style={[styles.td_txt, { fontSize: 15 }]}>
+                  {x.status}
+                </Text>
+                <TouchableOpacity style={styles.view_btn}>
+                  <Text style={styles.view_txt}>View</Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <TouchableOpacity style={styles.start_btn} onPress={goToInspect}>
+                <Text style={styles.start_txt}>Start</Text>
+              </TouchableOpacity>
+            )}
           </View>
         </View>
       ))}
@@ -71,7 +85,7 @@ const styles = StyleSheet.create({
   },
   tr: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'stretch',
     justifyContent: 'space-between',
     borderWidth: 1,
     borderColor: '#A9A9A9',
@@ -80,6 +94,7 @@ const styles = StyleSheet.create({
   th_cell: {
     flex: 1,
     padding: 10,
+    justifyContent: 'center',
   },
   th_txt: {
     textAlign: 'center',
@@ -89,10 +104,34 @@ const styles = StyleSheet.create({
   td_cell: {
     flex: 1,
     padding: 10,
+    justifyContent: 'center',
   },
   td_txt: {
     fontSize: 17,
     textAlign: 'center',
+  },
+  start_btn: {
+    borderRadius: 50,
+    backgroundColor: '#414BB2',
+    paddingVertical: 6,
+  },
+  start_txt: {
+    textAlign: 'center',
+    color: 'white',
+    fontWeight: '600',
+    fontSize: 21,
+  },
+  view_btn: {
+    borderRadius: 50,
+    backgroundColor: '#414BB2',
+    paddingVertical: 5,
+    marginTop: 3,
+  },
+  view_txt: {
+    textAlign: 'center',
+    color: 'white',
+    fontWeight: '600',
+    fontSize: 17,
   },
 });
 
