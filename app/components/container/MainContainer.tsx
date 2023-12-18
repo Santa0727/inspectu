@@ -6,14 +6,16 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  StyleProp,
   StyleSheet,
   Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
+  ViewStyle,
 } from 'react-native';
 
-type Props = PropsWithChildren<{ style?: Object }>;
+type Props = PropsWithChildren<{ style?: StyleProp<ViewStyle> }>;
 
 const MainContainer = ({ children, style }: Props) => (
   <KeyboardAvoidingView

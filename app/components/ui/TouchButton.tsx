@@ -1,8 +1,14 @@
 import { PropsWithChildren } from 'react';
-import { StyleSheet, Text, TouchableOpacity } from 'react-native';
+import {
+  StyleProp,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  ViewStyle,
+} from 'react-native';
 
 type Props = PropsWithChildren<{
-  style?: Object;
+  style?: StyleProp<ViewStyle>;
   onPress?: (d?: any) => void;
   label?: string;
   disabled?: boolean;

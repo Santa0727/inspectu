@@ -1,17 +1,19 @@
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import {
   KeyboardTypeOptions,
+  StyleProp,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
+  ViewStyle,
 } from 'react-native';
 
 interface Props {
   label?: string;
   placeholder?: string;
-  style?: Object;
+  style?: StyleProp<ViewStyle>;
   type?: KeyboardTypeOptions;
   autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters' | undefined;
   security?: boolean;

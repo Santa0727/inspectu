@@ -2,6 +2,7 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import MainContainer from '../components/container/MainContainer';
 import { FontAwesome } from '@expo/vector-icons';
 import { useState } from 'react';
+import Checkbox from '../components/ui/Checkbox';
 
 const StepOneView = () => (
   <View style={{ paddingHorizontal: 10 }}>
@@ -93,12 +94,48 @@ const StepTwoView = () => (
   </View>
 );
 
+const StepThreeView = () => (
+  <View>
+    <View
+      style={{
+        flexDirection: 'row',
+        borderColor: '#d1d1d1',
+        borderBottomWidth: 1,
+        marginHorizontal: 20,
+        alignItems: 'center',
+        paddingBottom: 10,
+      }}>
+      <FontAwesome name="home" size={30} />
+      <View style={{ marginLeft: 10 }}>
+        <Text style={{ fontSize: 22, fontWeight: '500' }}>Location</Text>
+        <Text style={{ fontSize: 18, fontWeight: '400' }}>Freezer</Text>
+      </View>
+    </View>
+    <Text style={{ fontSize: 20, marginVertical: 20, marginHorizontal: 10 }}>
+      {'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'}
+    </Text>
+    <View style={{ marginVertical: 10, paddingHorizontal: 10 }}>
+      <Text style={{ fontSize: 21, fontWeight: '600', marginBottom: 5 }}>
+        {'Did you check this'}
+      </Text>
+      <Checkbox value={true} label="I confirm that this is checked" />
+      <Checkbox value={false} label="I confirm that this is checked" />
+    </View>
+  </View>
+);
+
 const InspectionScreen = () => {
   const [step, setStep] = useState(1);
 
   return (
     <MainContainer style={{ padding: 5 }}>
-      {step === 1 ? <StepOneView /> : <StepTwoView />}
+      {step === 1 ? (
+        <StepOneView />
+      ) : step === 2 ? (
+        <StepTwoView />
+      ) : (
+        <StepThreeView />
+      )}
       <View style={styles.steps_view}>
         <View style={styles.steps_btn}>
           {step > 1 ? (
