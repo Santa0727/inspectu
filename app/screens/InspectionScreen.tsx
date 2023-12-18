@@ -1,4 +1,4 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import MainContainer from '../components/container/MainContainer';
 import { FontAwesome } from '@expo/vector-icons';
 import { useState } from 'react';
@@ -40,18 +40,56 @@ const StepOneView = () => (
 
 const StepTwoView = () => (
   <View>
-    <View>
+    <View
+      style={{
+        flexDirection: 'row',
+        borderColor: '#d1d1d1',
+        borderBottomWidth: 1,
+        marginHorizontal: 20,
+        alignItems: 'center',
+        paddingBottom: 10,
+      }}>
       <FontAwesome name="home" size={30} />
-      <View>
-        <Text>Location</Text>
-        <Text>Freezer</Text>
+      <View style={{ marginLeft: 10 }}>
+        <Text style={{ fontSize: 22, fontWeight: '500' }}>Location</Text>
+        <Text style={{ fontSize: 18, fontWeight: '400' }}>Freezer</Text>
       </View>
     </View>
-    <Text>
+    <Text style={{ fontSize: 20, marginVertical: 20, marginHorizontal: 10 }}>
       {
         'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam accumsan accumsan lorem, nec lobortis est tincidunt vel.'
       }
     </Text>
+    <View style={cardStyle.card}>
+      <Image
+        source={require('../images/demo-school-image.png')}
+        style={cardStyle.img}
+      />
+      <View style={cardStyle.name_view}>
+        <Text style={cardStyle.time}>{'28-Oct 10:24 am'}</Text>
+        <Text style={cardStyle.name}>{'Picture of inside of freezer'}</Text>
+      </View>
+    </View>
+    <View style={cardStyle.card}>
+      <Image
+        source={require('../images/demo-school-image.png')}
+        style={cardStyle.img}
+      />
+      <View style={cardStyle.name_view}>
+        <Text style={cardStyle.time}>{'28-Oct 10:24 am'}</Text>
+        <Text style={cardStyle.name}>{'Picture of inside of freezer'}</Text>
+      </View>
+    </View>
+    <View style={cardStyle.card}>
+      <Image
+        source={require('../images/demo-school-image.png')}
+        style={cardStyle.img}
+      />
+      <View style={cardStyle.name_view}>
+        <Text style={cardStyle.time}>{'28-Oct 10:24 am'}</Text>
+        <Text style={cardStyle.name}>{'Picture of inside of freezer'}</Text>
+      </View>
+    </View>
   </View>
 );
 
@@ -62,9 +100,26 @@ const InspectionScreen = () => {
     <MainContainer style={{ padding: 5 }}>
       {step === 1 ? <StepOneView /> : <StepTwoView />}
       <View style={styles.steps_view}>
-        <TouchableOpacity style={styles.next_btn}>
-          <Text style={styles.next_txt}>Next</Text>
-        </TouchableOpacity>
+        <View style={styles.steps_btn}>
+          {step > 1 ? (
+            <TouchableOpacity
+              style={styles.next_btn}
+              onPress={() => setStep(Math.max(1, step - 1))}>
+              <Text style={styles.next_txt}>Previous</Text>
+            </TouchableOpacity>
+          ) : (
+            <View />
+          )}
+          {step < 6 ? (
+            <TouchableOpacity
+              style={styles.next_btn}
+              onPress={() => setStep(Math.min(6, step + 1))}>
+              <Text style={styles.next_txt}>Next</Text>
+            </TouchableOpacity>
+          ) : (
+            <View />
+          )}
+        </View>
         <View style={styles.steps_bar}>
           <View style={styles.step_circle} />
           <View style={step > 1 ? styles.step_line : styles.inactive_line} />
@@ -99,8 +154,12 @@ const styles = StyleSheet.create({
     paddingBottom: 30,
     paddingHorizontal: 10,
   },
+  steps_btn: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
   next_btn: {
-    alignSelf: 'flex-end',
     backgroundColor: '#414BB2',
     paddingHorizontal: 25,
     paddingVertical: 10,
@@ -141,6 +200,32 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 5,
     backgroundColor: '#d9dbf0',
+  },
+});
+
+const cardStyle = StyleSheet.create({
+  card: {
+    borderWidth: 3,
+    borderColor: '#d1d1d1',
+    flexDirection: 'row',
+    marginVertical: 8,
+  },
+  img: {
+    width: 150,
+    height: 95,
+    resizeMode: 'contain',
+  },
+  name_view: {
+    flex: 1,
+    padding: 10,
+    justifyContent: 'center',
+  },
+  time: {
+    fontSize: 22,
+    fontWeight: '600',
+  },
+  name: {
+    fontSize: 18,
   },
 });
 
