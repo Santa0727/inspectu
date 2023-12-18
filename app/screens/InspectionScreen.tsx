@@ -4,6 +4,8 @@ import { FontAwesome } from '@expo/vector-icons';
 import { useState } from 'react';
 import Checkbox from '../components/ui/Checkbox';
 import RadioSelect from '../components/ui/RadioSelect';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { MainStackParamList } from '../navigation/AppNavigator';
 
 const StepOneView = () => (
   <View style={{ paddingHorizontal: 10 }}>
@@ -136,8 +138,55 @@ const StepThreeView = () => (
   </View>
 );
 
-const InspectionScreen = () => {
+const StepFourView = () => (
+  <View style={{ paddingHorizontal: 10 }}>
+    <Text style={{ fontSize: 24, fontWeight: '600' }}>
+      {'Thank you for your submitting report'}
+    </Text>
+    <Text style={{ marginVertical: 10, fontSize: 19 }}>
+      {
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam accumsan accumsan lorem, nec lobortis est tincidunt vel. Donec lobortis porttitor dapibus. Praesent pretium suscipit nulla. Fusce mollis hendrerit risus vel tincidunt. Quisque mattis ac lacus non posuere. Morbi facilisis fringilla lorem ac consequat. Ut vitae consequat tortor, sit amet laoreet felis. Nunc eleifend, nunc eget laoreet faucibus, erat mi fringilla'
+      }
+    </Text>
+    <View style={{ flexDirection: 'row', paddingLeft: 10, paddingTop: 10 }}>
+      <Text style={{ fontSize: 19 }}>{'1. '}</Text>
+      <Text style={{ fontSize: 19 }}>
+        {
+          'Quisque auctor leo nec eros faucibus tincidunt et et tellus. In ut ultrices nibh'
+        }
+      </Text>
+    </View>
+    <View style={{ flexDirection: 'row', paddingLeft: 10, paddingTop: 10 }}>
+      <Text style={{ fontSize: 19 }}>{'2. '}</Text>
+      <Text style={{ fontSize: 19 }}>
+        {
+          'Donec neque ex, eleifend ut ipsum vel, finibus malesuada sapien. Quisque non dui sit amet sapien porta fringilla.'
+        }
+      </Text>
+    </View>
+    <View style={{ flexDirection: 'row', paddingLeft: 10, paddingTop: 10 }}>
+      <Text style={{ fontSize: 19 }}>{'3. '}</Text>
+      <Text style={{ fontSize: 19 }}>
+        {
+          'Aenean enim nisl, venenatis non enim bibendum, accumsan pellentesque eros. Nulla rhoncus tortor metus, ac rhoncus lacus cursus et.'
+        }
+      </Text>
+    </View>
+  </View>
+);
+
+type Props = NativeStackScreenProps<MainStackParamList, 'Inspect'>;
+
+const InspectionScreen = ({ navigation }: Props) => {
   const [step, setStep] = useState(1);
+
+  const nextClick = () => {
+    if (step >= 4) {
+      navigation.goBack();
+    } else {
+      setStep(step + 1);
+    }
+  };
 
   return (
     <MainContainer style={{ padding: 5 }}>
@@ -145,8 +194,10 @@ const InspectionScreen = () => {
         <StepOneView />
       ) : step === 2 ? (
         <StepTwoView />
-      ) : (
+      ) : step === 3 ? (
         <StepThreeView />
+      ) : (
+        <StepFourView />
       )}
       <View style={styles.steps_view}>
         <View style={styles.steps_btn}>
@@ -159,15 +210,11 @@ const InspectionScreen = () => {
           ) : (
             <View />
           )}
-          {step < 6 ? (
-            <TouchableOpacity
-              style={styles.next_btn}
-              onPress={() => setStep(Math.min(6, step + 1))}>
-              <Text style={styles.next_txt}>Next</Text>
-            </TouchableOpacity>
-          ) : (
-            <View />
-          )}
+          <TouchableOpacity style={styles.next_btn} onPress={nextClick}>
+            <Text style={styles.next_txt}>
+              {step === 4 ? 'Finish' : 'Next'}
+            </Text>
+          </TouchableOpacity>
         </View>
         <View style={styles.steps_bar}>
           <View style={styles.step_circle} />
@@ -182,14 +229,6 @@ const InspectionScreen = () => {
           <View style={step > 3 ? styles.step_line : styles.inactive_line} />
           <View
             style={step > 3 ? styles.step_circle : styles.inactive_circle}
-          />
-          <View style={step > 4 ? styles.step_line : styles.inactive_line} />
-          <View
-            style={step > 4 ? styles.step_circle : styles.inactive_circle}
-          />
-          <View style={step > 5 ? styles.step_line : styles.inactive_line} />
-          <View
-            style={step > 5 ? styles.step_circle : styles.inactive_circle}
           />
         </View>
       </View>
