@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { selectProfile } from '../store/auth/auth.selector';
 import { toastError, toastSuccess } from '../lib/helper';
 import { sendRequest } from '../config/compose';
-import { loadMyProfile } from '../store/auth/auth.actions';
+import { authLogout, loadMyProfile } from '../store/auth/auth.actions';
 
 const ProfileScreen = () => {
   const dispatch = useDispatch<any>();
@@ -146,6 +146,14 @@ const ProfileScreen = () => {
             label="Change password"
             disabled={disabled}
             onPress={updatePassword}
+          />
+        </View>
+        <View style={styles.update_btn}>
+          <TouchButton
+            label="Logout"
+            disabled={disabled}
+            scheme="danger"
+            onPress={() => dispatch(authLogout())}
           />
         </View>
       </View>

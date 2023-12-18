@@ -1,21 +1,18 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-
-interface IItem {
-  id: number;
-  location: string;
-  date: string;
-  status?: string;
-}
+import { IInspection } from '../../lib/entities';
+import { defaultDateFormat } from '../../config/helper';
 
 interface Props {
-  items: IItem[];
+  items: IInspection[];
   status: 'upcoming' | 'past';
   goToInspect: (t: 'InspectEntry' | 'PostDetail') => void;
 }
 
 const InspectsTable = ({ items, status, goToInspect }: Props) => (
   <View style={styles.table}>
-    <Text style={styles.title}>{`${status} inspections`}</Text>
+    <Text style={styles.title}>
+      {`${status === 'past' ? 'Past' : 'Upcoming'} inspections`}
+    </Text>
     <View style={styles.tbody}>
       <View style={[styles.tr, { borderTopWidth: 1 }]}>
         <TouchableOpacity style={styles.th_cell}>
@@ -35,7 +32,7 @@ const InspectsTable = ({ items, status, goToInspect }: Props) => (
       {items.map((x) => (
         <View key={x.id} style={styles.tr}>
           <View style={styles.td_cell}>
-            <Text style={styles.td_txt}>{x.location}</Text>
+            <Text style={styles.td_txt}>{x.school.name}</Text>
           </View>
           <View
             style={[
@@ -46,10 +43,18 @@ const InspectsTable = ({ items, status, goToInspect }: Props) => (
                 borderColor: '#A9A9A9',
               },
             ]}>
-            <Text style={styles.td_txt}>{x.date}</Text>
+            <Text style={styles.td_txt}>
+              {defaultDateFormat(x.date_submitted ?? x.due_date)}
+            </Text>
           </View>
           <View style={[styles.td_cell, { paddingVertical: 3 }]}>
-            {x.status ? (
+            {x.status === 'publish' ? (
+              <TouchableOpacity
+                style={styles.start_btn}
+                onPress={() => goToInspect('InspectEntry')}>
+                <Text style={styles.start_txt}>Start</Text>
+              </TouchableOpacity>
+            ) : (
               <View>
                 <Text style={[styles.td_txt, { fontSize: 15 }]}>
                   {x.status}
@@ -60,12 +65,6 @@ const InspectsTable = ({ items, status, goToInspect }: Props) => (
                   <Text style={styles.view_txt}>View</Text>
                 </TouchableOpacity>
               </View>
-            ) : (
-              <TouchableOpacity
-                style={styles.start_btn}
-                onPress={() => goToInspect('InspectEntry')}>
-                <Text style={styles.start_txt}>Start</Text>
-              </TouchableOpacity>
             )}
           </View>
         </View>

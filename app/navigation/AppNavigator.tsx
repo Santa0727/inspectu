@@ -9,7 +9,7 @@ import { selectToken } from '../store/auth/auth.selector';
 import HomeScreen from '../screens/HomeScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import { loadMyProfile } from '../store/auth/auth.actions';
-import InspectionScreen from '../screens/InspectionScreen';
+import InspectEntryScreen from '../screens/InspectEntryScreen';
 import PostDetailScreen from '../screens/PostDetailScreen';
 import {
   AuthStackParamList,
@@ -47,7 +47,7 @@ const InspectNavigator = () => (
     <InspectStack.Screen
       options={{ headerShown: false }}
       name="InspectEntry"
-      component={InspectionScreen}
+      component={InspectEntryScreen}
     />
     <InspectStack.Screen
       options={{ headerShown: false }}

@@ -177,7 +177,7 @@ const StepFourView = () => (
 
 type Props = NativeStackScreenProps<InspectStackParamList, 'InspectEntry'>;
 
-const InspectionScreen = ({ navigation }: Props) => {
+const InspectEntryScreen = ({ navigation }: Props) => {
   const [step, setStep] = useState(1);
 
   const nextClick = () => {
@@ -317,4 +317,4 @@ const cardStyle = StyleSheet.create({
   },
 });
 
-export default InspectionScreen;
+export default InspectEntryScreen;
