@@ -14,47 +14,59 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { MainStackParamList } from '../../navigation/AppNavigator';
 
-type Props = PropsWithChildren<{ style?: StyleProp<ViewStyle> }>;
+type Props = PropsWithChildren<{
+  style?: StyleProp<ViewStyle>;
+}>;
 
-const MainContainer = ({ children, style }: Props) => (
-  <KeyboardAvoidingView
-    style={styles.wrapper}
-    behavior={Platform.OS === 'android' ? 'height' : 'padding'}>
-    <View style={styles.header}>
-      <TouchableOpacity style={styles.header_logo}>
-        <Image
-          source={require('../../images/header-logo.png')}
-          style={styles.header_img}
-        />
-      </TouchableOpacity>
-      <View style={styles.header_icons}>
-        <TouchableOpacity style={styles.header_btn}>
-          <Ionicons name="notifications" size={45} color="black" />
+const MainContainer = ({ children, style }: Props) => {
+  const navigation = useNavigation<NavigationProp<MainStackParamList>>();
+
+  return (
+    <KeyboardAvoidingView
+      style={styles.wrapper}
+      behavior={Platform.OS === 'android' ? 'height' : 'padding'}>
+      <View style={styles.header}>
+        <TouchableOpacity
+          style={styles.header_logo}
+          onPress={() => navigation.navigate('Home')}>
+          <Image
+            source={require('../../images/header-logo.png')}
+            style={styles.header_img}
+          />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.header_btn}>
-          <FontAwesome name="user-circle" size={42} color="black" />
+        <View style={styles.header_icons}>
+          <TouchableOpacity style={styles.header_btn}>
+            <Ionicons name="notifications" size={45} color="black" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.header_btn}
+            onPress={() => navigation.navigate('Profile')}>
+            <FontAwesome name="user-circle" size={42} color="black" />
+          </TouchableOpacity>
+        </View>
+      </View>
+      <ScrollView style={styles.scroll} keyboardShouldPersistTaps={'always'}>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <View style={style}>{children}</View>
+        </TouchableWithoutFeedback>
+      </ScrollView>
+      <View style={styles.footer}>
+        <TouchableOpacity style={[styles.footer_btn, styles.footer_left]}>
+          <Text style={styles.footer_txt}>Inspections</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={[styles.footer_btn, styles.footer_center]}>
+          <Text style={styles.footer_txt}>Schedule</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={[styles.footer_btn, styles.footer_right]}>
+          <Text style={styles.footer_txt}>Help</Text>
         </TouchableOpacity>
       </View>
-    </View>
-    <ScrollView style={styles.scroll} keyboardShouldPersistTaps={'always'}>
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={style}>{children}</View>
-      </TouchableWithoutFeedback>
-    </ScrollView>
-    <View style={styles.footer}>
-      <TouchableOpacity style={[styles.footer_btn, styles.footer_left]}>
-        <Text style={styles.footer_txt}>Inspections</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={[styles.footer_btn, styles.footer_center]}>
-        <Text style={styles.footer_txt}>Schedule</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={[styles.footer_btn, styles.footer_right]}>
-        <Text style={styles.footer_txt}>Help</Text>
-      </TouchableOpacity>
-    </View>
-  </KeyboardAvoidingView>
-);
+    </KeyboardAvoidingView>
+  );
+};
 
 const styles = StyleSheet.create({
   wrapper: {

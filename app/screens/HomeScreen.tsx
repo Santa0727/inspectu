@@ -31,9 +31,13 @@ const HomeScreen = ({ navigation }: Props) => (
     <InspectsTable
       items={upcoming_demo}
       status="upcoming"
-      goToInspect={() => navigation.navigate('Inspect')}
+      goToInspect={(t) => navigation.navigate(t)}
     />
-    <InspectsTable items={past_demo} status="past" />
+    <InspectsTable
+      items={past_demo}
+      status="past"
+      goToInspect={(t) => navigation.navigate(t)}
+    />
   </MainContainer>
 );
 
