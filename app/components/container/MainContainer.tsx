@@ -54,10 +54,14 @@ const MainContainer = ({ children, style }: Props) => {
         </TouchableWithoutFeedback>
       </ScrollView>
       <View style={styles.footer}>
-        <TouchableOpacity style={[styles.footer_btn, styles.footer_left]}>
+        <TouchableOpacity
+          style={[styles.footer_btn, styles.footer_left]}
+          onPress={() => navigation.navigate('Inspect')}>
           <Text style={styles.footer_txt}>Inspections</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.footer_btn, styles.footer_center]}>
+        <TouchableOpacity
+          style={[styles.footer_btn, styles.footer_center]}
+          onPress={() => navigation.navigate('Schedule')}>
           <Text style={styles.footer_txt}>Schedule</Text>
         </TouchableOpacity>
         <TouchableOpacity style={[styles.footer_btn, styles.footer_right]}>

@@ -16,6 +16,7 @@ import {
   InspectStackParamList,
   MainStackParamList,
 } from './AppStackParams';
+import ScheduleScreen from '../screens/ScheduleScreen';
 
 const AuthStack = createNativeStackNavigator<AuthStackParamList>();
 
@@ -76,6 +77,11 @@ const MainNavigator = () => {
         name="Profile"
         options={{ headerShown: false, drawerLabel: 'Profile' }}
         component={ProfileScreen}
+      />
+      <MainStack.Screen
+        name="Schedule"
+        options={{ headerShown: false, drawerLabel: 'Schedule' }}
+        component={ScheduleScreen}
       />
     </MainStack.Navigator>
   );

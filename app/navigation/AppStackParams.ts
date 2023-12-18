@@ -12,4 +12,5 @@ export type InspectStackParamList = {
 export type MainStackParamList = {
   Inspect: undefined;
   Profile: undefined;
+  Schedule: undefined;
 };
