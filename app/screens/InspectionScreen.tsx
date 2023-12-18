@@ -3,6 +3,7 @@ import MainContainer from '../components/container/MainContainer';
 import { FontAwesome } from '@expo/vector-icons';
 import { useState } from 'react';
 import Checkbox from '../components/ui/Checkbox';
+import RadioSelect from '../components/ui/RadioSelect';
 
 const StepOneView = () => (
   <View style={{ paddingHorizontal: 10 }}>
@@ -94,6 +95,11 @@ const StepTwoView = () => (
   </View>
 );
 
+const radioOptions = [
+  { id: 1, label: 'This one' },
+  { id: 2, label: 'Or this one' },
+];
+
 const StepThreeView = () => (
   <View>
     <View
@@ -120,6 +126,12 @@ const StepThreeView = () => (
       </Text>
       <Checkbox value={true} label="I confirm that this is checked" />
       <Checkbox value={false} label="I confirm that this is checked" />
+    </View>
+    <View style={{ marginVertical: 10, paddingHorizontal: 10 }}>
+      <Text style={{ fontSize: 21, fontWeight: '600', marginBottom: 5 }}>
+        {'Which one it is'}
+      </Text>
+      <RadioSelect options={radioOptions} value={1} />
     </View>
   </View>
 );
