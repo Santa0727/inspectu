@@ -10,7 +10,7 @@ interface IItem {
 interface Props {
   items: IItem[];
   status: 'upcoming' | 'past';
-  goToInspect: (t: 'Inspect' | 'PostDetail') => void;
+  goToInspect: (t: 'InspectEntry' | 'PostDetail') => void;
 }
 
 const InspectsTable = ({ items, status, goToInspect }: Props) => (
@@ -63,7 +63,7 @@ const InspectsTable = ({ items, status, goToInspect }: Props) => (
             ) : (
               <TouchableOpacity
                 style={styles.start_btn}
-                onPress={() => goToInspect('Inspect')}>
+                onPress={() => goToInspect('InspectEntry')}>
                 <Text style={styles.start_txt}>Start</Text>
               </TouchableOpacity>
             )}

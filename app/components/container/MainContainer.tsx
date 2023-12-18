@@ -15,7 +15,7 @@ import {
   ViewStyle,
 } from 'react-native';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
-import { MainStackParamList } from '../../navigation/AppNavigator';
+import { MainStackParamList } from '../../navigation/AppStackParams';
 
 type Props = PropsWithChildren<{
   style?: StyleProp<ViewStyle>;
@@ -31,7 +31,7 @@ const MainContainer = ({ children, style }: Props) => {
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.header_logo}
-          onPress={() => navigation.navigate('Home')}>
+          onPress={() => navigation.navigate('Inspect')}>
           <Image
             source={require('../../images/header-logo.png')}
             style={styles.header_img}

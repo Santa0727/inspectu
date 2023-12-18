@@ -3,11 +3,11 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Input from '../components/ui/Input';
 import TouchButton from '../components/ui/TouchButton';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { AuthStackParamList } from '../navigation/AppNavigator';
 import { useDispatch } from 'react-redux';
 import { isEmailFormat } from '../config/helper';
 import { authLogin } from '../store/auth/auth.actions';
 import AppContainer from '../components/container/AppContainer';
+import { AuthStackParamList } from '../navigation/AppStackParams';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'SignIn'>;
 

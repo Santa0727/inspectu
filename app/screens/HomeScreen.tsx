@@ -1,7 +1,7 @@
-import { MainStackParamList } from '../navigation/AppNavigator';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import MainContainer from '../components/container/MainContainer';
 import InspectsTable from '../components/manage/InspectsTable';
+import { InspectStackParamList } from '../navigation/AppStackParams';
 
 const upcoming_demo = [
     { id: 1, location: 'School A', date: '23-10-2023' },
@@ -24,7 +24,7 @@ const upcoming_demo = [
     },
   ];
 
-type Props = NativeStackScreenProps<MainStackParamList, 'Home'>;
+type Props = NativeStackScreenProps<InspectStackParamList, 'Inspections'>;
 
 const HomeScreen = ({ navigation }: Props) => (
   <MainContainer>

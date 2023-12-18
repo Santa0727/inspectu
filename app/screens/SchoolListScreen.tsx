@@ -1,5 +1,3 @@
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { MainStackParamList } from '../navigation/AppNavigator';
 import MainContainer from '../components/container/MainContainer';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
@@ -62,9 +60,7 @@ const SchoolCard = ({ school, onEditClick, loadData }: CardProps) => {
   );
 };
 
-type Props = NativeStackScreenProps<MainStackParamList, 'Schools'>;
-
-const SchoolListScreen = ({ navigation }: Props) => {
+const SchoolListScreen = () => {
   const dispatch = useDispatch<any>();
   const schools = useSelector(selectSchools);
 

@@ -1,4 +1,6 @@
+import { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
+import { createDrawerNavigator } from '@react-navigation/drawer';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
@@ -6,19 +8,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { selectToken } from '../store/auth/auth.selector';
 import HomeScreen from '../screens/HomeScreen';
 import ProfileScreen from '../screens/ProfileScreen';
-import UserListScreen from '../screens/UserListScreen';
-import { IUser } from '../lib/entities';
-import UserDetailScreen from '../screens/UserDetailScreen';
-import { useEffect } from 'react';
 import { loadMyProfile } from '../store/auth/auth.actions';
-import SchoolListScreen from '../screens/SchoolListScreen';
 import InspectionScreen from '../screens/InspectionScreen';
 import PostDetailScreen from '../screens/PostDetailScreen';
-
-export type AuthStackParamList = {
-  SignIn: undefined;
-  SignUp: undefined;
-};
+import {
+  AuthStackParamList,
+  InspectStackParamList,
+  MainStackParamList,
+} from './AppStackParams';
 
 const AuthStack = createNativeStackNavigator<AuthStackParamList>();
 
@@ -37,17 +34,29 @@ const AuthNavigator = () => (
   </AuthStack.Navigator>
 );
 
-export type MainStackParamList = {
-  Home: undefined;
-  Profile: undefined;
-  Users: undefined;
-  UserDetail: { user: IUser };
-  Schools: undefined;
-  Inspect: undefined;
-  PostDetail: undefined;
-};
+const InspectStack = createNativeStackNavigator<InspectStackParamList>();
 
-const MainStack = createNativeStackNavigator<MainStackParamList>();
+const InspectNavigator = () => (
+  <InspectStack.Navigator>
+    <InspectStack.Screen
+      options={{ headerShown: false }}
+      name="Inspections"
+      component={HomeScreen}
+    />
+    <InspectStack.Screen
+      options={{ headerShown: false }}
+      name="InspectEntry"
+      component={InspectionScreen}
+    />
+    <InspectStack.Screen
+      options={{ headerShown: false }}
+      name="PostDetail"
+      component={PostDetailScreen}
+    />
+  </InspectStack.Navigator>
+);
+
+const MainStack = createDrawerNavigator<MainStackParamList>();
 
 const MainNavigator = () => {
   const dispatch = useDispatch<any>();
@@ -59,39 +68,14 @@ const MainNavigator = () => {
   return (
     <MainStack.Navigator>
       <MainStack.Screen
-        options={{ headerShown: false }}
-        name="Home"
-        component={HomeScreen}
-      />
-      <MainStack.Screen
-        options={{ headerShown: false }}
-        name="Profile"
-        component={ProfileScreen}
-      />
-      <MainStack.Screen
-        options={{ headerShown: true }}
-        name="Users"
-        component={UserListScreen}
-      />
-      <MainStack.Screen
-        options={{ headerShown: true }}
-        name="UserDetail"
-        component={UserDetailScreen}
-      />
-      <MainStack.Screen
-        options={{ headerShown: true }}
-        name="Schools"
-        component={SchoolListScreen}
-      />
-      <MainStack.Screen
-        options={{ headerShown: false }}
         name="Inspect"
-        component={InspectionScreen}
+        options={{ headerShown: false, drawerLabel: 'Inspections' }}
+        component={InspectNavigator}
       />
       <MainStack.Screen
-        options={{ headerShown: false }}
-        name="PostDetail"
-        component={PostDetailScreen}
+        name="Profile"
+        options={{ headerShown: false, drawerLabel: 'Profile' }}
+        component={ProfileScreen}
       />
     </MainStack.Navigator>
   );

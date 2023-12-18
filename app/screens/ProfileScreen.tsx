@@ -1,19 +1,15 @@
 import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import Input from '../components/ui/Input';
 import MainContainer from '../components/container/MainContainer';
 import TouchButton from '../components/ui/TouchButton';
-import { MainStackParamList } from '../navigation/AppNavigator';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectProfile } from '../store/auth/auth.selector';
 import { toastError, toastSuccess } from '../lib/helper';
 import { sendRequest } from '../config/compose';
 import { loadMyProfile } from '../store/auth/auth.actions';
 
-type Props = NativeStackScreenProps<MainStackParamList, 'Profile'>;
-
-const ProfileScreen = ({ navigation }: Props) => {
+const ProfileScreen = () => {
   const dispatch = useDispatch<any>();
   const profile = useSelector(selectProfile);
 

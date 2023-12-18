@@ -1,11 +1,11 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { MainStackParamList } from '../navigation/AppNavigator';
 import MainContainer from '../components/container/MainContainer';
 import { FontAwesome, FontAwesome5 } from '@expo/vector-icons';
 import TouchButton from '../components/ui/TouchButton';
+import { InspectStackParamList } from '../navigation/AppStackParams';
 
-type Props = NativeStackScreenProps<MainStackParamList, 'PostDetail'>;
+type Props = NativeStackScreenProps<InspectStackParamList, 'PostDetail'>;
 
 const PostDetailScreen = ({ navigation }: Props) => (
   <MainContainer style={{ padding: 10 }}>

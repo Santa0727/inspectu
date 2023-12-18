@@ -5,7 +5,7 @@ import { useState } from 'react';
 import Checkbox from '../components/ui/Checkbox';
 import RadioSelect from '../components/ui/RadioSelect';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { MainStackParamList } from '../navigation/AppNavigator';
+import { InspectStackParamList } from '../navigation/AppStackParams';
 
 const StepOneView = () => (
   <View style={{ paddingHorizontal: 10 }}>
@@ -175,7 +175,7 @@ const StepFourView = () => (
   </View>
 );
 
-type Props = NativeStackScreenProps<MainStackParamList, 'Inspect'>;
+type Props = NativeStackScreenProps<InspectStackParamList, 'InspectEntry'>;
 
 const InspectionScreen = ({ navigation }: Props) => {
   const [step, setStep] = useState(1);
