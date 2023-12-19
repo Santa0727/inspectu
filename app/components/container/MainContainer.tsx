@@ -64,7 +64,9 @@ const MainContainer = ({ children, style }: Props) => {
           onPress={() => navigation.navigate('Schedule')}>
           <Text style={styles.footer_txt}>Schedule</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.footer_btn, styles.footer_right]}>
+        <TouchableOpacity
+          style={[styles.footer_btn, styles.footer_right]}
+          onPress={() => navigation.navigate('Help')}>
           <Text style={styles.footer_txt}>Help</Text>
         </TouchableOpacity>
       </View>

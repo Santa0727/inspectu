@@ -84,6 +84,10 @@ const ProfileScreen = () => {
       toastSuccess(res.data?.message ?? 'Success');
     }
   };
+  const logoutClick = async () => {
+    setDisabled(true);
+    await dispatch(authLogout());
+  };
 
   return (
     <MainContainer>
@@ -153,7 +157,7 @@ const ProfileScreen = () => {
             label="Logout"
             disabled={disabled}
             scheme="danger"
-            onPress={() => dispatch(authLogout())}
+            onPress={logoutClick}
           />
         </View>
       </View>

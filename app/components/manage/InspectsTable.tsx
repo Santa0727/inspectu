@@ -2,10 +2,16 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { IInspection } from '../../lib/entities';
 import { defaultDateFormat } from '../../config/helper';
 
+const labels = {
+  publish: 'Publish',
+  pending_review: 'Pending review',
+  review_required: 'Review required',
+};
+
 interface Props {
   items: IInspection[];
   status: 'upcoming' | 'past';
-  goToInspect: (t: 'InspectEntry' | 'PostDetail') => void;
+  goToInspect: (t: 'InspectEntry' | 'PostDetail', id: number) => void;
 }
 
 const InspectsTable = ({ items, status, goToInspect }: Props) => (
@@ -32,7 +38,7 @@ const InspectsTable = ({ items, status, goToInspect }: Props) => (
       {items.map((x) => (
         <View key={x.id} style={styles.tr}>
           <View style={styles.td_cell}>
-            <Text style={styles.td_txt}>{x.school.name}</Text>
+            <Text style={styles.td_txt}>{x.name}</Text>
           </View>
           <View
             style={[
@@ -43,25 +49,23 @@ const InspectsTable = ({ items, status, goToInspect }: Props) => (
                 borderColor: '#A9A9A9',
               },
             ]}>
-            <Text style={styles.td_txt}>
-              {defaultDateFormat(x.date_submitted ?? x.due_date)}
-            </Text>
+            <Text style={styles.td_txt}>{defaultDateFormat(x.due_date)}</Text>
           </View>
           <View style={[styles.td_cell, { paddingVertical: 3 }]}>
             {x.status === 'publish' ? (
               <TouchableOpacity
                 style={styles.start_btn}
-                onPress={() => goToInspect('InspectEntry')}>
+                onPress={() => goToInspect('InspectEntry', x.id)}>
                 <Text style={styles.start_txt}>Start</Text>
               </TouchableOpacity>
             ) : (
               <View>
                 <Text style={[styles.td_txt, { fontSize: 15 }]}>
-                  {x.status}
+                  {labels[x.status] ?? x.status}
                 </Text>
                 <TouchableOpacity
                   style={styles.view_btn}
-                  onPress={() => goToInspect('PostDetail')}>
+                  onPress={() => goToInspect('PostDetail', x.id)}>
                   <Text style={styles.view_txt}>View</Text>
                 </TouchableOpacity>
               </View>

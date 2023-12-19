@@ -5,12 +5,13 @@ export type AuthStackParamList = {
 
 export type InspectStackParamList = {
   Inspections: undefined;
-  InspectEntry: undefined;
-  PostDetail: undefined;
+  InspectEntry: { inspectID: number };
+  PostDetail: { inspectID: number };
 };
 
 export type MainStackParamList = {
   Inspect: undefined;
   Profile: undefined;
   Schedule: undefined;
+  Help: undefined;
 };

@@ -12,19 +12,24 @@ type Props = NativeStackScreenProps<InspectStackParamList, 'Inspections'>;
 
 const HomeScreen = ({ navigation }: Props) => {
   const [loading, setLoading] = useState(false);
-  const [items, setItems] = useState<IInspection[]>();
+  const [comingItems, setComingItems] = useState<IInspection[]>();
+  const [pastItems, setPastItems] = useState<IInspection[]>();
 
   const loadData = useCallback(() => {
     setLoading(true);
-    sendRequest('api/inspections', {}, 'GET').then((res) => {
+    sendRequest('api/member/inspections', {}, 'GET').then((res) => {
       if (res.status) {
-        setItems(res.data);
+        setComingItems(res.data.coming);
+        setPastItems(res.data.passed);
         setLoading(false);
       } else {
         alert(res.message ?? 'Server error');
       }
     });
   }, []);
+
+  const goToDetail = (t: 'InspectEntry' | 'PostDetail', id: number) =>
+    navigation.navigate(t, { inspectID: id });
 
   useFocusEffect(loadData);
 
@@ -37,14 +42,14 @@ const HomeScreen = ({ navigation }: Props) => {
       ) : (
         <>
           <InspectsTable
-            items={items?.filter((x) => x.status === 'publish') ?? []}
+            items={comingItems ?? []}
             status="upcoming"
-            goToInspect={(t) => navigation.navigate(t)}
+            goToInspect={(t, id) => goToDetail(t, id)}
           />
           <InspectsTable
-            items={items?.filter((x) => x.status !== 'publish') ?? []}
+            items={pastItems ?? []}
             status="past"
-            goToInspect={(t) => navigation.navigate(t)}
+            goToInspect={(t, id) => goToDetail(t, id)}
           />
         </>
       )}

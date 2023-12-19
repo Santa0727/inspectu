@@ -17,6 +17,7 @@ import {
   MainStackParamList,
 } from './AppStackParams';
 import ScheduleScreen from '../screens/ScheduleScreen';
+import HelpScreen from '../screens/HelpScreen';
 
 const AuthStack = createNativeStackNavigator<AuthStackParamList>();
 
@@ -82,6 +83,11 @@ const MainNavigator = () => {
         name="Schedule"
         options={{ headerShown: false, drawerLabel: 'Schedule' }}
         component={ScheduleScreen}
+      />
+      <MainStack.Screen
+        name="Help"
+        options={{ headerShown: false, drawerLabel: 'Help' }}
+        component={HelpScreen}
       />
     </MainStack.Navigator>
   );
