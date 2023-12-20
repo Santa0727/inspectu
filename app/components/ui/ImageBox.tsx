@@ -15,11 +15,12 @@ const options: ImagePicker.ImagePickerOptions = {
 
 interface Props {
   image?: string;
+  disabled?: boolean;
   onChange?: (d: string) => void;
   style?: StyleProp<ViewStyle>;
 }
 
-const ImageBox = ({ image, onChange, style }: Props) => {
+const ImageBox = ({ image, disabled, onChange, style }: Props) => {
   const onOpenCamera = async () => {
     const status = await ImagePicker.requestCameraPermissionsAsync();
     if (!status.granted) {
@@ -53,7 +54,10 @@ const ImageBox = ({ image, onChange, style }: Props) => {
 
   return (
     <View style={[styles.wrapper, style]}>
-      <TouchableOpacity style={styles.touch_img} onPress={onOpenCamera}>
+      <TouchableOpacity
+        style={styles.touch_img}
+        onPress={onOpenCamera}
+        disabled={disabled}>
         <Image
           resizeMode="cover"
           style={styles.image}

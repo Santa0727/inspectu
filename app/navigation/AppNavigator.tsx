@@ -2,15 +2,15 @@ import { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import LoginScreen from '../screens/LoginScreen';
-import RegisterScreen from '../screens/RegisterScreen';
+import LoginScreen from '../screens/auth/LoginScreen';
+import RegisterScreen from '../screens/auth/RegisterScreen';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectToken } from '../store/auth/auth.selector';
 import HomeScreen from '../screens/HomeScreen';
-import ProfileScreen from '../screens/ProfileScreen';
+import ProfileScreen from '../screens/auth/ProfileScreen';
 import { loadMyProfile } from '../store/auth/auth.actions';
-import InspectEntryScreen from '../screens/InspectEntryScreen';
-import PostDetailScreen from '../screens/PostDetailScreen';
+import InspectEntryScreen from '../screens/inspect/InspectEntryScreen';
+import PostDetailScreen from '../screens/inspect/PostDetailScreen';
 import {
   AuthStackParamList,
   InspectStackParamList,
@@ -18,6 +18,7 @@ import {
 } from './AppStackParams';
 import ScheduleScreen from '../screens/ScheduleScreen';
 import HelpScreen from '../screens/HelpScreen';
+import InspectReviewScreen from '../screens/inspect/InspectReviewScreen';
 
 const AuthStack = createNativeStackNavigator<AuthStackParamList>();
 
@@ -54,6 +55,11 @@ const InspectNavigator = () => (
       options={{ headerShown: false }}
       name="PostDetail"
       component={PostDetailScreen}
+    />
+    <InspectStack.Screen
+      options={{ headerShown: false }}
+      name="InspectReview"
+      component={InspectReviewScreen}
     />
   </InspectStack.Navigator>
 );

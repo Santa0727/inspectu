@@ -7,6 +7,7 @@ export type InspectStackParamList = {
   Inspections: undefined;
   InspectEntry: { inspectID: number };
   PostDetail: { inspectID: number };
+  InspectReview: { inspectID: number; stepID: string };
 };
 
 export type MainStackParamList = {

@@ -13,13 +13,15 @@ interface Props {
   onChange?: (c: boolean) => void;
   label: string;
   style?: StyleProp<ViewStyle>;
+  disabled?: boolean;
 }
 
-const Checkbox = ({ value, onChange, label, style }: Props) => (
+const Checkbox = ({ value, onChange, label, style, disabled }: Props) => (
   <View style={style}>
     <TouchableOpacity
       style={styles.touch_view}
-      onPress={() => onChange && onChange(!value)}>
+      onPress={() => onChange && onChange(!value)}
+      disabled={disabled}>
       {value ? (
         <MaterialCommunityIcons
           name="checkbox-outline"

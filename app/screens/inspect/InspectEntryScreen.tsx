@@ -1,123 +1,25 @@
 import {
   ActivityIndicator,
-  Image,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
-import MainContainer from '../components/container/MainContainer';
-import { FontAwesome } from '@expo/vector-icons';
+import MainContainer from '../../components/container/MainContainer';
 import { useCallback, useState } from 'react';
-import Checkbox from '../components/ui/Checkbox';
-import RadioSelect from '../components/ui/RadioSelect';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { InspectStackParamList } from '../navigation/AppStackParams';
-import { sendRequest } from '../config/compose';
+import { InspectStackParamList } from '../../navigation/AppStackParams';
+import { sendRequest } from '../../config/compose';
 import { useFocusEffect } from '@react-navigation/native';
 import HTMLView from 'react-native-htmlview';
-import ImageBox from '../components/ui/ImageBox';
-
-interface IStep {
-  id: string;
-  name: string;
-  text: string;
-  type: 'multipleimage' | 'checkbox' | 'radio';
-  options: Array<{ id: string; name: string }>;
-}
+import InspectStep from '../../components/manage/InspectStep';
+import { IInspectStep } from '../../lib/entities';
 
 interface IEntry {
   first: string;
-  steps: IStep[];
+  steps: IInspectStep[];
   last: string;
 }
-
-interface FormProps {
-  form: any;
-  setForm: (d: any) => void;
-  step: IStep;
-}
-
-const StepForm = ({ form, setForm, step }: FormProps) => {
-  const changeImage = (id: string, img: string) => {
-    setForm({ ...form, [id]: img });
-  };
-  const toggleCheck = (id: string, c: boolean) => {
-    setForm({ ...form, [id]: c });
-  };
-  const selectRadio = (c: string) => {
-    const v = step.options.find((x) => !!form[x.id]);
-    let tmp = { ...form };
-    if (v) {
-      tmp[v.id] = false;
-    }
-    tmp[c] = true;
-    setForm(tmp);
-  };
-
-  return (
-    <View>
-      <View
-        style={{
-          flexDirection: 'row',
-          borderColor: '#d1d1d1',
-          borderBottomWidth: 1,
-          marginHorizontal: 20,
-          alignItems: 'center',
-          paddingBottom: 10,
-        }}>
-        <FontAwesome name="home" size={30} />
-        <View style={{ marginLeft: 10 }}>
-          <Text style={{ fontSize: 22, fontWeight: '500' }}>Location</Text>
-          <Text style={{ fontSize: 18, fontWeight: '400' }}>{step.name}</Text>
-        </View>
-      </View>
-      <HTMLView
-        style={{ marginVertical: 20, marginHorizontal: 10 }}
-        value={step.text}
-      />
-      {step.type === 'multipleimage' ? (
-        step.options.map((x) => (
-          <View key={x.id} style={cardStyle.card}>
-            <ImageBox
-              image={form[x.id] ?? undefined}
-              onChange={(m) => changeImage(x.id, m)}
-            />
-            <View style={cardStyle.name_view}>
-              <Text style={cardStyle.time}>{x.name}</Text>
-              <Text style={cardStyle.name}>{''}</Text>
-            </View>
-          </View>
-        ))
-      ) : step.type === 'checkbox' ? (
-        <View style={{ marginVertical: 10, paddingHorizontal: 10 }}>
-          <Text style={{ fontSize: 21, fontWeight: '600', marginBottom: 5 }}>
-            {'Did you check this'}
-          </Text>
-          {step.options.map((x) => (
-            <Checkbox
-              key={x.id}
-              value={form[x.id] ?? false}
-              label={x.name}
-              onChange={(c) => toggleCheck(x.id, c)}
-            />
-          ))}
-        </View>
-      ) : (
-        <View style={{ marginVertical: 10, paddingHorizontal: 10 }}>
-          <Text style={{ fontSize: 21, fontWeight: '600', marginBottom: 5 }}>
-            {'Which one it is'}
-          </Text>
-          <RadioSelect
-            options={step.options.map((x) => ({ id: x.id, label: x.name }))}
-            value={step.options.find((x) => !!form[x.id])?.id}
-            onChange={(c) => selectRadio(c.toString())}
-          />
-        </View>
-      )}
-    </View>
-  );
-};
 
 const StepSector = ({ isActive }: { isActive: boolean }) => (
   <>
@@ -216,21 +118,25 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
                 <HTMLView style={{ marginTop: 10 }} value={entry.last} />
               </View>
             ) : (
-              <StepForm
+              <InspectStep
                 form={form}
                 setForm={setForm}
-                step={entry.steps[step - 1]}
+                data={entry.steps[step - 1]}
               />
             )}
           </View>
           <View style={styles.steps_view}>
             <View style={styles.steps_btn}>
-              {step > 0 && step <= entry.steps.length ? (
+              {step <= entry.steps.length ? (
                 <TouchableOpacity
                   style={[styles.next_btn, disabled ? styles.disabled : {}]}
-                  onPress={() => setStep(Math.max(0, step - 1))}
+                  onPress={() =>
+                    step <= 0 ? navigation.goBack() : setStep(step - 1)
+                  }
                   disabled={disabled}>
-                  <Text style={styles.next_txt}>Previous</Text>
+                  <Text style={styles.next_txt}>
+                    {step <= 0 ? 'Go Back' : 'Previous'}
+                  </Text>
                 </TouchableOpacity>
               ) : (
                 <View />
@@ -322,32 +228,6 @@ const styles = StyleSheet.create({
   },
   disabled: {
     backgroundColor: '#737373',
-  },
-});
-
-const cardStyle = StyleSheet.create({
-  card: {
-    borderWidth: 3,
-    borderColor: '#d1d1d1',
-    flexDirection: 'row',
-    marginVertical: 8,
-  },
-  img: {
-    width: 150,
-    height: 95,
-    resizeMode: 'contain',
-  },
-  name_view: {
-    flex: 1,
-    padding: 10,
-    justifyContent: 'center',
-  },
-  time: {
-    fontSize: 22,
-    fontWeight: '600',
-  },
-  name: {
-    fontSize: 18,
   },
 });
 

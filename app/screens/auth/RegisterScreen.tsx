@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import Input from '../components/ui/Input';
-import TouchButton from '../components/ui/TouchButton';
+import Input from '../../components/ui/Input';
+import TouchButton from '../../components/ui/TouchButton';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useDispatch } from 'react-redux';
-import { isEmailFormat } from '../config/helper';
-import { authRegister } from '../store/auth/auth.actions';
-import AppContainer from '../components/container/AppContainer';
-import { AuthStackParamList } from '../navigation/AppStackParams';
+import { isEmailFormat } from '../../config/helper';
+import { authRegister } from '../../store/auth/auth.actions';
+import AppContainer from '../../components/container/AppContainer';
+import { AuthStackParamList } from '../../navigation/AppStackParams';
 
 interface IForm {
   name: string;

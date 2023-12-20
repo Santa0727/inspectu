@@ -13,9 +13,10 @@ interface Props {
   options: Array<{ id: string | number; label: string }>;
   onChange?: (v: string | number) => void;
   style?: StyleProp<ViewStyle>;
+  disabled?: boolean;
 }
 
-const RadioSelect = ({ value, options, onChange, style }: Props) => (
+const RadioSelect = ({ value, options, onChange, style, disabled }: Props) => (
   <View style={style}>
     {options.map((x) => (
       <TouchableOpacity

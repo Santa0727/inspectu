@@ -23,3 +23,25 @@ export interface IInspection {
   status: 'publish' | 'pending_review' | 'review_required';
   due_date: string;
 }
+
+interface IOption {
+  id: string;
+  name: string;
+  answer?: string | boolean;
+}
+
+interface ICheck {
+  id: string;
+  name: string;
+  checked: boolean;
+}
+
+export interface IInspectStep {
+  id: string;
+  name: string;
+  text: string;
+  type: 'multipleimage' | 'checkbox' | 'radio';
+  options: IOption[];
+  checklist?: ICheck[];
+  status?: 'approved' | 'error' | 'clarify';
+}
