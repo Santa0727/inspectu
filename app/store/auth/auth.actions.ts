@@ -10,6 +10,8 @@ export const loadMyProfile = () => {
   return async (dispatch: Dispatch<any>) => {
     const response = await sendRequest('api/member/self', {}, 'GET');
     if (!response.status) {
+      dispatch(setAuth({ type: 'AUTH/LOGOUT' }));
+
       return response.message ?? 'Server error';
     }
     dispatch(setAuth({ type: 'AUTH/SET_PROFILE', payload: response.data }));
