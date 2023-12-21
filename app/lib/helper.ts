@@ -15,3 +15,5 @@ export const toastSuccess = (message: string) =>
     opacity: 0.95,
     position: 100,
   });
+
+export const zeroPad = (num: number) => String(num).padStart(2, '0');
