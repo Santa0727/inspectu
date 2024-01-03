@@ -33,8 +33,6 @@ const InspectStep = ({ form, setForm, stepsIntro, data }: Props) => {
     let tmp = { ...form };
     const q = data.questions.find((x) => x.id === qID);
 
-    console.log(q);
-
     q?.options.forEach((e) => {
       tmp[e.id] = false;
     });
