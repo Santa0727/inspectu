@@ -45,3 +45,21 @@ export interface IInspectStep {
   checklist?: ICheck[];
   status?: 'approved' | 'error' | 'clarify';
 }
+
+interface IQuestion {
+  id: string;
+  name: string;
+  type: 'radio' | 'checkbox';
+  text: string;
+  options: Array<{ id: string; name: string }>;
+}
+
+export interface IEntryStep {
+  id: string;
+  name: string;
+  options: {
+    id: string;
+    type: 'image';
+  };
+  questions: IQuestion[];
+}

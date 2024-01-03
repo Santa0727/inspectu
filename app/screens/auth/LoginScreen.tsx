@@ -14,8 +14,8 @@ type Props = NativeStackScreenProps<AuthStackParamList, 'SignIn'>;
 const LoginScreen = ({ navigation }: Props) => {
   const dispatch = useDispatch<any>();
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('inspector@sfh.com');
+  const [password, setPassword] = useState('Futurelab2023+');
   const [valid, setValid] = useState({ email: '', password: '' });
   const [disabled, setDisabled] = useState(false);
   const [hidePass, setHidePass] = useState(true);

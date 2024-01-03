@@ -1,33 +1,35 @@
 import { FontAwesome } from '@expo/vector-icons';
 import { StyleSheet, Text, View } from 'react-native';
 import HTMLView from 'react-native-htmlview';
-import { IInspectStep } from '../../lib/entities';
+import { IEntryStep } from '../../lib/entities';
 import ImageBox from '../ui/ImageBox';
 import RadioSelect from '../ui/RadioSelect';
 import Checkbox from '../ui/Checkbox';
 
 interface Props {
   form?: any;
+  stepsIntro?: string | null;
   setForm?: (d: any) => void;
-  data: IInspectStep;
+  data: IEntryStep;
 }
 
-const InspectStep = ({ form, setForm, data }: Props) => {
+const InspectStep = ({ form, setForm, stepsIntro, data }: Props) => {
   const disabled = !setForm;
 
-  const changeImage = (id: string, img: string) => {
-    if (setForm) setForm({ ...form, [id]: img });
+  const changeImage = (img: string) => {
+    if (setForm) setForm({ ...form, [data.options.id]: img });
   };
   const toggleCheck = (id: string, c: boolean) => {
     if (setForm) setForm({ ...form, [id]: c });
   };
-  const selectRadio = (c: string) => {
-    const v = data.options.find((x) => !!form[x.id]);
+  const selectRadio = (qID: string, c: string) => {
     let tmp = { ...form };
-    if (v) {
-      tmp[v.id] = false;
-    }
+    const q = data.questions.find((x) => x.id === qID);
+    q?.options.forEach((e) => {
+      tmp[e.id] = false;
+    });
     tmp[c] = true;
+
     if (setForm) setForm(tmp);
   };
 
@@ -50,61 +52,57 @@ const InspectStep = ({ form, setForm, data }: Props) => {
       </View>
       <HTMLView
         style={{ marginVertical: 20, marginHorizontal: 10 }}
-        value={data.text}
+        value={stepsIntro ?? ''}
       />
-      {data.type === 'multipleimage' ? (
-        data.options.map((x) => (
-          <View key={x.id} style={styles.card}>
-            <ImageBox
-              image={(form ?? {})[x.id] ?? x.answer ?? undefined}
-              onChange={(m) => changeImage(x.id, m)}
-              disabled={disabled}
-            />
-            <View style={styles.name_view}>
-              <Text style={styles.time}>{x.name}</Text>
-              <Text style={styles.name}>{''}</Text>
-            </View>
+      <View style={styles.card}>
+        <ImageBox
+          image={(form ?? {})[data.options.id] ?? undefined}
+          onChange={(m) => changeImage(m)}
+          disabled={disabled}
+        />
+        <View style={styles.name_view}>
+          <Text style={styles.time}>{data.name}</Text>
+          <Text style={styles.name}>{''}</Text>
+        </View>
+      </View>
+      {data.questions.map((question) =>
+        question.type === 'checkbox' ? (
+          <View
+            key={question.id}
+            style={{ marginVertical: 10, paddingHorizontal: 10 }}>
+            <Text style={{ fontSize: 21, fontWeight: '600', marginBottom: 5 }}>
+              {question.name}
+            </Text>
+            <HTMLView style={{ marginVertical: 5 }} value={question.text} />
+            {question.options.map((x) => (
+              <Checkbox
+                key={x.id}
+                value={(form ?? {})[x.id]}
+                label={x.name}
+                onChange={(c) => toggleCheck(x.id, c)}
+                disabled={disabled}
+              />
+            ))}
           </View>
-        ))
-      ) : data.type === 'checkbox' ? (
-        <View style={{ marginVertical: 10, paddingHorizontal: 10 }}>
-          <Text style={{ fontSize: 21, fontWeight: '600', marginBottom: 5 }}>
-            {'Did you check this'}
-          </Text>
-          {data.options.map((x) => (
-            <Checkbox
-              key={x.id}
-              value={(form ?? {})[x.id] ?? !!x.answer}
-              label={x.name}
-              onChange={(c) => toggleCheck(x.id, c)}
+        ) : (
+          <View
+            key={question.id}
+            style={{ marginVertical: 10, paddingHorizontal: 10 }}>
+            <Text style={{ fontSize: 21, fontWeight: '600', marginBottom: 5 }}>
+              {question.name}
+            </Text>
+            <HTMLView style={{ marginVertical: 5 }} value={question.text} />
+            <RadioSelect
+              options={question.options.map((x) => ({
+                id: x.id,
+                label: x.name,
+              }))}
+              value={question.options.find((x) => !!(form ?? {})[x.id])?.id}
+              onChange={(c) => selectRadio(question.id, c.toString())}
               disabled={disabled}
             />
-          ))}
-        </View>
-      ) : (
-        <View style={{ marginVertical: 10, paddingHorizontal: 10 }}>
-          <Text style={{ fontSize: 21, fontWeight: '600', marginBottom: 5 }}>
-            {'Which one it is'}
-          </Text>
-          <RadioSelect
-            options={data.options.map((x) => ({ id: x.id, label: x.name }))}
-            value={data.options.find((x) => !!(form ?? {})[x.id])?.id}
-            onChange={(c) => selectRadio(c.toString())}
-            disabled={disabled}
-          />
-        </View>
-      )}
-      {data.checklist && data.checklist.length > 0 && (
-        <View style={{ marginVertical: 20, paddingHorizontal: 10 }}>
-          {data.checklist.map((x) => (
-            <Checkbox
-              key={x.id}
-              value={x.checked}
-              label={x.name}
-              disabled={true}
-            />
-          ))}
-        </View>
+          </View>
+        ),
       )}
     </View>
   );

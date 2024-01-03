@@ -13,11 +13,12 @@ import { sendRequest } from '../../config/compose';
 import { useFocusEffect } from '@react-navigation/native';
 import HTMLView from 'react-native-htmlview';
 import InspectStep from '../../components/manage/InspectStep';
-import { IInspectStep } from '../../lib/entities';
+import { IEntryStep } from '../../lib/entities';
 
 interface IEntry {
   first: string;
-  steps: IInspectStep[];
+  steps_intro: string | null;
+  steps: IEntryStep[];
   last: string;
 }
 
@@ -40,21 +41,17 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
 
   const validForm = () => {
     if (!entry) return null;
-    let result: any = { inspection_id: inspectID };
+    let result: any = { inspection_id: inspectID, ...form };
     for (let s of entry.steps) {
-      if (s.type === 'multipleimage') {
-        for (let o of s.options) {
-          if (!form[o.id]) {
-            alert(`Please pick image for ${o.name}`);
-            return null;
-          }
-          result[o.id] = form[o.id];
-        }
-      } else {
-        for (let o of s.options) {
-          result[o.id] = form[o.id] ?? false;
-        }
+      if (!form[s.options.id]) {
+        alert(`Please pick image for ${s.name}`);
+        return null;
       }
+      s.questions.forEach((e) => {
+        e.options.forEach((t) => {
+          if (result[t.id] === undefined) result[t.id] = false;
+        });
+      });
     }
     return result;
   };
@@ -80,7 +77,11 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
     } else if (step > entry.steps.length) {
       navigation.goBack();
     } else {
-      setStep(step + 1);
+      if (step > 0 && !form[entry.steps[step - 1].options.id]) {
+        alert(`Please pick image`);
+      } else {
+        setStep(step + 1);
+      }
     }
   };
 
@@ -88,7 +89,12 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
     sendRequest(`api/member/inspections/${inspectID}`, {}, 'GET').then(
       (res) => {
         if (res.status) {
-          setEntry(res.data);
+          let tmp = { ...res.data };
+          tmp.steps = [];
+          for (const k in res.data.steps) {
+            tmp.steps.push(res.data.steps[k]);
+          }
+          setEntry(tmp);
         } else {
           alert(res.message ?? 'Server error');
         }
@@ -122,6 +128,7 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
                 form={form}
                 setForm={setForm}
                 data={entry.steps[step - 1]}
+                stepsIntro={entry.steps_intro}
               />
             )}
           </View>
