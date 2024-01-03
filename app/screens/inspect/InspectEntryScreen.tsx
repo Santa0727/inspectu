@@ -89,12 +89,7 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
     sendRequest(`api/member/inspections/${inspectID}`, {}, 'GET').then(
       (res) => {
         if (res.status) {
-          let tmp = { ...res.data };
-          tmp.steps = [];
-          for (const k in res.data.steps) {
-            tmp.steps.push(res.data.steps[k]);
-          }
-          setEntry(tmp);
+          setEntry(res.data);
         } else {
           alert(res.message ?? 'Server error');
         }

@@ -1,95 +1,88 @@
+import { useState } from 'react';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import {
-  ActivityIndicator,
-  Platform,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import { Platform, StyleSheet, Text, TextInput, View } from 'react-native';
 import { InspectStackParamList } from '../../navigation/AppStackParams';
-import { IInspectStep } from '../../lib/entities';
+import { IEntryStep } from '../../lib/entities';
 import MainContainer from '../../components/container/MainContainer';
 import { FontAwesome } from '@expo/vector-icons';
 import TouchButton from '../../components/ui/TouchButton';
-import { useCallback, useState } from 'react';
-import { useFocusEffect } from '@react-navigation/native';
 import { sendRequest } from '../../config/compose';
 import InspectStep from '../../components/manage/InspectStep';
 
-interface IEntry {
-  inspection_id: number;
-  name: string;
-  status: 'publish' | 'pending_review' | 'review_required';
-  step: IInspectStep;
-}
+const CommentForm = ({
+  entry,
+  disabled,
+  updateClick,
+  sendClick,
+}: {
+  entry: IEntryStep;
+  disabled?: boolean;
+  updateClick: () => void;
+  sendClick: (message: string) => void;
+}) => {
+  const [msg, setMsg] = useState('');
 
-const CommentForm = ({ entry }: { entry: IEntry }) => (
-  <>
-    <View
-      style={{
-        flexDirection: 'row',
-        borderColor: '#d1d1d1',
-        borderBottomWidth: 1,
-        marginHorizontal: 20,
-        alignItems: 'center',
-        paddingBottom: 10,
-      }}>
-      <FontAwesome name="home" size={30} />
-      <View style={{ marginLeft: 10 }}>
-        <Text style={{ fontSize: 22, fontWeight: '500' }}>Location</Text>
-        <Text style={{ fontSize: 18, fontWeight: '400' }}>{entry.name}</Text>
+  return (
+    <>
+      <View
+        style={{
+          flexDirection: 'row',
+          borderColor: '#d1d1d1',
+          borderBottomWidth: 1,
+          marginHorizontal: 20,
+          alignItems: 'center',
+          paddingBottom: 10,
+        }}>
+        <FontAwesome name="home" size={30} />
+        <View style={{ marginLeft: 10 }}>
+          <Text style={{ fontSize: 22, fontWeight: '500' }}>Location</Text>
+          <Text style={{ fontSize: 18, fontWeight: '400' }}>{entry.name}</Text>
+        </View>
       </View>
-    </View>
-    <View style={styles.text_view}>
-      <Text style={styles.text}>
-        {'Please confirm that this is right sink'}
-      </Text>
-    </View>
-    <TextInput
-      placeholder="Add text"
-      numberOfLines={Platform.OS === 'ios' ? undefined : 5}
-      multiline={true}
-      style={styles.input}
-    />
-    <View style={styles.btn_row}>
-      <TouchButton style={styles.send_btn} label="Send" scheme="success" />
-      <TouchButton
-        style={styles.update_btn}
-        label="Update details"
-        size="small"
+      <View style={styles.text_view}>
+        <Text style={styles.text}>
+          {'Please confirm that this is right sink'}
+        </Text>
+      </View>
+      <TextInput
+        placeholder="Add text"
+        numberOfLines={Platform.OS === 'ios' ? undefined : 5}
+        multiline={true}
+        style={styles.input}
+        value={msg}
+        onChangeText={(t) => setMsg(t)}
       />
-    </View>
-  </>
-);
+      <View style={styles.btn_row}>
+        <TouchButton
+          style={styles.send_btn}
+          label="Send"
+          scheme="success"
+          disabled={disabled}
+          onPress={() => sendClick(msg)}
+        />
+        <TouchButton
+          style={styles.update_btn}
+          label="Update details"
+          size="small"
+          onPress={updateClick}
+          disabled={disabled}
+        />
+      </View>
+    </>
+  );
+};
 
 type Props = NativeStackScreenProps<InspectStackParamList, 'InspectReview'>;
 
 const InspectReviewScreen = ({ navigation, route }: Props) => {
-  const { inspectID, stepID } = route.params;
+  const { inspectID, entryStep } = route.params;
 
-  const [entry, setEntry] = useState<IEntry>();
   const [form, setForm] = useState<any>({});
   const [disabled, setDisabled] = useState(false);
-
-  const loadData = useCallback(() => {
-    sendRequest(
-      `api/member/inspections/${inspectID}/review/${stepID}`,
-      {},
-      'GET',
-    ).then((res) => {
-      if (res.status) {
-        setEntry(res.data);
-      } else {
-        alert(res.message ?? 'Server error');
-      }
-    });
-  }, []);
-
-  useFocusEffect(loadData);
+  const [needUpdate, setNeedUpdate] = useState(entryStep.status === 'error');
 
   const buttonClick = async () => {
-    if (entry?.step.status === 'error') {
+    if (needUpdate) {
       setDisabled(true);
       const res = await sendRequest(
         'api/member/inspections/review/submit',
@@ -106,39 +99,54 @@ const InspectReviewScreen = ({ navigation, route }: Props) => {
       navigation.goBack();
     }
   };
+  const sendClick = async (message: string) => {
+    if (!message) {
+      alert('Please fill the message');
+      return;
+    }
+    setDisabled(true);
+    const res = await sendRequest(
+      'api/member/inspections/review/message/submit',
+      { inspection_id: inspectID, step_id: entryStep.id, message },
+      'POST',
+    );
+    if (res.status) {
+      navigation.popToTop();
+    } else {
+      alert(res.message ?? 'Server error');
+      setDisabled(false);
+    }
+  };
 
   return (
     <MainContainer style={{ padding: 5 }}>
-      {entry ? (
-        <>
-          <View style={{ margin: 10 }}>
-            {entry.step.status === 'approved' ? (
-              <InspectStep data={entry.step} />
-            ) : entry.step.status === 'error' ? (
-              <InspectStep form={form} setForm={setForm} data={entry.step} />
-            ) : (
-              <CommentForm entry={entry} />
-            )}
-          </View>
-          <View
-            style={{
-              marginVertical: 20,
-              flexDirection: 'row',
-              justifyContent: 'flex-end',
-              paddingHorizontal: 20,
-            }}>
-            <TouchButton
-              label={entry.step.status === 'error' ? 'Update' : 'Go back'}
-              onPress={buttonClick}
-              disabled={disabled}
-            />
-          </View>
-        </>
-      ) : (
-        <View style={{ paddingTop: '50%' }}>
-          <ActivityIndicator size="large" color={'black'} />
-        </View>
-      )}
+      <View style={{ margin: 10 }}>
+        {entryStep.status === 'approved' ? (
+          <InspectStep data={entryStep} />
+        ) : needUpdate ? (
+          <InspectStep form={form} setForm={setForm} data={entryStep} />
+        ) : (
+          <CommentForm
+            disabled={disabled}
+            entry={entryStep}
+            updateClick={() => setNeedUpdate(true)}
+            sendClick={sendClick}
+          />
+        )}
+      </View>
+      <View
+        style={{
+          marginVertical: 20,
+          flexDirection: 'row',
+          justifyContent: 'flex-end',
+          paddingHorizontal: 20,
+        }}>
+        <TouchButton
+          label={needUpdate ? 'Update' : 'Go back'}
+          onPress={buttonClick}
+          disabled={disabled}
+        />
+      </View>
     </MainContainer>
   );
 };

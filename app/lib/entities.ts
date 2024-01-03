@@ -27,23 +27,7 @@ export interface IInspection {
 interface IOption {
   id: string;
   name: string;
-  answer?: string | boolean;
-}
-
-interface ICheck {
-  id: string;
-  name: string;
-  checked: boolean;
-}
-
-export interface IInspectStep {
-  id: string;
-  name: string;
-  text: string;
-  type: 'multipleimage' | 'checkbox' | 'radio';
-  options: IOption[];
-  checklist?: ICheck[];
-  status?: 'approved' | 'error' | 'clarify';
+  answer?: boolean;
 }
 
 interface IQuestion {
@@ -51,7 +35,7 @@ interface IQuestion {
   name: string;
   type: 'radio' | 'checkbox';
   text: string;
-  options: Array<{ id: string; name: string }>;
+  options: IOption[];
 }
 
 export interface IEntryStep {
@@ -60,6 +44,10 @@ export interface IEntryStep {
   options: {
     id: string;
     type: 'image';
+    answer?: string;
   };
   questions: IQuestion[];
+  status?: 'approved' | 'error' | 'clarify';
+  message?: string;
+  userMessage?: string;
 }

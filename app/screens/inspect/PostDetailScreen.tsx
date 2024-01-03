@@ -15,6 +15,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { sendRequest } from '../../config/compose';
 import { defaultDateFormat } from '../../config/helper';
 import { statusLabels } from '../../lib/lang';
+import { IEntryStep } from '../../lib/entities';
 
 interface IEntry {
   inspection_id: number;
@@ -22,11 +23,7 @@ interface IEntry {
   reviewed_by: string;
   date_submitted: string;
   status: 'publish' | 'pending_review' | 'review_required';
-  steps: Array<{
-    id: string;
-    name: string;
-    status: 'approved' | 'error' | 'clarify';
-  }>;
+  steps: IEntryStep[];
 }
 
 type Props = NativeStackScreenProps<InspectStackParamList, 'PostDetail'>;
@@ -94,7 +91,7 @@ const PostDetailScreen = ({ navigation, route }: Props) => {
                   onPress={() =>
                     navigation.navigate('InspectReview', {
                       inspectID,
-                      stepID: x.id,
+                      entryStep: x,
                     })
                   }>
                   <Text style={styles.touch_txt}>

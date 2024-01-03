@@ -6,6 +6,13 @@ import ImageBox from '../ui/ImageBox';
 import RadioSelect from '../ui/RadioSelect';
 import Checkbox from '../ui/Checkbox';
 
+const checkedRadio = (form: any, options: any[]) => {
+  for (let x of options) {
+    if (form && !!form[x.id]) return x.id;
+  }
+  return options.find((x) => !!x.answer)?.id ?? undefined;
+};
+
 interface Props {
   form?: any;
   stepsIntro?: string | null;
@@ -25,6 +32,9 @@ const InspectStep = ({ form, setForm, stepsIntro, data }: Props) => {
   const selectRadio = (qID: string, c: string) => {
     let tmp = { ...form };
     const q = data.questions.find((x) => x.id === qID);
+
+    console.log(q);
+
     q?.options.forEach((e) => {
       tmp[e.id] = false;
     });
@@ -56,7 +66,9 @@ const InspectStep = ({ form, setForm, stepsIntro, data }: Props) => {
       />
       <View style={styles.card}>
         <ImageBox
-          image={(form ?? {})[data.options.id] ?? undefined}
+          image={
+            (form ?? {})[data.options.id] ?? data.options.answer ?? undefined
+          }
           onChange={(m) => changeImage(m)}
           disabled={disabled}
         />
@@ -77,7 +89,7 @@ const InspectStep = ({ form, setForm, stepsIntro, data }: Props) => {
             {question.options.map((x) => (
               <Checkbox
                 key={x.id}
-                value={(form ?? {})[x.id]}
+                value={(form ?? {})[x.id] ?? x.answer}
                 label={x.name}
                 onChange={(c) => toggleCheck(x.id, c)}
                 disabled={disabled}
@@ -97,7 +109,7 @@ const InspectStep = ({ form, setForm, stepsIntro, data }: Props) => {
                 id: x.id,
                 label: x.name,
               }))}
-              value={question.options.find((x) => !!(form ?? {})[x.id])?.id}
+              value={checkedRadio(form, question.options)}
               onChange={(c) => selectRadio(question.id, c.toString())}
               disabled={disabled}
             />
