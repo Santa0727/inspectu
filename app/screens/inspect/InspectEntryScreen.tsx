@@ -17,6 +17,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import ImageBox from '../../components/ui/ImageBox';
 import Checkbox from '../../components/ui/Checkbox';
 import RadioSelect from '../../components/ui/RadioSelect';
+import { COLORS } from '../../config/constants';
 
 const FormStep: FC<{
   data: IEntryStep;
@@ -323,7 +324,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#414BB2',
   },
   inactive_circle: {
-    backgroundColor: '#d9dbf0',
+    backgroundColor: COLORS.inactive,
     width: 15,
     height: 15,
     borderRadius: 15,
@@ -333,10 +334,10 @@ const styles = StyleSheet.create({
   inactive_line: {
     flex: 1,
     height: 5,
-    backgroundColor: '#d9dbf0',
+    backgroundColor: COLORS.inactive,
   },
   disabled: {
-    backgroundColor: '#737373',
+    backgroundColor: COLORS.disabled,
   },
   card: {
     borderWidth: 3,
