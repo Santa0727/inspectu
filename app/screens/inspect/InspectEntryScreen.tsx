@@ -15,111 +15,43 @@ import HTMLView from 'react-native-htmlview';
 import { IEntryStep } from '../../lib/entities';
 import { FontAwesome } from '@expo/vector-icons';
 import ImageBox from '../../components/ui/ImageBox';
-import Checkbox from '../../components/ui/Checkbox';
-import RadioSelect from '../../components/ui/RadioSelect';
 import { COLORS } from '../../config/constants';
 
 const FormStep: FC<{
   data: IEntryStep;
   form: any;
   setForm: (d: any) => void;
+  goToReview: (d: IEntryStep) => void;
   disabled?: boolean;
-}> = ({ data, form, setForm, disabled }) => {
-  const [open, setOpen] = useState(false);
-
-  const toggleCheck = (id: string, c: boolean) => {
-    if (setForm) setForm({ ...form, [id]: c });
-  };
-  const selectRadio = (qID: string, c: string) => {
-    let tmp = { ...form };
-    const q = data.questions.find((x) => x.id === qID);
-
-    q?.options.forEach((e) => {
-      tmp[e.id] = false;
-    });
-    tmp[c] = true;
-
-    if (setForm) setForm(tmp);
-  };
+}> = ({ data, form, setForm, goToReview, disabled }) => {
   const changeImage = (img: string) => {
     setForm({ ...form, [data.options.id]: img });
   };
   return (
-    <View>
-      <View style={styles.card}>
-        <ImageBox
-          image={
-            (form ?? {})[data.options.id] ?? data.options.answer ?? undefined
-          }
-          onChange={(m) => changeImage(m)}
-          disabled={disabled}
-        />
-        <TouchableOpacity
-          style={{
-            flexDirection: 'row',
-            marginHorizontal: 20,
-            alignItems: 'center',
-            paddingBottom: 10,
-          }}
-          onPress={() => setOpen(!open)}>
-          <FontAwesome name="home" size={30} />
-          <View style={{ marginLeft: 10 }}>
-            <Text style={{ fontSize: 22, fontWeight: '500' }}>Location</Text>
-            <Text style={{ fontSize: 18, fontWeight: '400' }}>{data.name}</Text>
-          </View>
-        </TouchableOpacity>
-      </View>
-      {open &&
-        data.questions.map((question) =>
-          question.type === 'checkbox' ? (
-            <View
-              key={question.id}
-              style={{ marginVertical: 10, paddingHorizontal: 10 }}>
-              <Text
-                style={{ fontSize: 21, fontWeight: '600', marginBottom: 5 }}>
-                {question.name}
-              </Text>
-              <HTMLView style={{ marginVertical: 5 }} value={question.text} />
-              {question.options.map((x) => (
-                <Checkbox
-                  key={x.id}
-                  value={(form ?? {})[x.id] ?? x.answer}
-                  label={x.name}
-                  onChange={(c) => toggleCheck(x.id, c)}
-                  disabled={disabled}
-                />
-              ))}
-            </View>
-          ) : (
-            <View
-              key={question.id}
-              style={{ marginVertical: 10, paddingHorizontal: 10 }}>
-              <Text
-                style={{ fontSize: 21, fontWeight: '600', marginBottom: 5 }}>
-                {question.name}
-              </Text>
-              <HTMLView style={{ marginVertical: 5 }} value={question.text} />
-              <RadioSelect
-                options={question.options.map((x) => ({
-                  id: x.id,
-                  label: x.name,
-                }))}
-                value={checkedRadio(form, question.options)}
-                onChange={(c) => selectRadio(question.id, c.toString())}
-                disabled={disabled}
-              />
-            </View>
-          ),
-        )}
+    <View style={styles.card}>
+      <ImageBox
+        image={
+          (form ?? {})[data.options.id] ?? data.options.answer ?? undefined
+        }
+        onChange={(m) => changeImage(m)}
+        disabled={disabled}
+      />
+      <TouchableOpacity
+        style={{
+          flexDirection: 'row',
+          marginHorizontal: 20,
+          alignItems: 'center',
+          paddingBottom: 10,
+        }}
+        onPress={() => goToReview(data)}>
+        <FontAwesome name="home" size={30} />
+        <View style={{ marginLeft: 10 }}>
+          <Text style={{ fontSize: 22, fontWeight: '500' }}>Location</Text>
+          <Text style={{ fontSize: 18, fontWeight: '400' }}>{data.name}</Text>
+        </View>
+      </TouchableOpacity>
     </View>
   );
-};
-
-const checkedRadio = (form: any, options: any[]) => {
-  for (let x of options) {
-    if (form && !!form[x.id]) return x.id;
-  }
-  return options.find((x) => !!x.answer)?.id ?? undefined;
 };
 
 interface IEntry {
@@ -145,7 +77,14 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
   const [entry, setEntry] = useState<IEntry>();
   const [form, setForm] = useState<any>({});
   const [disabled, setDisabled] = useState(false);
-  const [questions, setQuestions] = useState<IEntryStep['questions']>();
+
+  const goToReview = (step: IEntryStep) =>
+    navigation.navigate('InspectReview', {
+      inspectID,
+      entryStep: step,
+      initialForm: form,
+      onConfirm: (d) => setForm(d),
+    });
 
   const validForm = () => {
     if (!entry) return null;
@@ -236,6 +175,7 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
                     data={step}
                     form={form}
                     setForm={setForm}
+                    goToReview={goToReview}
                     disabled={disabled}
                   />
                 ))}

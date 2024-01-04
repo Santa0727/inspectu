@@ -75,14 +75,19 @@ const CommentForm = ({
 type Props = NativeStackScreenProps<InspectStackParamList, 'InspectReview'>;
 
 const InspectReviewScreen = ({ navigation, route }: Props) => {
-  const { inspectID, entryStep } = route.params;
+  const { inspectID, entryStep, initialForm, onConfirm } = route.params;
 
-  const [form, setForm] = useState<any>({});
+  const [form, setForm] = useState<any>(initialForm ?? {});
   const [disabled, setDisabled] = useState(false);
-  const [needUpdate, setNeedUpdate] = useState(entryStep.status === 'error');
+  const [needUpdate, setNeedUpdate] = useState(
+    entryStep.status === 'error' || entryStep.status === undefined,
+  );
 
   const buttonClick = async () => {
-    if (needUpdate) {
+    if (onConfirm) {
+      onConfirm(form);
+      navigation.goBack();
+    } else if (needUpdate) {
       setDisabled(true);
       const res = await sendRequest(
         'api/member/inspections/review/submit',

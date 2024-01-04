@@ -9,7 +9,12 @@ export type InspectStackParamList = {
   Inspections: undefined;
   InspectEntry: { inspectID: number };
   PostDetail: { inspectID: number };
-  InspectReview: { inspectID: number; entryStep: IEntryStep };
+  InspectReview: {
+    inspectID: number;
+    entryStep: IEntryStep;
+    initialForm?: any;
+    onConfirm?: (d: any) => void;
+  };
 };
 
 export type MainStackParamList = {
