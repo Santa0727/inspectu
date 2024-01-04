@@ -92,10 +92,10 @@ const InspectStep = ({ form, setForm, stepsIntro, data }: Props) => {
                 onChange={(c) => toggleCheck(x.id, c)}
                 disabled={disabled}
                 colorScheme={
-                  x.answer === true
-                    ? 'green'
-                    : x.answer === false
-                    ? 'red'
+                  question.status === true
+                    ? 'success'
+                    : question.status === false
+                    ? 'danger'
                     : undefined
                 }
               />
@@ -117,6 +117,13 @@ const InspectStep = ({ form, setForm, stepsIntro, data }: Props) => {
               value={checkedRadio(form, question.options)}
               onChange={(c) => selectRadio(question.id, c.toString())}
               disabled={disabled}
+              colorScheme={
+                question.status === true
+                  ? 'success'
+                  : question.status === false
+                  ? 'danger'
+                  : undefined
+              }
             />
           </View>
         ),

@@ -15,7 +15,7 @@ interface Props {
   label: string;
   style?: StyleProp<ViewStyle>;
   disabled?: boolean;
-  colorScheme?: 'green' | 'red';
+  colorScheme?: 'success' | 'danger';
 }
 
 const Checkbox = ({
@@ -35,36 +35,16 @@ const Checkbox = ({
         <MaterialCommunityIcons
           name="checkbox-outline"
           size={28}
-          color={
-            colorScheme === 'green'
-              ? COLORS.success
-              : colorScheme === 'red'
-              ? COLORS.danger
-              : 'black'
-          }
+          color={colorScheme ? COLORS[colorScheme] : 'black'}
         />
       ) : (
         <MaterialIcons
           name="check-box-outline-blank"
           size={28}
-          color={
-            colorScheme === 'green'
-              ? COLORS.success
-              : colorScheme === 'red'
-              ? COLORS.danger
-              : 'black'
-          }
+          color={colorScheme ? COLORS[colorScheme] : 'black'}
         />
       )}
-      <Text
-        style={[
-          styles.label,
-          colorScheme === 'green'
-            ? styles.green
-            : colorScheme === 'red'
-            ? styles.danger
-            : {},
-        ]}>
+      <Text style={[styles.label, colorScheme ? styles[colorScheme] : {}]}>
         {label}
       </Text>
     </TouchableOpacity>
@@ -82,7 +62,7 @@ const styles = StyleSheet.create({
     fontSize: 19,
     marginLeft: 5,
   },
-  green: {
+  success: {
     color: COLORS.success,
   },
   danger: {

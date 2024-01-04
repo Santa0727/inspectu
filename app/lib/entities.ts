@@ -36,6 +36,7 @@ interface IQuestion {
   type: 'radio' | 'checkbox';
   text: string;
   options: IOption[];
+  status?: boolean;
 }
 
 export interface IEntryStep {
