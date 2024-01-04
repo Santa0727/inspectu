@@ -2,6 +2,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { IInspection } from '../../lib/entities';
 import { defaultDateFormat } from '../../config/helper';
 import { statusLabels } from '../../lib/lang';
+import { COLORS } from '../../config/constants';
 
 interface Props {
   items: IInspection[];
@@ -55,7 +56,21 @@ const InspectsTable = ({ items, status, goToInspect }: Props) => (
               </TouchableOpacity>
             ) : (
               <View>
-                <Text style={[styles.td_txt, { fontSize: 15 }]}>
+                <Text
+                  style={[
+                    styles.td_txt,
+                    {
+                      fontSize: 15,
+                      color:
+                        x.status === 'pending_review'
+                          ? COLORS.pending
+                          : x.status === 'review_required'
+                          ? COLORS.danger
+                          : x.status === 'approved'
+                          ? COLORS.success
+                          : 'black',
+                    },
+                  ]}>
                   {statusLabels[x.status] ?? x.status}
                 </Text>
                 {x.status === 'review_required' && (

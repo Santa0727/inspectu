@@ -20,7 +20,7 @@ export interface IUser {
 export interface IInspection {
   id: number;
   name: string;
-  status: 'publish' | 'pending_review' | 'review_required';
+  status: 'publish' | 'pending_review' | 'review_required' | 'approved';
   due_date: string;
 }
 

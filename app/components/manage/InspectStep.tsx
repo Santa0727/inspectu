@@ -91,6 +91,13 @@ const InspectStep = ({ form, setForm, stepsIntro, data }: Props) => {
                 label={x.name}
                 onChange={(c) => toggleCheck(x.id, c)}
                 disabled={disabled}
+                colorScheme={
+                  x.answer === true
+                    ? 'green'
+                    : x.answer === false
+                    ? 'red'
+                    : undefined
+                }
               />
             ))}
           </View>
