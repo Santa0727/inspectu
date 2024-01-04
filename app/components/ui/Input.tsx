@@ -9,6 +9,7 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
+import { COLORS } from '../../config/constants';
 
 interface Props {
   label?: string;
@@ -114,10 +115,10 @@ const styles = StyleSheet.create({
   error: {
     fontSize: 15,
     paddingVertical: 5,
-    color: '#dc2626',
+    color: COLORS.error,
   },
   disabled_input: {
-    color: '#737373',
+    color: COLORS.disabled,
   },
 });
 

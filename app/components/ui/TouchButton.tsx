@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ViewStyle,
 } from 'react-native';
+import { COLORS } from '../../config/constants';
 
 type Props = PropsWithChildren<{
   style?: StyleProp<ViewStyle>;
@@ -75,19 +76,19 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   primary_btn: {
-    backgroundColor: '#0891b2',
+    backgroundColor: COLORS.primary,
   },
   sec_btn: {
-    backgroundColor: '#71ba3a',
+    backgroundColor: COLORS.secondary,
   },
   disabled: {
-    backgroundColor: '#737373',
+    backgroundColor: COLORS.disabled,
   },
   danger_btn: {
-    backgroundColor: '#e11d48',
+    backgroundColor: COLORS.danger,
   },
   success_btn: {
-    backgroundColor: '#16a34a',
+    backgroundColor: COLORS.success,
   },
 });
 
