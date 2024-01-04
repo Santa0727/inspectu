@@ -6,14 +6,120 @@ import {
   View,
 } from 'react-native';
 import MainContainer from '../../components/container/MainContainer';
-import { useCallback, useState } from 'react';
+import { FC, useCallback, useState } from 'react';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { InspectStackParamList } from '../../navigation/AppStackParams';
 import { sendRequest } from '../../config/compose';
 import { useFocusEffect } from '@react-navigation/native';
 import HTMLView from 'react-native-htmlview';
-import InspectStep from '../../components/manage/InspectStep';
 import { IEntryStep } from '../../lib/entities';
+import { FontAwesome } from '@expo/vector-icons';
+import ImageBox from '../../components/ui/ImageBox';
+import Checkbox from '../../components/ui/Checkbox';
+import RadioSelect from '../../components/ui/RadioSelect';
+
+const FormStep: FC<{
+  data: IEntryStep;
+  form: any;
+  setForm: (d: any) => void;
+  disabled?: boolean;
+}> = ({ data, form, setForm, disabled }) => {
+  const [open, setOpen] = useState(false);
+
+  const toggleCheck = (id: string, c: boolean) => {
+    if (setForm) setForm({ ...form, [id]: c });
+  };
+  const selectRadio = (qID: string, c: string) => {
+    let tmp = { ...form };
+    const q = data.questions.find((x) => x.id === qID);
+
+    q?.options.forEach((e) => {
+      tmp[e.id] = false;
+    });
+    tmp[c] = true;
+
+    if (setForm) setForm(tmp);
+  };
+  const changeImage = (img: string) => {
+    setForm({ ...form, [data.options.id]: img });
+  };
+  return (
+    <View>
+      <View style={styles.card}>
+        <ImageBox
+          image={
+            (form ?? {})[data.options.id] ?? data.options.answer ?? undefined
+          }
+          onChange={(m) => changeImage(m)}
+          disabled={disabled}
+        />
+        <TouchableOpacity
+          style={{
+            flexDirection: 'row',
+            marginHorizontal: 20,
+            alignItems: 'center',
+            paddingBottom: 10,
+          }}
+          onPress={() => setOpen(!open)}>
+          <FontAwesome name="home" size={30} />
+          <View style={{ marginLeft: 10 }}>
+            <Text style={{ fontSize: 22, fontWeight: '500' }}>Location</Text>
+            <Text style={{ fontSize: 18, fontWeight: '400' }}>{data.name}</Text>
+          </View>
+        </TouchableOpacity>
+      </View>
+      {open &&
+        data.questions.map((question) =>
+          question.type === 'checkbox' ? (
+            <View
+              key={question.id}
+              style={{ marginVertical: 10, paddingHorizontal: 10 }}>
+              <Text
+                style={{ fontSize: 21, fontWeight: '600', marginBottom: 5 }}>
+                {question.name}
+              </Text>
+              <HTMLView style={{ marginVertical: 5 }} value={question.text} />
+              {question.options.map((x) => (
+                <Checkbox
+                  key={x.id}
+                  value={(form ?? {})[x.id] ?? x.answer}
+                  label={x.name}
+                  onChange={(c) => toggleCheck(x.id, c)}
+                  disabled={disabled}
+                />
+              ))}
+            </View>
+          ) : (
+            <View
+              key={question.id}
+              style={{ marginVertical: 10, paddingHorizontal: 10 }}>
+              <Text
+                style={{ fontSize: 21, fontWeight: '600', marginBottom: 5 }}>
+                {question.name}
+              </Text>
+              <HTMLView style={{ marginVertical: 5 }} value={question.text} />
+              <RadioSelect
+                options={question.options.map((x) => ({
+                  id: x.id,
+                  label: x.name,
+                }))}
+                value={checkedRadio(form, question.options)}
+                onChange={(c) => selectRadio(question.id, c.toString())}
+                disabled={disabled}
+              />
+            </View>
+          ),
+        )}
+    </View>
+  );
+};
+
+const checkedRadio = (form: any, options: any[]) => {
+  for (let x of options) {
+    if (form && !!form[x.id]) return x.id;
+  }
+  return options.find((x) => !!x.answer)?.id ?? undefined;
+};
 
 interface IEntry {
   first: string;
@@ -38,6 +144,7 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
   const [entry, setEntry] = useState<IEntry>();
   const [form, setForm] = useState<any>({});
   const [disabled, setDisabled] = useState(false);
+  const [questions, setQuestions] = useState<IEntryStep['questions']>();
 
   const validForm = () => {
     if (!entry) return null;
@@ -58,7 +165,7 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
 
   const nextClick = async () => {
     if (!entry) return;
-    if (step === entry.steps.length) {
+    if (step === 1) {
       const data = validForm();
       if (!data) return;
 
@@ -74,14 +181,10 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
       } else {
         setStep(step + 1);
       }
-    } else if (step > entry.steps.length) {
+    } else if (step === 2) {
       navigation.goBack();
     } else {
-      if (step > 0 && !form[entry.steps[step - 1].options.id]) {
-        alert(`Please pick image`);
-      } else {
-        setStep(step + 1);
-      }
+      setStep(step + 1);
     }
   };
 
@@ -111,7 +214,7 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
                 </Text>
                 <HTMLView style={{ marginTop: 10 }} value={entry.first} />
               </View>
-            ) : step > entry.steps.length ? (
+            ) : step > 1 ? (
               <View>
                 <Text style={{ fontSize: 24, fontWeight: '600' }}>
                   {'Thank you for your submitting report'}
@@ -119,17 +222,28 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
                 <HTMLView style={{ marginTop: 10 }} value={entry.last} />
               </View>
             ) : (
-              <InspectStep
-                form={form}
-                setForm={setForm}
-                data={entry.steps[step - 1]}
-                stepsIntro={entry.steps_intro}
-              />
+              <>
+                {!!entry.steps_intro && (
+                  <HTMLView
+                    style={{ marginVertical: 20, marginHorizontal: 10 }}
+                    value={entry.steps_intro ?? ''}
+                  />
+                )}
+                {entry.steps.map((step) => (
+                  <FormStep
+                    key={step.id}
+                    data={step}
+                    form={form}
+                    setForm={setForm}
+                    disabled={disabled}
+                  />
+                ))}
+              </>
             )}
           </View>
           <View style={styles.steps_view}>
             <View style={styles.steps_btn}>
-              {step <= entry.steps.length ? (
+              {step < 2 ? (
                 <TouchableOpacity
                   style={[styles.next_btn, disabled ? styles.disabled : {}]}
                   onPress={() =>
@@ -148,20 +262,13 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
                 onPress={nextClick}
                 disabled={disabled}>
                 <Text style={styles.next_txt}>
-                  {step === entry.steps.length
-                    ? 'Submit'
-                    : step === entry.steps.length + 1
-                    ? 'Finish'
-                    : 'Next'}
+                  {step === 1 ? 'Submit' : step === 2 ? 'Finish' : 'Next'}
                 </Text>
               </TouchableOpacity>
             </View>
             <View style={styles.steps_bar}>
               <View style={styles.step_circle} />
-              {Array.from(
-                { length: entry.steps.length + 1 },
-                (_, id) => id + 1,
-              ).map((x) => (
+              {Array.from({ length: 2 }, (_, id) => id + 1).map((x) => (
                 <StepSector key={x} isActive={step >= x} />
               ))}
             </View>
@@ -230,6 +337,12 @@ const styles = StyleSheet.create({
   },
   disabled: {
     backgroundColor: '#737373',
+  },
+  card: {
+    borderWidth: 3,
+    borderColor: '#d1d1d1',
+    flexDirection: 'row',
+    marginVertical: 8,
   },
 });
 
