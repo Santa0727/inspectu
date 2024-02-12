@@ -62,19 +62,21 @@ const InspectStep = ({ form, setForm, stepsIntro, data }: Props) => {
         style={{ marginVertical: 20, marginHorizontal: 10 }}
         value={stepsIntro ?? ''}
       />
-      <View style={styles.card}>
-        <ImageBox
-          image={
-            (form ?? {})[data.options.id] ?? data.options.answer ?? undefined
-          }
-          onChange={(m) => changeImage(m)}
-          disabled={disabled}
-        />
-        <View style={styles.name_view}>
-          <Text style={styles.time}>{data.name}</Text>
-          <Text style={styles.name}>{''}</Text>
+      {!(data.status === undefined && form && !!form[data.options.id]) && (
+        <View style={styles.card}>
+          <ImageBox
+            image={
+              (form ?? {})[data.options.id] ?? data.options.answer ?? undefined
+            }
+            onChange={(m) => changeImage(m)}
+            disabled={disabled}
+          />
+          <View style={styles.name_view}>
+            <Text style={styles.time}>{data.name}</Text>
+            <Text style={styles.name}>{''}</Text>
+          </View>
         </View>
-      </View>
+      )}
       {data.questions.map((question) =>
         question.type === 'checkbox' ? (
           <View
