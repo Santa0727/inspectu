@@ -1,7 +1,11 @@
 export interface ISchool {
   id: number;
   name: string;
-  users_count: number;
+  district_id: number;
+  phone: string;
+  email: string;
+  address: string;
+  location: string;
 }
 
 export interface IRole {
@@ -22,6 +26,8 @@ export interface IInspection {
   name: string;
   status: 'publish' | 'pending_review' | 'review_required' | 'approved';
   due_date: string;
+  school_id: number;
+  school: ISchool;
 }
 
 interface IOption {

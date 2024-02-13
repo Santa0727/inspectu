@@ -37,7 +37,7 @@ const SchoolCard = ({ school, onEditClick, loadData }: CardProps) => {
     <View style={styles.school_card}>
       <Text style={styles.school_name}>{school.name}</Text>
       <Text style={styles.users_cnt}>
-        {`Number of users: ${school.users_count}`}
+        {`Number of users: {school.users_count}`}
       </Text>
       <View style={styles.btn_row}>
         <TouchButton

@@ -34,7 +34,7 @@ const InspectsTable = ({ items, status, goToInspect }: Props) => (
       {items.map((x) => (
         <View key={x.id} style={styles.tr}>
           <View style={styles.td_cell}>
-            <Text style={styles.td_txt}>{x.name}</Text>
+            <Text style={styles.td_txt}>{x.school.name}</Text>
           </View>
           <View
             style={[
