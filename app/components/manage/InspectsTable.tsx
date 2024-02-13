@@ -1,5 +1,5 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { IInspection } from '../../lib/entities';
+import { IInspection, ISchool } from '../../lib/entities';
 import { defaultDateFormat } from '../../config/helper';
 import { statusLabels } from '../../lib/lang';
 import { COLORS } from '../../config/constants';
@@ -8,9 +8,15 @@ interface Props {
   items: IInspection[];
   status: 'upcoming' | 'past';
   goToInspect: (t: 'InspectEntry' | 'PostDetail', id: number) => void;
+  onClickSchool: (school: ISchool) => void;
 }
 
-const InspectsTable = ({ items, status, goToInspect }: Props) => (
+const InspectsTable = ({
+  items,
+  status,
+  goToInspect,
+  onClickSchool,
+}: Props) => (
   <View style={styles.table}>
     <Text style={styles.title}>
       {`${status === 'past' ? 'Past' : 'Upcoming'} inspections`}
@@ -33,9 +39,11 @@ const InspectsTable = ({ items, status, goToInspect }: Props) => (
       </View>
       {items.map((x) => (
         <View key={x.id} style={styles.tr}>
-          <View style={styles.td_cell}>
+          <TouchableOpacity
+            style={styles.td_cell}
+            onPress={() => onClickSchool(x.school)}>
             <Text style={styles.td_txt}>{x.school.name}</Text>
-          </View>
+          </TouchableOpacity>
           <View
             style={[
               styles.td_cell,
