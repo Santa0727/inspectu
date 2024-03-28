@@ -4,9 +4,11 @@ import MainContainer from '../../components/container/MainContainer';
 import {
   ActivityIndicator,
   Dimensions,
+  Linking,
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from 'react-native';
 import { SceneMap, TabView } from 'react-native-tab-view';
@@ -15,40 +17,61 @@ import { ISchool } from '../../lib/entities';
 import { useFocusEffect } from '@react-navigation/native';
 import { sendRequest } from '../../config/compose';
 
-const OverviewRoute: FC<{ school: ISchool }> = ({ school }) => (
-  <ScrollView style={styles.tab_view}>
-    <View style={styles.row}>
-      <Text style={styles.label}>Name</Text>
-      <Text style={styles.value}>{school.name}</Text>
-    </View>
-    <View style={styles.row}>
-      <Text style={styles.label}>Phone</Text>
-      <Text style={styles.value}>{school.phone}</Text>
-    </View>
-    <View style={styles.row}>
-      <Text style={styles.label}>Email</Text>
-      <Text style={styles.value}>{school.email}</Text>
-    </View>
-    <View style={styles.row}>
-      <Text style={styles.label}>Address</Text>
-      <Text style={styles.value}>{school.address}</Text>
-    </View>
-    <View style={styles.row}>
-      <Text style={styles.label}>Location</Text>
-      <Text style={styles.value}>{school.location}</Text>
-    </View>
-    <View style={styles.row}>
-      <Text style={styles.label}>Notes</Text>
-      <Text style={styles.value}>{school.notes}</Text>
-    </View>
-    <View style={styles.row}>
-      <Text style={styles.label}>Visit information</Text>
-      <Text style={styles.value}>{school.visit?.name}</Text>
-      <Text style={styles.value}>{school.visit?.date}</Text>
-    </View>
-    <View style={{ height: 15 }} />
-  </ScrollView>
-);
+const OverviewRoute: FC<{ school: ISchool }> = ({ school }) => {
+  const openLink = async (url: string) => {
+    try {
+      const supported = await Linking.canOpenURL(url);
+      if (supported) {
+        await Linking.openURL(url);
+      } else {
+        alert('Unable to open');
+      }
+    } catch (error: any) {
+      alert('An error occurred ' + error?.message);
+    }
+  };
+
+  return (
+    <ScrollView style={styles.tab_view}>
+      <View style={styles.row}>
+        <Text style={styles.label}>Name</Text>
+        <Text style={styles.value}>{school.name}</Text>
+      </View>
+      <TouchableOpacity
+        style={styles.row}
+        onPress={() => openLink(`tel:${school.phone}`)}>
+        <Text style={styles.label}>Phone</Text>
+        <Text style={styles.value}>{school.phone}</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.row}
+        onPress={() => openLink(`mailto:${school.email}`)}>
+        <Text style={styles.label}>Email</Text>
+        <Text style={styles.value}>{school.email}</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.row}
+        onPress={() =>
+          openLink(`http://maps.google.com/?q=${school.location}`)
+        }>
+        <Text style={styles.label}>Address</Text>
+        <Text style={styles.value}>{school.address}</Text>
+      </TouchableOpacity>
+      {!!school.notes && (
+        <View style={styles.row}>
+          <Text style={styles.label}>Notes</Text>
+          <Text style={styles.value}>{school.notes}</Text>
+        </View>
+      )}
+      <View style={styles.row}>
+        <Text style={styles.label}>Visit information</Text>
+        <Text style={styles.value}>{school.visit?.name}</Text>
+        <Text style={styles.value}>{school.visit?.date}</Text>
+      </View>
+      <View style={{ height: 15 }} />
+    </ScrollView>
+  );
+};
 
 interface IComing {
   id: number;
