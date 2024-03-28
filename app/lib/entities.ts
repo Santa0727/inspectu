@@ -3,6 +3,11 @@ export interface IName {
   name: string;
 }
 
+interface IVisit {
+  name: string;
+  date: string;
+}
+
 export interface ISchool {
   id: number;
   name: string;
@@ -11,6 +16,8 @@ export interface ISchool {
   email: string;
   address: string;
   location: string;
+  notes: string | null;
+  visit: IVisit | null;
 }
 
 export interface IUser {
