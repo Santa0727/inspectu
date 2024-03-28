@@ -1,3 +1,8 @@
+export interface IName {
+  id: number;
+  name: string;
+}
+
 export interface ISchool {
   id: number;
   name: string;
@@ -8,17 +13,12 @@ export interface ISchool {
   location: string;
 }
 
-export interface IRole {
-  id: number;
-  name: string;
-}
-
 export interface IUser {
   id: number;
   name: string;
   email: string;
   schools: ISchool[];
-  roles: IRole[];
+  roles: IName[];
 }
 
 export interface IInspection {

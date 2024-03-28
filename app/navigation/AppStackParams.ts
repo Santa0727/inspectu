@@ -15,6 +15,7 @@ export type InspectStackParamList = {
     initialForm?: any;
     onConfirm?: (d: any) => void;
   };
+  School: { schoolID: number };
 };
 
 export type MainStackParamList = {

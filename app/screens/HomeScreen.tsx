@@ -4,7 +4,7 @@ import InspectsTable from '../components/manage/InspectsTable';
 import { InspectStackParamList } from '../navigation/AppStackParams';
 import { useCallback, useState } from 'react';
 import { sendRequest } from '../config/compose';
-import { IInspection, ISchool } from '../lib/entities';
+import { IInspection, IName, ISchool } from '../lib/entities';
 import { useFocusEffect } from '@react-navigation/native';
 import {
   ActivityIndicator,
@@ -22,23 +22,36 @@ const HomeScreen = ({ navigation }: Props) => {
   const [loading, setLoading] = useState(false);
   const [comingItems, setComingItems] = useState<IInspection[]>();
   const [pastItems, setPastItems] = useState<IInspection[]>();
-  const [school, setSchool] = useState<ISchool>();
+  const [curSchool, setCurSchool] = useState<ISchool>();
+  const [schools, setSchools] = useState<IName[]>();
 
   const loadData = useCallback(() => {
-    setLoading(true);
-    sendRequest('api/member/inspections', {}, 'GET').then((res) => {
+    (async () => {
+      setLoading(true);
+
+      let res = await sendRequest('api/member/inspections', {}, 'GET');
       if (res.status) {
         setComingItems(res.data.coming);
         setPastItems(res.data.passed);
-        setLoading(false);
       } else {
         alert(res.message ?? 'Server error');
       }
-    });
+
+      res = await sendRequest('api/member/schools', {}, 'GET');
+      if (res.status) {
+        setSchools(res.data);
+      } else {
+        alert(res.message ?? 'Server error');
+      }
+
+      setLoading(false);
+    })();
   }, []);
 
   const goToDetail = (t: 'InspectEntry' | 'PostDetail', id: number) =>
     navigation.navigate(t, { inspectID: id });
+  const goToSchool = (id: number) =>
+    navigation.navigate('School', { schoolID: id });
 
   const openSchool = async (url: string) => {
     try {
@@ -63,41 +76,52 @@ const HomeScreen = ({ navigation }: Props) => {
         </View>
       ) : (
         <>
+          <View style={{ padding: 10 }}>
+            <Text style={styles.subtitle}>Schools</Text>
+            {schools?.map((x) => (
+              <TouchableOpacity
+                key={x.id}
+                onPress={goToSchool.bind(this, x.id)}>
+                <Text style={styles.school_name}>{x.name}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
           <InspectsTable
             items={comingItems ?? []}
             status="upcoming"
             goToInspect={(t, id) => goToDetail(t, id)}
-            onClickSchool={(s) => setSchool(s)}
+            onClickSchool={(s) => setCurSchool(s)}
           />
           <InspectsTable
             items={pastItems ?? []}
             status="past"
             goToInspect={(t, id) => goToDetail(t, id)}
-            onClickSchool={(s) => setSchool(s)}
+            onClickSchool={(s) => setCurSchool(s)}
           />
         </>
       )}
-      {school && (
+      {curSchool && (
         <Modal
           visible={true}
           title="School info"
           showFooter={false}
-          onClose={() => setSchool(undefined)}>
+          onClose={() => setCurSchool(undefined)}>
           <View>
-            <Text style={styles.name}>{school.name}</Text>
+            <Text style={styles.name}>{curSchool.name}</Text>
             <TouchableOpacity
-              onPress={() => openSchool(`mailto:${school.email}`)}>
-              <Text style={styles.link}>{school.email}</Text>
+              onPress={() => openSchool(`mailto:${curSchool.email}`)}>
+              <Text style={styles.link}>{curSchool.email}</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => openSchool(`tel:${school.phone}`)}>
-              <Text style={styles.link}>{school.phone}</Text>
+            <TouchableOpacity
+              onPress={() => openSchool(`tel:${curSchool.phone}`)}>
+              <Text style={styles.link}>{curSchool.phone}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={{ marginBottom: 30 }}
               onPress={() =>
-                openSchool(`http://maps.google.com/?q=${school.location}`)
+                openSchool(`http://maps.google.com/?q=${curSchool.location}`)
               }>
-              <Text style={styles.link}>{school.address}</Text>
+              <Text style={styles.link}>{curSchool.address}</Text>
             </TouchableOpacity>
           </View>
         </Modal>
@@ -118,6 +142,19 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: '500',
     textAlign: 'center',
+    textDecorationLine: 'underline',
+  },
+  subtitle: {
+    fontSize: 22,
+    marginVertical: 5,
+    marginHorizontal: 10,
+    fontWeight: '500',
+  },
+  school_name: {
+    fontSize: 20,
+    marginVertical: 8,
+    marginHorizontal: 10,
+    fontWeight: '400',
     textDecorationLine: 'underline',
   },
 });

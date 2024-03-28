@@ -1,9 +1,9 @@
-import { IRole, ISchool, IUser } from '../../lib/entities';
+import { IName, ISchool, IUser } from '../../lib/entities';
 import { ILogoutAction } from '../auth/auth.types';
 
 export interface IManageState {
   schools: ISchool[];
-  roles: IRole[];
+  roles: IName[];
   users: IUser[];
 }
 
@@ -14,7 +14,7 @@ interface ISetSchoolsAction {
 
 interface ISetRolesAction {
   type: 'MANAGE/SET_ROLES';
-  payload: IRole[];
+  payload: IName[];
 }
 
 interface ISetUsersAction {
