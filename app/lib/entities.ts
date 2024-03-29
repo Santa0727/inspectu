@@ -40,13 +40,13 @@ export interface IInspection {
 interface IOption {
   id: string;
   name: string;
+  qType: 'NA' | 'NC';
   answer?: boolean;
 }
 
 interface IQuestion {
   id: string;
   name: string;
-  type: 'radio' | 'checkbox';
   text: string;
   options: IOption[];
   status?: boolean;
