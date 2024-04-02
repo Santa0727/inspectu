@@ -13,9 +13,9 @@ import { InspectStackParamList } from '../../navigation/AppStackParams';
 import { useCallback, useState } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { sendRequest } from '../../config/compose';
-import { defaultDateFormat } from '../../config/helper';
 import { statusLabels } from '../../lib/lang';
 import { IEntryStep } from '../../lib/entities';
+import { defaultDateFormat } from '../../lib/helper';
 
 interface IEntry {
   inspection_id: number;

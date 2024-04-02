@@ -1,8 +1,8 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { IInspection, ISchool } from '../../lib/entities';
-import { defaultDateFormat } from '../../config/helper';
 import { statusLabels } from '../../lib/lang';
 import { COLORS } from '../../config/constants';
+import { defaultDateFormat } from '../../lib/helper';
 
 interface Props {
   items: IInspection[];

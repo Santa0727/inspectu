@@ -78,7 +78,7 @@ const InspectStep = ({ form, setForm, stepsIntro, data }: Props) => {
         </View>
       )}
       {data.questions.map((question) =>
-        question.type === 'checkbox' ? (
+        question.name === 'checkbox' ? (
           <View
             key={question.id}
             style={{ marginVertical: 10, paddingHorizontal: 10 }}>
