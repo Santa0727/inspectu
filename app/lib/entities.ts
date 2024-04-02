@@ -3,6 +3,11 @@ export interface IName {
   name: string;
 }
 
+interface IValue {
+  id: string;
+  value: boolean;
+}
+
 interface IVisit {
   name: string;
   date: string;
@@ -41,27 +46,25 @@ interface IOption {
   id: string;
   name: string;
   qType: 'NA' | 'NC';
-  answer?: boolean;
 }
 
 interface IQuestion {
   id: string;
   name: string;
   text: string;
-  options: IOption[];
-  status?: boolean;
+  options?: IOption[];
 }
 
 export interface IEntryStep {
   id: string;
   name: string;
-  options: {
-    id: string;
-    type: 'image';
-    answer?: string;
-  };
   questions: IQuestion[];
-  status?: 'approved' | 'error' | 'clarify';
-  message?: string;
-  userMessage?: string;
+}
+
+export interface IInspectAnswer {
+  question_id: string;
+  compliance_status: 'c' | 'n/c' | 'n/a';
+  options: IValue[];
+  images?: string[];
+  notes?: string;
 }

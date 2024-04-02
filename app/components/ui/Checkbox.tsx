@@ -16,6 +16,7 @@ interface Props {
   style?: StyleProp<ViewStyle>;
   disabled?: boolean;
   colorScheme?: 'success' | 'danger';
+  markPosition?: 'left' | 'right';
 }
 
 const Checkbox = ({
@@ -25,12 +26,19 @@ const Checkbox = ({
   style,
   disabled,
   colorScheme,
+  markPosition,
 }: Props) => (
   <View style={style}>
     <TouchableOpacity
       style={styles.touch_view}
       onPress={() => onChange && onChange(!value)}
       disabled={disabled}>
+      {markPosition === 'right' && (
+        <Text
+          style={[styles.left_label, colorScheme ? styles[colorScheme] : {}]}>
+          {label}
+        </Text>
+      )}
       {value ? (
         <MaterialCommunityIcons
           name="checkbox-outline"
@@ -44,9 +52,12 @@ const Checkbox = ({
           color={colorScheme ? COLORS[colorScheme] : 'black'}
         />
       )}
-      <Text style={[styles.label, colorScheme ? styles[colorScheme] : {}]}>
-        {label}
-      </Text>
+      {markPosition !== 'right' && (
+        <Text
+          style={[styles.right_label, colorScheme ? styles[colorScheme] : {}]}>
+          {label}
+        </Text>
+      )}
     </TouchableOpacity>
   </View>
 );
@@ -57,10 +68,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 3,
     marginVertical: 3,
+    justifyContent: 'space-between',
   },
-  label: {
+  right_label: {
     fontSize: 19,
     marginLeft: 5,
+    maxWidth: '85%',
+  },
+  left_label: {
+    fontSize: 19,
+    marginRight: 5,
+    maxWidth: '85%',
   },
   success: {
     color: COLORS.success,

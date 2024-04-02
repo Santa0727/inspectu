@@ -77,29 +77,22 @@ const PostDetailScreen = ({ navigation, route }: Props) => {
             {entry.steps.map((x) => (
               <View key={x.id} style={styles.label_btn_box}>
                 <View style={styles.label_view}>
-                  {x.status === 'approved' ? (
+                  {/* {x.status === 'approved' ? (
                     <FontAwesome name="check" size={24} color="#8FD14F" />
                   ) : x.status === 'error' ? (
                     <FontAwesome name="warning" size={24} color="#f24726" />
                   ) : (
                     <FontAwesome5 name="question" size={24} color="#fac710" />
-                  )}
+                  )} */}
                   <Text style={styles.label_txt}>{x.name}</Text>
                 </View>
-                <TouchableOpacity
-                  style={styles.touch_btn}
-                  onPress={() =>
-                    navigation.navigate('InspectReview', {
-                      inspectID,
-                      entryStep: x,
-                    })
-                  }>
+                <TouchableOpacity style={styles.touch_btn} onPress={() => {}}>
                   <Text style={styles.touch_txt}>
-                    {x.status === 'approved'
+                    {/* {x.status === 'approved'
                       ? 'View checklist'
                       : x.status === 'error'
                       ? 'Sink'
-                      : 'Clarify'}
+                      : 'Clarify'} */}
                   </Text>
                 </TouchableOpacity>
               </View>

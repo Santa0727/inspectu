@@ -6,53 +6,16 @@ import {
   View,
 } from 'react-native';
 import MainContainer from '../../components/container/MainContainer';
-import { FC, useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { InspectStackParamList } from '../../navigation/AppStackParams';
 import { sendRequest } from '../../config/compose';
 import { useFocusEffect } from '@react-navigation/native';
 import HTMLView from 'react-native-htmlview';
-import { IEntryStep } from '../../lib/entities';
-import { FontAwesome } from '@expo/vector-icons';
-import ImageBox from '../../components/ui/ImageBox';
+import { IEntryStep, IInspectAnswer } from '../../lib/entities';
 import { COLORS } from '../../config/constants';
-
-const FormStep: FC<{
-  data: IEntryStep;
-  form: any;
-  setForm: (d: any) => void;
-  goToReview: (d: IEntryStep) => void;
-  disabled?: boolean;
-}> = ({ data, form, setForm, goToReview, disabled }) => {
-  const changeImage = (img: string) => {
-    setForm({ ...form, [data.options.id]: img });
-  };
-  return (
-    <View style={styles.card}>
-      <ImageBox
-        image={
-          (form ?? {})[data.options.id] ?? data.options.answer ?? undefined
-        }
-        onChange={(m) => changeImage(m)}
-        disabled={disabled}
-      />
-      <TouchableOpacity
-        style={{
-          flexDirection: 'row',
-          marginHorizontal: 20,
-          alignItems: 'center',
-          paddingBottom: 10,
-        }}
-        onPress={() => goToReview(data)}>
-        <FontAwesome name="home" size={30} />
-        <View style={{ marginLeft: 10 }}>
-          <Text style={{ fontSize: 22, fontWeight: '500' }}>Location</Text>
-          <Text style={{ fontSize: 18, fontWeight: '400' }}>{data.name}</Text>
-        </View>
-      </TouchableOpacity>
-    </View>
-  );
-};
+import InspectStep from '../../components/manage/InspectStep';
+import ImageBox from '../../components/ui/ImageBox';
 
 interface IEntry {
   first: string;
@@ -60,6 +23,70 @@ interface IEntry {
   steps: IEntryStep[];
   last: string;
 }
+
+interface ReviewProps {
+  answers: IInspectAnswer[];
+  step: IEntryStep;
+  onClick: () => void;
+}
+
+const ReviewQuestionCard = ({ answers, step, onClick }: ReviewProps) => {
+  const data = step.questions.map((question) => {
+    const answer = answers.find((x) => x.question_id === question.id);
+
+    return {
+      id: question.id,
+      name: question.name,
+      options:
+        question.options?.filter((x) =>
+          answer?.options?.some((y) => y.id === x.id),
+        ) ?? [],
+      notes: answer?.notes,
+      images: answer?.images,
+      color:
+        answer?.compliance_status === 'c'
+          ? COLORS.success
+          : answer?.compliance_status === 'n/c'
+          ? COLORS.primary
+          : answer?.compliance_status === 'n/a'
+          ? COLORS.secondary
+          : 'black',
+    };
+  });
+
+  return (
+    <TouchableOpacity style={styles.card_container} onPress={onClick}>
+      {data.map((item, i) => (
+        <View key={item.id}>
+          <Text style={[styles.question_name, { color: item.color }]}>
+            {`${i + 1}) ${item.name}`}
+          </Text>
+          <View style={styles.question_body}>
+            {item.options.map((x) => (
+              <Text key={x.id} style={styles.question_option}>
+                {x.name}
+              </Text>
+            ))}
+            {!!item.notes && (
+              <>
+                <Text style={{ fontSize: 18, fontWeight: '500' }}>Notes</Text>
+                <Text style={styles.question_note}>{item.notes}</Text>
+              </>
+            )}
+            {item.images?.map((x, i) => (
+              <ImageBox
+                key={i}
+                style={{ marginVertical: 5 }}
+                image={x}
+                disabled={true}
+              />
+            ))}
+          </View>
+        </View>
+      ))}
+    </TouchableOpacity>
+  );
+};
 
 const StepSector = ({ isActive }: { isActive: boolean }) => (
   <>
@@ -75,37 +102,19 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
 
   const [step, setStep] = useState(0);
   const [entry, setEntry] = useState<IEntry>();
-  const [form, setForm] = useState<any>({});
+  const [form, setForm] = useState<IInspectAnswer[]>([]);
   const [disabled, setDisabled] = useState(false);
 
-  const goToReview = (step: IEntryStep) =>
-    navigation.navigate('InspectReview', {
-      inspectID,
-      entryStep: step,
-      initialForm: form,
-      onConfirm: (d) => setForm(d),
-    });
-
   const validForm = () => {
-    if (!entry) return null;
-    let result: any = { inspection_id: inspectID, ...form };
-    for (let s of entry.steps) {
-      if (!form[s.options.id]) {
-        alert(`Please pick image for ${s.name}`);
-        return null;
-      }
-      s.questions.forEach((e) => {
-        e.options.forEach((t) => {
-          if (result[t.id] === undefined) result[t.id] = false;
-        });
-      });
-    }
-    return result;
+    return {
+      inspection_id: inspectID,
+      questions: form,
+    };
   };
 
   const nextClick = async () => {
     if (!entry) return;
-    if (step === 1) {
+    if (step === entry.steps.length + 1) {
       const data = validForm();
       if (!data) return;
 
@@ -115,29 +124,45 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
         data,
         'POST',
       );
-      setDisabled(false);
       if (!res.status) {
         alert(res.message ?? 'Server error');
       } else {
         setStep(step + 1);
       }
-    } else if (step === 2) {
+      setDisabled(false);
+    } else if (step === entry.steps.length + 2) {
       navigation.goBack();
+    } else if (step === 0) {
+      setDisabled(true);
+      const res = await sendRequest(
+        'api/member/inspections/start',
+        { inspection_id: inspectID },
+        'POST',
+      );
+      if (res.status) {
+        setStep(step + 1);
+      } else {
+        alert(res.message ?? 'Server error');
+      }
+      setDisabled(false);
     } else {
       setStep(step + 1);
     }
   };
 
   const loadData = useCallback(() => {
-    sendRequest(`api/member/inspections/${inspectID}`, {}, 'GET').then(
-      (res) => {
-        if (res.status) {
-          setEntry(res.data);
-        } else {
-          alert(res.message ?? 'Server error');
-        }
-      },
-    );
+    (async () => {
+      const res = await sendRequest(
+        `api/member/inspections/${inspectID}`,
+        {},
+        'GET',
+      );
+      if (res.status) {
+        setEntry(res.data);
+      } else {
+        alert(res.message ?? 'Server error');
+      }
+    })();
   }, [inspectID]);
 
   useFocusEffect(loadData);
@@ -154,12 +179,28 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
                 </Text>
                 <HTMLView style={{ marginTop: 10 }} value={entry.first} />
               </View>
-            ) : step > 1 ? (
+            ) : step === entry.steps.length + 2 ? (
               <View>
                 <Text style={{ fontSize: 24, fontWeight: '600' }}>
                   {'Thank you for your submitting report'}
                 </Text>
                 <HTMLView style={{ marginTop: 10 }} value={entry.last} />
+              </View>
+            ) : step === entry.steps.length + 1 ? (
+              <View>
+                <Text style={{ fontSize: 24, fontWeight: '600' }}>Review</Text>
+                <HTMLView
+                  style={{ marginTop: 10 }}
+                  value={entry.steps_intro ?? ''}
+                />
+                {entry.steps.map((x, i) => (
+                  <ReviewQuestionCard
+                    key={i}
+                    answers={form}
+                    step={x}
+                    onClick={() => setStep(i + 1)}
+                  />
+                ))}
               </View>
             ) : (
               <>
@@ -169,22 +210,17 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
                     value={entry.steps_intro ?? ''}
                   />
                 )}
-                {entry.steps.map((step) => (
-                  <FormStep
-                    key={step.id}
-                    data={step}
-                    form={form}
-                    setForm={setForm}
-                    goToReview={goToReview}
-                    disabled={disabled}
-                  />
-                ))}
+                <InspectStep
+                  data={entry.steps[step - 1]}
+                  form={form}
+                  setForm={setForm}
+                />
               </>
             )}
           </View>
           <View style={styles.steps_view}>
             <View style={styles.steps_btn}>
-              {step < 2 ? (
+              {step < entry.steps.length + 2 ? (
                 <TouchableOpacity
                   style={[styles.next_btn, disabled ? styles.disabled : {}]}
                   onPress={() =>
@@ -203,13 +239,22 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
                 onPress={nextClick}
                 disabled={disabled}>
                 <Text style={styles.next_txt}>
-                  {step === 1 ? 'Submit' : step === 2 ? 'Finish' : 'Next'}
+                  {step === entry.steps.length
+                    ? 'Review'
+                    : step === entry.steps.length + 1
+                    ? 'Submit'
+                    : step === entry.steps.length + 2
+                    ? 'Finish'
+                    : 'Next'}
                 </Text>
               </TouchableOpacity>
             </View>
             <View style={styles.steps_bar}>
               <View style={styles.step_circle} />
-              {Array.from({ length: 2 }, (_, id) => id + 1).map((x) => (
+              {Array.from(
+                { length: entry.steps.length + 2 },
+                (_, id) => id + 1,
+              ).map((x) => (
                 <StepSector key={x} isActive={step >= x} />
               ))}
             </View>
@@ -279,11 +324,30 @@ const styles = StyleSheet.create({
   disabled: {
     backgroundColor: COLORS.disabled,
   },
-  card: {
-    borderWidth: 3,
+  card_container: {
+    marginVertical: 5,
+    padding: 10,
+    borderWidth: 1,
     borderColor: '#d1d1d1',
-    flexDirection: 'row',
-    marginVertical: 8,
+    borderRadius: 5,
+  },
+  question_name: {
+    fontSize: 20,
+    fontWeight: '500',
+  },
+  question_body: {
+    marginVertical: 10,
+    paddingLeft: 15,
+  },
+  question_option: {
+    fontSize: 18,
+    fontWeight: '400',
+    marginBottom: 5,
+  },
+  question_note: {
+    fontSize: 18,
+    fontWeight: '400',
+    marginBottom: 10,
   },
 });
 

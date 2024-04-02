@@ -177,8 +177,6 @@ const SchoolScreen = ({ navigation, route }: Props) => {
       );
       if (res.status) {
         setComes(res.data);
-      } else {
-        alert(res.message ?? 'Server error');
       }
 
       res = await sendRequest(
@@ -188,8 +186,6 @@ const SchoolScreen = ({ navigation, route }: Props) => {
       );
       if (res.status) {
         setHistories(res.data);
-      } else {
-        alert(res.message ?? 'Server error');
       }
 
       setLoading(false);

@@ -18,7 +18,6 @@ import {
 } from './AppStackParams';
 import ScheduleScreen from '../screens/ScheduleScreen';
 import HelpScreen from '../screens/HelpScreen';
-import InspectReviewScreen from '../screens/inspect/InspectReviewScreen';
 import SchoolScreen from '../screens/inspect/SchoolScreen';
 
 const AuthStack = createNativeStackNavigator<AuthStackParamList>();
@@ -56,11 +55,6 @@ const InspectNavigator = () => (
       options={{ headerShown: false }}
       name="PostDetail"
       component={PostDetailScreen}
-    />
-    <InspectStack.Screen
-      options={{ headerShown: false }}
-      name="InspectReview"
-      component={InspectReviewScreen}
     />
     <InspectStack.Screen
       options={{ headerShown: false }}
