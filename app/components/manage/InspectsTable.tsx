@@ -1,13 +1,13 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { IInspection, ISchool } from '../../lib/entities';
-import { statusLabels } from '../../lib/lang';
+import { statusLabel } from '../../lib/lang';
 import { COLORS } from '../../config/constants';
 import { defaultDateFormat } from '../../lib/helper';
 
 interface Props {
   items: IInspection[];
   status: 'upcoming' | 'past';
-  goToInspect: (t: 'InspectEntry' | 'PostDetail', id: number) => void;
+  goToInspect: (t: 'InspectEntry' | 'InspectReview', id: number) => void;
   onClickSchool: (school: ISchool) => void;
 }
 
@@ -79,12 +79,12 @@ const InspectsTable = ({
                           : 'black',
                     },
                   ]}>
-                  {statusLabels[x.status] ?? x.status}
+                  {statusLabel(x.status)}
                 </Text>
                 {x.status === 'review_required' && (
                   <TouchableOpacity
                     style={styles.view_btn}
-                    onPress={() => goToInspect('PostDetail', x.id)}>
+                    onPress={() => goToInspect('InspectReview', x.id)}>
                     <Text style={styles.view_txt}>View</Text>
                   </TouchableOpacity>
                 )}

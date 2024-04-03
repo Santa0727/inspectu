@@ -48,6 +48,10 @@ interface IOption {
   qType: 'NA' | 'NC';
 }
 
+interface ICheckedOption extends IOption {
+  status: boolean;
+}
+
 interface IQuestion {
   id: string;
   name: string;
@@ -55,10 +59,21 @@ interface IQuestion {
   options?: IOption[];
 }
 
+interface IQuestionAnswer extends IQuestion {
+  options?: ICheckedOption[];
+  review_flagged?: boolean;
+}
+
 export interface IEntryStep {
   id: string;
   name: string;
   questions: IQuestion[];
+}
+
+export interface IReviewStep extends IEntryStep {
+  questions: IQuestionAnswer[];
+  status: 'approved' | 'error' | 'clarification';
+  adminMessage?: string;
 }
 
 export interface IInspectAnswer {

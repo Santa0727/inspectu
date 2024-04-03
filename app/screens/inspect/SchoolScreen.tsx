@@ -16,6 +16,7 @@ import { useCallback, useState, FC } from 'react';
 import { ISchool } from '../../lib/entities';
 import { useFocusEffect } from '@react-navigation/native';
 import { sendRequest } from '../../config/compose';
+import { statusLabel, statusLabels } from '../../lib/lang';
 
 const OverviewRoute: FC<{ school: ISchool }> = ({ school }) => {
   const openLink = async (url: string) => {
@@ -92,21 +93,6 @@ const InspectionsRoute: FC<{ comes: IComing[] }> = ({ comes }) => (
     <View style={{ height: 15 }} />
   </ScrollView>
 );
-
-const statusLabel = (s: string) => {
-  switch (s) {
-    case 'publish':
-      return 'Published';
-    case 'pending_review':
-      return 'Pending review';
-    case 'review_required':
-      return 'Review required';
-    case 'approved':
-      return 'Approved';
-    default:
-      return s;
-  }
-};
 
 interface IHistory {
   id: number;

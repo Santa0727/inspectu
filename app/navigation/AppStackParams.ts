@@ -6,7 +6,7 @@ export type AuthStackParamList = {
 export type InspectStackParamList = {
   Inspections: undefined;
   InspectEntry: { inspectID: number };
-  PostDetail: { inspectID: number };
+  InspectReview: { inspectID: number };
   School: { schoolID: number };
 };
 

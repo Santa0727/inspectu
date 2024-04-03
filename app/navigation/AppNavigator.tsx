@@ -10,7 +10,6 @@ import HomeScreen from '../screens/HomeScreen';
 import ProfileScreen from '../screens/auth/ProfileScreen';
 import { loadMyProfile } from '../store/auth/auth.actions';
 import InspectEntryScreen from '../screens/inspect/InspectEntryScreen';
-import PostDetailScreen from '../screens/inspect/PostDetailScreen';
 import {
   AuthStackParamList,
   InspectStackParamList,
@@ -19,6 +18,7 @@ import {
 import ScheduleScreen from '../screens/ScheduleScreen';
 import HelpScreen from '../screens/HelpScreen';
 import SchoolScreen from '../screens/inspect/SchoolScreen';
+import InspectReviewScreen from '../screens/inspect/InspectReviewScreen';
 
 const AuthStack = createNativeStackNavigator<AuthStackParamList>();
 
@@ -53,8 +53,8 @@ const InspectNavigator = () => (
     />
     <InspectStack.Screen
       options={{ headerShown: false }}
-      name="PostDetail"
-      component={PostDetailScreen}
+      name="InspectReview"
+      component={InspectReviewScreen}
     />
     <InspectStack.Screen
       options={{ headerShown: false }}

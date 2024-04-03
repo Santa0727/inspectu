@@ -48,7 +48,7 @@ const HomeScreen = ({ navigation }: Props) => {
     })();
   }, []);
 
-  const goToDetail = (t: 'InspectEntry' | 'PostDetail', id: number) =>
+  const goToDetail = (t: 'InspectEntry' | 'InspectReview', id: number) =>
     navigation.navigate(t, { inspectID: id });
   const goToSchool = (id: number) =>
     navigation.navigate('School', { schoolID: id });
