@@ -149,7 +149,7 @@ interface Props {
   data: IEntryStep;
 }
 
-const InspectStep = ({ form, setForm, data }: Props) => {
+const InspectStepForm = ({ form, setForm, data }: Props) => {
   const [queID, setQueID] = useState<string>();
   const [selected, setSelected] = useState<ISelectedData>();
 
@@ -323,4 +323,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default InspectStep;
+export default InspectStepForm;

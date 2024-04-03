@@ -49,7 +49,7 @@ interface IOption {
 }
 
 interface ICheckedOption extends IOption {
-  status: boolean;
+  answer: boolean;
 }
 
 interface IQuestion {
@@ -61,7 +61,10 @@ interface IQuestion {
 
 interface IQuestionAnswer extends IQuestion {
   options?: ICheckedOption[];
+  compliance_status: 'c' | 'n/c' | 'n/a';
   review_flagged?: boolean;
+  images?: string[];
+  notes?: string;
 }
 
 export interface IEntryStep {
@@ -72,7 +75,7 @@ export interface IEntryStep {
 
 export interface IReviewStep extends IEntryStep {
   questions: IQuestionAnswer[];
-  status: 'approved' | 'error' | 'clarification';
+  status: 'approved' | 'error' | 'clarify';
   adminMessage?: string;
 }
 

@@ -14,7 +14,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import HTMLView from 'react-native-htmlview';
 import { IEntryStep, IInspectAnswer } from '../../lib/entities';
 import { COLORS } from '../../config/constants';
-import InspectStep from '../../components/manage/InspectStep';
+import InspectStepForm from '../../components/manage/InspectStepForm';
 import ImageBox from '../../components/ui/ImageBox';
 
 interface IEntry {
@@ -219,7 +219,7 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
                     value={entry.steps_intro ?? ''}
                   />
                 )}
-                <InspectStep
+                <InspectStepForm
                   data={entry.steps[step - 1]}
                   form={form}
                   setForm={setForm}
