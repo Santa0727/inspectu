@@ -14,7 +14,7 @@ interface IOption {
   name: string;
 }
 
-interface IModalProps {
+interface QuestionProps {
   visible: boolean;
   title: string;
   data: IInspectAnswer;
@@ -30,7 +30,7 @@ const QuestionModal = ({
   data,
   onConfirm,
   onClose,
-}: IModalProps) => {
+}: QuestionProps) => {
   const [images, setImages] = useState(data.images ?? []);
   const [checked, setChecked] = useState(data.options ?? []);
   const [notes, setNotes] = useState(data.notes ?? '');
@@ -102,6 +102,47 @@ interface ISelectedData {
   title: string;
 }
 
+interface CompliantProps {
+  compliantClick: () => void;
+  nonCompliantClick: (type: 'NA' | 'NC') => void;
+  onClose: () => void;
+}
+
+const CompliantModal = ({
+  compliantClick,
+  nonCompliantClick,
+  onClose,
+}: CompliantProps) => (
+  <Modal
+    visible={true}
+    title="Select compliant status"
+    showFooter={false}
+    onClose={onClose}
+    size="small">
+    <TouchButton
+      style={{ marginVertical: 10 }}
+      label="Compliant"
+      scheme="success"
+      size="small"
+      onPress={compliantClick}
+    />
+    <TouchButton
+      style={{ marginVertical: 10 }}
+      label="N/C"
+      scheme="primary"
+      size="small"
+      onPress={() => nonCompliantClick('NC')}
+    />
+    <TouchButton
+      style={{ marginVertical: 10 }}
+      label="N/A"
+      scheme="secondary"
+      size="small"
+      onPress={() => nonCompliantClick('NA')}
+    />
+  </Modal>
+);
+
 interface Props {
   form: IInspectAnswer[];
   setForm: (d: IInspectAnswer[]) => void;
@@ -139,6 +180,7 @@ const InspectStep = ({ form, setForm, data }: Props) => {
     }
     setForm(tmp);
     setSelected(undefined);
+    setQueID(undefined);
   };
   const nonCompliantClick = (type: 'NA' | 'NC') => {
     if (!queID) return;
@@ -159,6 +201,7 @@ const InspectStep = ({ form, setForm, data }: Props) => {
     const answer = i >= 0 ? tmp[i] : tmp[tmp.length - 1];
 
     setSelected({ options, answer, title: question?.name ?? '' });
+    setQueID(undefined);
   };
   const clearClick = () => {
     let tmp = form.filter(
@@ -191,35 +234,13 @@ const InspectStep = ({ form, setForm, data }: Props) => {
         </View>
       </View>
       <View style={styles.body}>
-        <View style={styles.buttons}>
-          <TouchButton
-            label="COMP"
-            scheme="success"
-            size="small"
-            disabled={!queID}
-            onPress={compliantClick}
-          />
-          <TouchButton
-            label="N/C"
-            scheme="primary"
-            size="small"
-            disabled={!queID}
-            onPress={() => nonCompliantClick('NC')}
-          />
-          <TouchButton
-            label="N/A"
-            scheme="secondary"
-            size="small"
-            disabled={!queID}
-            onPress={() => nonCompliantClick('NA')}
-          />
-          <TouchButton
-            label="CLR"
-            scheme="danger"
-            size="small"
-            onPress={clearClick}
-          />
-        </View>
+        <TouchButton
+          style={styles.clear_button}
+          label="Clear"
+          scheme="danger"
+          size="small"
+          onPress={clearClick}
+        />
         <View style={styles.questions}>
           {data.questions.map((x, i) => (
             <TouchableOpacity
@@ -251,6 +272,13 @@ const InspectStep = ({ form, setForm, data }: Props) => {
           }}
         />
       )}
+      {!!queID && (
+        <CompliantModal
+          compliantClick={compliantClick}
+          nonCompliantClick={nonCompliantClick}
+          onClose={() => setQueID(undefined)}
+        />
+      )}
     </View>
   );
 };
@@ -268,10 +296,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     paddingHorizontal: 5,
   },
-  buttons: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+  clear_button: {
     marginBottom: 20,
   },
   questions: {
