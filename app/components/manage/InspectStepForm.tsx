@@ -1,6 +1,6 @@
 import { FontAwesome } from '@expo/vector-icons';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { IEntryStep, IInspectAnswer } from '../../lib/entities';
+import { IEntryStep, IInspectAnswer, IReviewStep } from '../../lib/entities';
 import Modal from '../ui/Modal';
 import Checkbox from '../ui/Checkbox';
 import CommentBox from '../ui/CommentBox';
@@ -146,10 +146,11 @@ const CompliantModal = ({
 interface Props {
   form: IInspectAnswer[];
   setForm: (d: IInspectAnswer[]) => void;
-  data: IEntryStep;
+  data: IEntryStep | IReviewStep;
+  isReview?: boolean;
 }
 
-const InspectStepForm = ({ form, setForm, data }: Props) => {
+const InspectStepForm = ({ form, setForm, data, isReview }: Props) => {
   const [queID, setQueID] = useState<string>();
   const [selected, setSelected] = useState<ISelectedData>();
 
@@ -224,6 +225,10 @@ const InspectStepForm = ({ form, setForm, data }: Props) => {
     setSelected(undefined);
   };
 
+  const questions = isReview
+    ? (data as IReviewStep).questions.filter((x) => !!x.review_flagged)
+    : data.questions;
+
   return (
     <View>
       <View style={styles.header}>
@@ -242,7 +247,7 @@ const InspectStepForm = ({ form, setForm, data }: Props) => {
           onPress={clearClick}
         />
         <View style={styles.questions}>
-          {data.questions.map((x, i) => (
+          {questions.map((x, i) => (
             <TouchableOpacity
               key={x.id}
               style={styles.question}

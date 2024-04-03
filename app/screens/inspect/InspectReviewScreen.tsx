@@ -108,8 +108,6 @@ const InspectReviewScreen = ({ navigation, route }: Props) => {
   const [disabled, setDisabled] = useState(false);
 
   const reviewClick = (step: IReviewStep) => {
-    console.log(step.status);
-
     if (step.status === 'approved') {
       setViewData(step);
       setClarifyData(undefined);
@@ -188,6 +186,7 @@ const InspectReviewScreen = ({ navigation, route }: Props) => {
                 data={retryData}
                 form={retryForm}
                 setForm={setRetryForm}
+                isReview={true}
               />
               <TouchButton
                 style={{ marginHorizontal: 12, marginVertical: 20 }}
