@@ -51,7 +51,12 @@ const QuestionModal = ({
     setImages([...images, img]);
   };
   const confirmClick = () =>
-    onConfirm({ ...data, options: checked, images, notes });
+    onConfirm({
+      ...data,
+      options: checked,
+      images,
+      notes: notes ? notes : undefined,
+    });
 
   return (
     <Modal

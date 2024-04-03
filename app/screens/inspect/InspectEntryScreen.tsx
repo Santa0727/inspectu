@@ -146,6 +146,15 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
       }
       setDisabled(false);
     } else {
+      for (let i = 0; i < entry.steps[step - 1].questions.length; i++) {
+        const answer = form.find(
+          (x) => x.question_id === entry.steps[step - 1].questions[i].id,
+        );
+        if (!answer) {
+          alert('Please answer all questions');
+          return;
+        }
+      }
       setStep(step + 1);
     }
   };
