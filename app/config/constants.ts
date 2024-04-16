@@ -8,4 +8,5 @@ export const COLORS = {
   inactive: '#d9dbf0',
   pending: '#eab308',
   approved: '#8FD14F',
+  yellow: '#facc15',
 };

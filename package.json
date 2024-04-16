@@ -16,7 +16,7 @@
     "@react-navigation/native-stack": "^6.9.17",
     "@types/react-native-htmlview": "^0.16.4",
     "axios": "^1.6.2",
-    "expo": "~50.0.14",
+    "expo": "~50.0.15",
     "expo-image-picker": "~14.7.1",
     "expo-status-bar": "~1.11.1",
     "expo-updates": "~0.24.12",

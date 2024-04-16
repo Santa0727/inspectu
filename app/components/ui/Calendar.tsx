@@ -10,6 +10,7 @@ import {
 import { zeroPad } from '../../lib/helper';
 import { StyleSheet } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
+import { COLORS } from '../../config/constants';
 
 const weeks = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
   monthNames = [
@@ -34,10 +35,12 @@ interface ICell {
 }
 
 interface Props {
+  markers?: string[];
   style?: StyleProp<ViewStyle>;
+  onSelectDate?: (date: string) => void;
 }
 
-const Calendar = ({ style }: Props) => {
+const Calendar = ({ markers, style, onSelectDate }: Props) => {
   const [year, setYear] = useState(moment().toDate().getFullYear());
   const [month, setMonth] = useState(moment().toDate().getMonth());
   const valStr = moment().format('YYYY-MM-DD');
@@ -85,7 +88,6 @@ const Calendar = ({ style }: Props) => {
     }
     setMonth(m);
   };
-  const selectClick = (v: number) => {};
 
   return (
     <View style={[styles.wrapper, style]}>
@@ -118,10 +120,15 @@ const Calendar = ({ style }: Props) => {
             <View key={j} style={{ flex: 1 }}>
               {!!cell.label && (
                 <TouchableOpacity
-                  style={
-                    cell.date_str === valStr ? styles.sel_touch : styles.touch
-                  }
-                  onPress={() => selectClick(cell.value ?? 0)}>
+                  style={[
+                    cell.date_str === valStr ? styles.sel_touch : styles.touch,
+                    cell.date_str && markers && markers.includes(cell.date_str)
+                      ? styles.marked
+                      : {},
+                  ]}
+                  onPress={() =>
+                    cell.date_str && onSelectDate && onSelectDate(cell.date_str)
+                  }>
                   <Text
                     style={{
                       color: cell.date_str === valStr ? 'white' : 'black',
@@ -197,6 +204,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingBottom: 10,
+  },
+  marked: {
+    backgroundColor: COLORS.yellow,
   },
 });
 

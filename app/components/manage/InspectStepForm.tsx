@@ -129,14 +129,14 @@ const CompliantModal = ({
     <TouchButton
       style={{ marginVertical: 10 }}
       label="N/C"
-      scheme="primary"
+      scheme="danger"
       size="small"
       onPress={() => nonCompliantClick('NC')}
     />
     <TouchButton
       style={{ marginVertical: 10 }}
       label="N/A"
-      scheme="secondary"
+      scheme="yellow"
       size="small"
       onPress={() => nonCompliantClick('NA')}
     />
@@ -159,9 +159,9 @@ const InspectStepForm = ({ form, setForm, data, isReview }: Props) => {
     if (com?.compliance_status === 'c') {
       return COLORS.success;
     } else if (com?.compliance_status === 'n/c') {
-      return COLORS.primary;
+      return COLORS.danger;
     } else if (com?.compliance_status === 'n/a') {
-      return COLORS.secondary;
+      return COLORS.yellow;
     } else {
       return 'black';
     }
