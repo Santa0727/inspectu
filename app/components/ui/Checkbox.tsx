@@ -1,4 +1,4 @@
-import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import {
   StyleProp,
   StyleSheet,
@@ -46,8 +46,8 @@ const Checkbox = ({
           color={colorScheme ? COLORS[colorScheme] : 'black'}
         />
       ) : (
-        <MaterialIcons
-          name="check-box-outline-blank"
+        <MaterialCommunityIcons
+          name="checkbox-blank-outline"
           size={28}
           color={colorScheme ? COLORS[colorScheme] : 'black'}
         />

@@ -151,14 +151,13 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
       }
       setDisabled(false);
     } else {
-      for (let i = 0; i < entry.steps[step - 1].questions.length; i++) {
-        const answer = form.find(
-          (x) => x.question_id === entry.steps[step - 1].questions[i].id,
-        );
-        if (!answer) {
-          alert('Please answer all questions');
-          return;
-        }
+      if (
+        entry.steps[step - 1].questions.every(
+          (x) => !form.some((y) => y.question_id === x.id),
+        )
+      ) {
+        alert('Please answer for at least one question');
+        return;
       }
       setStep(step + 1);
     }
