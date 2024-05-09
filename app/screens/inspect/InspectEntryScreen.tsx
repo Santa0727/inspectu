@@ -55,36 +55,41 @@ const ReviewQuestionCard = ({ answers, step, onClick }: ReviewProps) => {
   });
 
   return (
-    <TouchableOpacity style={styles.card_container} onPress={onClick}>
-      {data.map((item, i) => (
-        <View key={item.id}>
-          <Text style={[styles.question_name, { color: item.color }]}>
-            {`${i + 1}) ${item.name}`}
-          </Text>
-          <View style={styles.question_body}>
-            {item.options.map((x) => (
-              <Text key={x.id} style={styles.question_option}>
-                {x.name}
-              </Text>
-            ))}
-            {!!item.notes && (
-              <>
-                <Text style={{ fontSize: 18, fontWeight: '500' }}>Notes</Text>
-                <Text style={styles.question_note}>{item.notes}</Text>
-              </>
-            )}
-            {item.images?.map((x, i) => (
-              <ImageBox
-                key={i}
-                style={{ marginVertical: 5 }}
-                image={x}
-                disabled={true}
-              />
-            ))}
+    <View style={{ marginBottom: 20, marginTop: 5 }}>
+      <Text style={{ fontSize: 20, fontWeight: '600', paddingLeft: 5 }}>
+        {step.name}
+      </Text>
+      <TouchableOpacity style={styles.card_container} onPress={onClick}>
+        {data.map((item, i) => (
+          <View key={item.id}>
+            <Text style={[styles.question_name, { color: item.color }]}>
+              {`${i + 1}) ${item.name}`}
+            </Text>
+            <View style={styles.question_body}>
+              {item.options.map((x) => (
+                <Text key={x.id} style={styles.question_option}>
+                  {x.name}
+                </Text>
+              ))}
+              {!!item.notes && (
+                <>
+                  <Text style={{ fontSize: 18, fontWeight: '500' }}>Notes</Text>
+                  <Text style={styles.question_note}>{item.notes}</Text>
+                </>
+              )}
+              {item.images?.map((x, i) => (
+                <ImageBox
+                  key={i}
+                  style={{ marginVertical: 5 }}
+                  image={x}
+                  disabled={true}
+                />
+              ))}
+            </View>
           </View>
-        </View>
-      ))}
-    </TouchableOpacity>
+        ))}
+      </TouchableOpacity>
+    </View>
   );
 };
 

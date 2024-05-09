@@ -14,7 +14,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import Modal from '../components/ui/Modal';
+import SchoolViewModal from '../components/manage/SchoolViewModal';
 
 type Props = NativeStackScreenProps<InspectStackParamList, 'Inspections'>;
 
@@ -101,30 +101,11 @@ const HomeScreen = ({ navigation }: Props) => {
         </>
       )}
       {curSchool && (
-        <Modal
+        <SchoolViewModal
           visible={true}
-          title="School info"
-          showFooter={false}
-          onClose={() => setCurSchool(undefined)}>
-          <View>
-            <Text style={styles.name}>{curSchool.name}</Text>
-            <TouchableOpacity
-              onPress={() => openSchool(`mailto:${curSchool.email}`)}>
-              <Text style={styles.link}>{curSchool.email}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => openSchool(`tel:${curSchool.phone}`)}>
-              <Text style={styles.link}>{curSchool.phone}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={{ marginBottom: 30 }}
-              onPress={() =>
-                openSchool(`http://maps.google.com/?q=${curSchool.location}`)
-              }>
-              <Text style={styles.link}>{curSchool.address}</Text>
-            </TouchableOpacity>
-          </View>
-        </Modal>
+          school={curSchool}
+          onClose={() => setCurSchool(undefined)}
+        />
       )}
     </MainContainer>
   );
