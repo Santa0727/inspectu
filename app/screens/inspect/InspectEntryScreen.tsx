@@ -16,6 +16,7 @@ import { IEntryStep, IInspectAnswer } from '../../lib/entities';
 import { COLORS } from '../../config/constants';
 import InspectStepForm from '../../components/manage/InspectStepForm';
 import ImageBox from '../../components/ui/ImageBox';
+import Input from '../../components/ui/Input';
 
 interface IEntry {
   first: string;
@@ -33,16 +34,46 @@ interface ReviewProps {
 const ReviewQuestionCard = ({ answers, step, onClick }: ReviewProps) => {
   const data = step.questions.map((question) => {
     const answer = answers.find((x) => x.question_id === question.id);
+    const options =
+      question.type === 'compliance' ||
+      question.type === 'checkbox' ||
+      question.type === 'radio'
+        ? question.options?.filter((x) =>
+            answer?.options?.some((y) => y.id === x.id),
+          ) ?? []
+        : [];
+    const labels =
+      question.type === 'text' || question.type === 'multitext'
+        ? question.options?.map((x) => ({
+            id: x.id,
+            label: x.name,
+            value: answer?.options.find((y) => y.id === x.id)?.value as
+              | string
+              | undefined,
+          })) ?? []
+        : [];
+    const images =
+      question.type === 'image'
+        ? question.options?.map((x) => ({
+            id: x.id,
+            label: x.name,
+            value: answer?.options.find((y) => y.id === x.id)?.value as
+              | string
+              | undefined,
+          }))
+        : answer?.images?.map((x, j) => ({
+            id: j.toString(),
+            label: '',
+            value: x,
+          }));
 
     return {
       id: question.id,
       name: question.name,
-      options:
-        question.options?.filter((x) =>
-          answer?.options?.some((y) => y.id === x.id),
-        ) ?? [],
+      options,
+      labels,
       notes: answer?.notes,
-      images: answer?.images,
+      images,
       color:
         answer?.compliance_status === 'c'
           ? COLORS.success
@@ -77,11 +108,20 @@ const ReviewQuestionCard = ({ answers, step, onClick }: ReviewProps) => {
                   <Text style={styles.question_note}>{item.notes}</Text>
                 </>
               )}
+              {item.labels.map((x) => (
+                <Input
+                  key={x.id}
+                  label={x.label}
+                  value={x.value ?? ''}
+                  disabled={true}
+                />
+              ))}
               {item.images?.map((x, i) => (
                 <ImageBox
                   key={i}
                   style={{ marginVertical: 5 }}
-                  image={x}
+                  label={x.label}
+                  image={x.value}
                   disabled={true}
                 />
               ))}

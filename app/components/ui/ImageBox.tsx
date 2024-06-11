@@ -2,6 +2,7 @@ import {
   Image,
   StyleProp,
   StyleSheet,
+  Text,
   TouchableOpacity,
   View,
   ViewStyle,
@@ -14,13 +15,14 @@ const options: ImagePicker.ImagePickerOptions = {
 };
 
 interface Props {
+  label?: string;
   image?: string;
   disabled?: boolean;
   onChange?: (d: string) => void;
   style?: StyleProp<ViewStyle>;
 }
 
-const ImageBox = ({ image, disabled, onChange, style }: Props) => {
+const ImageBox = ({ label, image, disabled, onChange, style }: Props) => {
   const onOpenCamera = async () => {
     const status = await ImagePicker.requestCameraPermissionsAsync();
     if (!status.granted) {
@@ -54,6 +56,7 @@ const ImageBox = ({ image, disabled, onChange, style }: Props) => {
 
   return (
     <View style={[styles.wrapper, style]}>
+      {!!label && <Text style={styles.label}>{label}</Text>}
       <TouchableOpacity
         style={styles.touch_img}
         onPress={onOpenCamera}
@@ -77,6 +80,11 @@ const ImageBox = ({ image, disabled, onChange, style }: Props) => {
 
 const styles = StyleSheet.create({
   wrapper: {},
+  label: {
+    fontSize: 20,
+    fontWeight: '600',
+    marginVertical: 5,
+  },
   touch_img: {
     borderColor: 'lightgrey',
     borderWidth: 1,

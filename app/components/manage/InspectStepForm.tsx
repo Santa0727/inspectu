@@ -1,6 +1,11 @@
 import { FontAwesome } from '@expo/vector-icons';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { IEntryStep, IInspectAnswer, IReviewStep } from '../../lib/entities';
+import {
+  IEntryStep,
+  IInspectAnswer,
+  IReviewStep,
+  TQuestionType,
+} from '../../lib/entities';
 import Modal from '../ui/Modal';
 import Checkbox from '../ui/Checkbox';
 import CommentBox from '../ui/CommentBox';
@@ -8,6 +13,8 @@ import { useState } from 'react';
 import ImageBox from '../ui/ImageBox';
 import TouchButton from '../ui/TouchButton';
 import { COLORS } from '../../config/constants';
+import RadioSelect from '../ui/RadioSelect';
+import Input from '../ui/Input';
 
 interface IOption {
   id: string;
@@ -15,6 +22,7 @@ interface IOption {
 }
 
 interface QuestionProps {
+  type: TQuestionType;
   visible: boolean;
   title: string;
   data: IInspectAnswer;
@@ -24,6 +32,7 @@ interface QuestionProps {
 }
 
 const QuestionModal = ({
+  type,
   visible,
   title,
   options,
@@ -34,6 +43,7 @@ const QuestionModal = ({
   const [images, setImages] = useState(data.images ?? []);
   const [checked, setChecked] = useState(data.options ?? []);
   const [notes, setNotes] = useState(data.notes ?? '');
+  const [values, setValues] = useState(data.options ?? []);
 
   const toggleCheck = (id: string, c: boolean) => {
     let tmp = checked.filter((x) => x.id !== id);
@@ -50,13 +60,41 @@ const QuestionModal = ({
   const addImage = (img: string) => {
     setImages([...images, img]);
   };
-  const confirmClick = () =>
-    onConfirm({
-      ...data,
-      options: checked,
-      images,
-      notes: notes ? notes : undefined,
-    });
+  const updateValue = (id: string, v: string | boolean) => {
+    let tmp = [...values];
+    const i = tmp.findIndex((x) => x.id === id);
+    if (i >= 0) {
+      tmp[i].value = v;
+    } else {
+      tmp.push({ id, value: v });
+    }
+    setValues(tmp);
+  };
+  const radioSelectValue = (v: string | number) => {
+    let tmp = values.map((x) => ({
+      id: x.id,
+      value: v === x.id,
+    }));
+    if (tmp.every((x) => x.id !== v)) {
+      tmp.push({ id: v.toString(), value: true });
+    }
+    setValues(tmp);
+  };
+  const confirmClick = () => {
+    if (type === 'compliance') {
+      onConfirm({
+        ...data,
+        options: checked,
+        images,
+        notes: notes ? notes : undefined,
+      });
+    } else {
+      onConfirm({
+        ...data,
+        options: values,
+      });
+    }
+  };
 
   return (
     <Modal
@@ -66,37 +104,91 @@ const QuestionModal = ({
       onClose={onClose}
       onConfirm={confirmClick}
       size="small">
-      {options.map((x) => (
-        <Checkbox
-          key={x.id}
-          label={x.name}
-          value={checked.some((y) => y.value && y.id === x.id)}
-          onChange={(v) => toggleCheck(x.id, v)}
-          markPosition="right"
-        />
-      ))}
-      <CommentBox
-        label="Notes"
-        style={styles.note}
-        value={notes}
-        onChange={(v) => setNotes(v)}
-      />
-      <View style={styles.images}>
-        {images.map((x, i) => (
-          <ImageBox
-            style={{ marginVertical: 5 }}
-            key={i}
-            image={x}
-            onChange={(v) => changeImage(i, v)}
+      {type === 'compliance' ? (
+        <>
+          {options.map((x) => (
+            <Checkbox
+              key={x.id}
+              label={x.name}
+              value={checked.some((y) => y.value && y.id === x.id)}
+              onChange={(v) => toggleCheck(x.id, v)}
+              markPosition="right"
+            />
+          ))}
+          <CommentBox
+            label="Notes"
+            style={styles.note}
+            value={notes}
+            onChange={(v) => setNotes(v)}
           />
-        ))}
-        <ImageBox onChange={(v) => addImage(v)} />
-      </View>
+          <View style={styles.images}>
+            {images.map((x, i) => (
+              <ImageBox
+                style={{ marginVertical: 5 }}
+                key={i}
+                image={x}
+                onChange={(v) => changeImage(i, v)}
+              />
+            ))}
+            <ImageBox onChange={(v) => addImage(v)} />
+          </View>
+        </>
+      ) : type === 'checkbox' ? (
+        <>
+          {options.map((x) => (
+            <Checkbox
+              key={x.id}
+              label={x.name}
+              value={values.some((y) => y.value && y.id === x.id)}
+              onChange={(v) => updateValue(x.id, v)}
+              markPosition="right"
+            />
+          ))}
+        </>
+      ) : type === 'image' ? (
+        <>
+          {options.map((x) => (
+            <ImageBox
+              key={x.id}
+              label={x.name}
+              style={{ marginVertical: 5 }}
+              image={
+                values.find((y) => y.id === x.id)?.value as string | undefined
+              }
+              onChange={(v) => updateValue(x.id, v)}
+            />
+          ))}
+        </>
+      ) : type === 'multitext' || type === 'text' ? (
+        <>
+          {options.map((x) => (
+            <Input
+              key={x.id}
+              label={x.name}
+              value={
+                (values.find((y) => y.id === x.id)?.value as
+                  | string
+                  | undefined) ?? ''
+              }
+              onChange={(v) => updateValue(x.id, v)}
+            />
+          ))}
+        </>
+      ) : type === 'radio' ? (
+        <RadioSelect
+          value={values.find((x) => x.value === true)?.id}
+          options={options.map((x) => ({ id: x.id, label: x.name }))}
+          onChange={(v) => radioSelectValue(v)}
+        />
+      ) : (
+        <></>
+      )}
     </Modal>
   );
 };
 
 interface ISelectedData {
+  type: TQuestionType;
   options: IOption[];
   answer: IInspectAnswer;
   title: string;
@@ -162,8 +254,32 @@ const InspectStepForm = ({ form, setForm, data, isReview }: Props) => {
       return COLORS.danger;
     } else if (com?.compliance_status === 'n/a') {
       return COLORS.yellow;
+    } else if (com?.options.some((x) => !!x.value)) {
+      return COLORS.primary;
     } else {
       return 'black';
+    }
+  };
+  const selectQuestion = (q: any) => {
+    if (q.type === 'compliance') {
+      setQueID(q.id);
+    } else {
+      let tmp = [...form];
+      const i = tmp.findIndex((x) => x.question_id === q.id);
+      if (i < 0) {
+        tmp.push({
+          question_id: q.id,
+          options: [],
+        });
+        setForm(tmp);
+      }
+      const answer = i >= 0 ? tmp[i] : tmp[tmp.length - 1];
+      setSelected({
+        type: q.type,
+        options: q.options ?? [],
+        answer,
+        title: q.name ?? '',
+      });
     }
   };
   const compliantClick = () => {
@@ -201,7 +317,12 @@ const InspectStepForm = ({ form, setForm, data, isReview }: Props) => {
     const options = question?.options?.filter((x) => x.qType === type) ?? [];
     const answer = i >= 0 ? tmp[i] : tmp[tmp.length - 1];
 
-    setSelected({ options, answer, title: question?.name ?? '' });
+    setSelected({
+      type: 'compliance',
+      options,
+      answer,
+      title: question?.name ?? '',
+    });
     setQueID(undefined);
   };
   const clearClick = () => {
@@ -251,7 +372,7 @@ const InspectStepForm = ({ form, setForm, data, isReview }: Props) => {
             <TouchableOpacity
               key={x.id}
               style={styles.question}
-              onPress={() => setQueID(x.id)}>
+              onPress={() => selectQuestion(x)}>
               <Text style={[styles.question_name, { color: getColor(x.id) }]}>
                 {`${i + 1}) ${x.name}`}
               </Text>
@@ -266,6 +387,7 @@ const InspectStepForm = ({ form, setForm, data, isReview }: Props) => {
       </View>
       {selected && (
         <QuestionModal
+          type={selected.type}
           visible={true}
           title={selected.title}
           options={selected.options}

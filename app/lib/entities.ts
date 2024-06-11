@@ -5,7 +5,7 @@ export interface IName {
 
 interface IValue {
   id: string;
-  value: boolean;
+  value: boolean | string;
 }
 
 interface IVisit {
@@ -55,13 +55,22 @@ interface ICheckedOption extends IOption {
 interface IQuestion {
   id: string;
   name: string;
+  type: TQuestionType;
   text: string;
   options?: IOption[];
 }
 
+export type TQuestionType =
+  | 'compliance'
+  | 'text'
+  | 'multitext'
+  | 'checkbox'
+  | 'radio'
+  | 'image';
+
 interface IQuestionAnswer extends IQuestion {
   options?: ICheckedOption[];
-  compliance_status: 'c' | 'n/c' | 'n/a';
+  compliance_status?: 'c' | 'n/c' | 'n/a';
   review_flagged?: boolean;
   images?: string[];
   notes?: string;
@@ -81,7 +90,7 @@ export interface IReviewStep extends IEntryStep {
 
 export interface IInspectAnswer {
   question_id: string;
-  compliance_status: 'c' | 'n/c' | 'n/a';
+  compliance_status?: 'c' | 'n/c' | 'n/a';
   options: IValue[];
   images?: string[];
   notes?: string;

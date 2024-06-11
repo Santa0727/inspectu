@@ -22,7 +22,7 @@ import ImageBox from '../../components/ui/ImageBox';
 import Checkbox from '../../components/ui/Checkbox';
 import InspectStepForm from '../../components/manage/InspectStepForm';
 
-const itemColor = (status: string) => {
+const itemColor = (status: string | undefined) => {
   if (status === 'c') {
     return COLORS.success;
   } else if (status === 'n/c') {
