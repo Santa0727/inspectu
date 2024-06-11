@@ -127,6 +127,7 @@ const InspectReviewScreen = ({ navigation, route }: Props) => {
   const submitRetryForm = async () => {
     if (!retryData) return;
     for (let i = 0; i < retryData.questions.length; i++) {
+      if (!retryData.questions[i].review_flagged) continue;
       const answer = retryForm.find(
         (x) => x.question_id === retryData.questions[i].id,
       );
