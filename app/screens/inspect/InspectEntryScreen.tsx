@@ -17,6 +17,7 @@ import { COLORS } from '../../config/constants';
 import InspectStepForm from '../../components/manage/InspectStepForm';
 import ImageBox from '../../components/ui/ImageBox';
 import Input from '../../components/ui/Input';
+import SingleSelect from '../../components/ui/SingleSelect';
 
 interface IEntry {
   first: string;
@@ -78,9 +79,9 @@ const ReviewQuestionCard = ({ answers, step, onClick }: ReviewProps) => {
         answer?.compliance_status === 'c'
           ? COLORS.success
           : answer?.compliance_status === 'n/c'
-          ? COLORS.primary
+          ? COLORS.danger
           : answer?.compliance_status === 'n/a'
-          ? COLORS.secondary
+          ? COLORS.yellow
           : 'black',
     };
   });
@@ -191,15 +192,13 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
       }
       setDisabled(false);
     } else {
-      if (
-        entry.steps[step - 1].questions.every(
-          (x) => !form.some((y) => y.question_id === x.id),
-        )
-      ) {
-        alert('Please answer for at least one question');
-        return;
-      }
       setStep(step + 1);
+    }
+  };
+  const selectLocation = (id: string | number) => {
+    const i = entry?.steps.findIndex((x) => x.id === id) ?? -1;
+    if (i >= 0) {
+      setStep(i + 1);
     }
   };
 
@@ -257,6 +256,16 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
               </View>
             ) : (
               <>
+                <SingleSelect
+                  label=""
+                  options={entry.steps.map((x) => ({
+                    value: x.id,
+                    label: x.name,
+                  }))}
+                  value={entry.steps[step - 1].id}
+                  onChange={selectLocation}
+                  style={{ marginBottom: 20 }}
+                />
                 {!!entry.steps_intro && (
                   <HTMLView
                     style={{ marginVertical: 20, marginHorizontal: 10 }}

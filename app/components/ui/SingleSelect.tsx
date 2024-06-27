@@ -1,6 +1,13 @@
 import { useState } from 'react';
 import { Feather, FontAwesome } from '@expo/vector-icons';
-import { StyleSheet, TouchableOpacity, Text, View } from 'react-native';
+import {
+  StyleSheet,
+  TouchableOpacity,
+  Text,
+  View,
+  StyleProp,
+  ViewStyle,
+} from 'react-native';
 import Modal from 'react-native-modal';
 
 interface IOption {
@@ -13,13 +20,14 @@ interface Props {
   label: string;
   value?: string | number;
   onChange: (v: string | number) => void;
+  style?: StyleProp<ViewStyle>;
 }
 
-const SingleSelect = ({ options, label, value, onChange }: Props) => {
+const SingleSelect = ({ options, label, value, onChange, style }: Props) => {
   const [show, setShow] = useState(false);
 
   return (
-    <View>
+    <View style={style}>
       <TouchableOpacity style={styles.type_touch} onPress={() => setShow(true)}>
         <Text
           style={
