@@ -10,7 +10,12 @@ export type InspectStackParamList = {
   School: { schoolID: number };
 };
 
+export type HomeStackParamList = {
+  Home: undefined;
+};
+
 export type MainStackParamList = {
+  Home: undefined;
   Inspect: undefined;
   Profile: undefined;
   Schedule: undefined;

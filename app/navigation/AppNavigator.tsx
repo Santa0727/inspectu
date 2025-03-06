@@ -6,12 +6,12 @@ import LoginScreen from '../screens/auth/LoginScreen';
 import RegisterScreen from '../screens/auth/RegisterScreen';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectToken } from '../store/auth/auth.selector';
-import HomeScreen from '../screens/HomeScreen';
 import ProfileScreen from '../screens/auth/ProfileScreen';
 import { loadMyProfile } from '../store/auth/auth.actions';
 import InspectEntryScreen from '../screens/inspect/InspectEntryScreen';
 import {
   AuthStackParamList,
+  HomeStackParamList,
   InspectStackParamList,
   MainStackParamList,
 } from './AppStackParams';
@@ -19,6 +19,8 @@ import ScheduleScreen from '../screens/ScheduleScreen';
 import HelpScreen from '../screens/HelpScreen';
 import SchoolScreen from '../screens/inspect/SchoolScreen';
 import InspectReviewScreen from '../screens/inspect/InspectReviewScreen';
+import InspectionsScreen from '../screens/inspect/InspectionsScreen';
+import HomeScreen from '../screens/HomeScreen';
 
 const AuthStack = createNativeStackNavigator<AuthStackParamList>();
 
@@ -37,6 +39,18 @@ const AuthNavigator = () => (
   </AuthStack.Navigator>
 );
 
+const HomeStack = createNativeStackNavigator<HomeStackParamList>();
+
+const HomeNavigator = () => (
+  <HomeStack.Navigator>
+    <HomeStack.Screen
+      options={{ headerShown: false }}
+      name="Home"
+      component={HomeScreen}
+    />
+  </HomeStack.Navigator>
+);
+
 const InspectStack = createNativeStackNavigator<InspectStackParamList>();
 
 const InspectNavigator = () => (
@@ -44,7 +58,7 @@ const InspectNavigator = () => (
     <InspectStack.Screen
       options={{ headerShown: false }}
       name="Inspections"
-      component={HomeScreen}
+      component={InspectionsScreen}
     />
     <InspectStack.Screen
       options={{ headerShown: false }}
@@ -75,6 +89,11 @@ const MainNavigator = () => {
 
   return (
     <MainStack.Navigator>
+      <MainStack.Screen
+        name="Home"
+        options={{ headerShown: false, drawerLabel: 'Home' }}
+        component={HomeNavigator}
+      />
       <MainStack.Screen
         name="Inspect"
         options={{ headerShown: false, drawerLabel: 'Inspections' }}
