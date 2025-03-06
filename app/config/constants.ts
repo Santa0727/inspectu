@@ -9,4 +9,5 @@ export const COLORS = {
   pending: '#eab308',
   approved: '#8FD14F',
   yellow: '#facc15',
+  red: '#FF0000',
 };

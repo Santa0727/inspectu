@@ -13,7 +13,7 @@ type Props = PropsWithChildren<{
   onPress?: (d?: any) => void;
   label?: string;
   disabled?: boolean;
-  scheme?: 'primary' | 'secondary' | 'danger' | 'success' | 'yellow';
+  scheme?: 'primary' | 'secondary' | 'danger' | 'success' | 'yellow' | 'red';
   size?: 'default' | 'small';
 }>;
 
@@ -37,6 +37,8 @@ const TouchButton = ({
       ? styles.success_btn
       : scheme === 'yellow'
       ? styles.yellow_btn
+      : scheme === 'red'
+      ? styles.red_btn
       : {};
 
   return (
@@ -94,6 +96,9 @@ const styles = StyleSheet.create({
   },
   yellow_btn: {
     backgroundColor: COLORS.yellow,
+  },
+  red_btn: {
+    backgroundColor: COLORS.red,
   },
 });
 
