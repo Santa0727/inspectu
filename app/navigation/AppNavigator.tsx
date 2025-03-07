@@ -39,6 +39,42 @@ const AuthNavigator = () => (
   </AuthStack.Navigator>
 );
 
+const ScheduleStack = createNativeStackNavigator();
+
+const ScheduleNavigator = () => (
+  <ScheduleStack.Navigator>
+    <ScheduleStack.Screen
+      options={{ headerShown: false }}
+      name="Schedule"
+      component={ScheduleScreen}
+    />
+  </ScheduleStack.Navigator>
+);
+
+const HelpStack = createNativeStackNavigator();
+
+const HelpNavigator = () => (
+  <HelpStack.Navigator>
+    <HelpStack.Screen
+      options={{ headerShown: false }}
+      name="Help"
+      component={HelpScreen}
+    />
+  </HelpStack.Navigator>
+);
+
+const ProfileStack = createNativeStackNavigator();
+
+const ProfileNavigator = () => (
+  <ProfileStack.Navigator>
+    <ProfileStack.Screen
+      options={{ headerShown: false }}
+      name="Profile"
+      component={ProfileScreen}
+    />
+  </ProfileStack.Navigator>
+);
+
 const HomeStack = createNativeStackNavigator<HomeStackParamList>();
 
 const HomeNavigator = () => (
@@ -102,17 +138,17 @@ const MainNavigator = () => {
       <MainStack.Screen
         name="Profile"
         options={{ headerShown: false, drawerLabel: 'Profile' }}
-        component={ProfileScreen}
+        component={ProfileNavigator}
       />
       <MainStack.Screen
         name="Schedule"
         options={{ headerShown: false, drawerLabel: 'Schedule' }}
-        component={ScheduleScreen}
+        component={ScheduleNavigator}
       />
       <MainStack.Screen
         name="Help"
         options={{ headerShown: false, drawerLabel: 'Help' }}
-        component={HelpScreen}
+        component={HelpNavigator}
       />
     </MainStack.Navigator>
   );
