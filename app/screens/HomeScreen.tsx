@@ -40,32 +40,6 @@ const HomeScreen = ({ navigation }: Props) => {
 };
 
 const styles = StyleSheet.create({
-  name: {
-    marginVertical: 20,
-    fontSize: 24,
-    fontWeight: '600',
-    textAlign: 'center',
-  },
-  link: {
-    marginVertical: 15,
-    fontSize: 22,
-    fontWeight: '500',
-    textAlign: 'center',
-    textDecorationLine: 'underline',
-  },
-  subtitle: {
-    fontSize: 22,
-    marginVertical: 5,
-    marginHorizontal: 10,
-    fontWeight: '500',
-  },
-  school_name: {
-    fontSize: 20,
-    marginVertical: 8,
-    marginHorizontal: 10,
-    fontWeight: '400',
-    textDecorationLine: 'underline',
-  },
   panel: {
     borderColor: '#DDE6F8',
     borderWidth: 1,

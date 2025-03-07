@@ -1,6 +1,5 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import MainContainer from '../../components/container/MainContainer';
-import InspectsTable from '../../components/manage/InspectsTable';
 import { InspectStackParamList } from '../../navigation/AppStackParams';
 import { useCallback, useState } from 'react';
 import { sendRequest } from '../../config/compose';
@@ -8,38 +7,37 @@ import { IInspection, IName, ISchool } from '../../lib/entities';
 import { useFocusEffect } from '@react-navigation/native';
 import {
   ActivityIndicator,
-  Linking,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
 import SchoolViewModal from '../../components/manage/SchoolViewModal';
+import { COLORS } from '../../config/constants';
+import ViewCalendar from '../../components/ui/ViewCalendar';
+import moment from 'moment';
 
 type Props = NativeStackScreenProps<InspectStackParamList, 'Inspections'>;
 
 const InspectionsScreen = ({ navigation }: Props) => {
   const [loading, setLoading] = useState(false);
-  const [comingItems, setComingItems] = useState<IInspection[]>();
-  const [pastItems, setPastItems] = useState<IInspection[]>();
   const [curSchool, setCurSchool] = useState<ISchool>();
+  const [items, setItems] = useState<IInspection[]>();
   const [schools, setSchools] = useState<IName[]>();
 
   const loadData = useCallback(() => {
     (async () => {
       setLoading(true);
 
-      let res = await sendRequest('api/member/inspections', {}, 'GET');
+      let res = await sendRequest(
+        'api/member/inspections',
+        { per_page: 50 },
+        'GET',
+      );
       if (res.status) {
-        setComingItems(res.data.coming);
-        setPastItems(res.data.passed);
-      } else {
-        alert(res.message ?? 'Server error');
-      }
-
-      res = await sendRequest('api/member/schools', {}, 'GET');
-      if (res.status) {
-        setSchools(res.data);
+        const comings = res.data.coming ?? [],
+          passed = res.data.passed ?? [];
+        setItems([...comings, ...passed]);
       } else {
         alert(res.message ?? 'Server error');
       }
@@ -50,21 +48,6 @@ const InspectionsScreen = ({ navigation }: Props) => {
 
   const goToDetail = (t: 'InspectEntry' | 'InspectReview', id: number) =>
     navigation.navigate(t, { inspectID: id });
-  const goToSchool = (id: number) =>
-    navigation.navigate('School', { schoolID: id });
-
-  const openSchool = async (url: string) => {
-    try {
-      const supported = await Linking.canOpenURL(url);
-      if (supported) {
-        await Linking.openURL(url);
-      } else {
-        alert('Unable to open');
-      }
-    } catch (error: any) {
-      alert('An error occurred ' + error?.message);
-    }
-  };
 
   useFocusEffect(loadData);
 
@@ -76,28 +59,56 @@ const InspectionsScreen = ({ navigation }: Props) => {
         </View>
       ) : (
         <>
-          <View style={{ padding: 10 }}>
-            <Text style={styles.subtitle}>Schools</Text>
-            {schools?.map((x) => (
-              <TouchableOpacity
-                key={x.id}
-                onPress={goToSchool.bind(this, x.id)}>
-                <Text style={styles.school_name}>{x.name}</Text>
-              </TouchableOpacity>
-            ))}
+          <View style={styles.panel}>
+            <ViewCalendar
+              markers={items?.map((x) => ({
+                date: x.due_date.slice(0, 10),
+                color:
+                  x.status === 'approved'
+                    ? COLORS.approved
+                    : x.status === 'pending_review'
+                    ? COLORS.pending
+                    : x.status === 'review_required'
+                    ? COLORS.danger
+                    : COLORS.inactive,
+              }))}
+            />
           </View>
-          <InspectsTable
-            items={comingItems ?? []}
-            status="upcoming"
-            goToInspect={(t, id) => goToDetail(t, id)}
-            onClickSchool={(s) => setCurSchool(s)}
-          />
-          <InspectsTable
-            items={pastItems ?? []}
-            status="past"
-            goToInspect={(t, id) => goToDetail(t, id)}
-            onClickSchool={(s) => setCurSchool(s)}
-          />
+          {items?.map((item) => (
+            <TouchableOpacity
+              key={item.id}
+              style={styles.panel}
+              onPress={() =>
+                goToDetail(
+                  item.status === 'publish' ? 'InspectEntry' : 'InspectReview',
+                  item.id,
+                )
+              }>
+              <View style={styles.item_header}>
+                <View
+                  style={[
+                    styles.item_dot,
+                    {
+                      backgroundColor:
+                        item.status === 'approved'
+                          ? COLORS.approved
+                          : item.status === 'pending_review'
+                          ? COLORS.pending
+                          : item.status === 'review_required'
+                          ? COLORS.danger
+                          : COLORS.inactive,
+                    },
+                  ]}
+                />
+                <Text style={styles.item_time}>
+                  {moment(item.due_date).calendar()}
+                </Text>
+              </View>
+              <Text style={styles.item_title}>{item.name}</Text>
+              <Text style={styles.item_subtitle}>{item.school.name}</Text>
+            </TouchableOpacity>
+          ))}
+          <View style={{ height: 20 }} />
         </>
       )}
       {curSchool && (
@@ -112,31 +123,41 @@ const InspectionsScreen = ({ navigation }: Props) => {
 };
 
 const styles = StyleSheet.create({
-  name: {
-    marginVertical: 20,
-    fontSize: 24,
-    fontWeight: '600',
-    textAlign: 'center',
-  },
-  link: {
-    marginVertical: 15,
-    fontSize: 22,
-    fontWeight: '500',
-    textAlign: 'center',
-    textDecorationLine: 'underline',
-  },
-  subtitle: {
-    fontSize: 22,
-    marginVertical: 5,
+  panel: {
+    borderColor: '#DDE6F8',
+    borderWidth: 1,
+    borderRadius: 10,
+    backgroundColor: '#FFFFFF',
     marginHorizontal: 10,
-    fontWeight: '500',
-  },
-  school_name: {
-    fontSize: 20,
     marginVertical: 8,
-    marginHorizontal: 10,
+    padding: 10,
+  },
+  item_header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 5,
+  },
+  item_dot: {
+    width: 15,
+    height: 15,
+    borderRadius: 7,
+  },
+  item_time: {
+    marginHorizontal: 6,
+    color: '#8F9BB3',
+    fontSize: 12,
     fontWeight: '400',
-    textDecorationLine: 'underline',
+  },
+  item_title: {
+    fontSize: 16,
+    color: '#222B45',
+    fontWeight: '600',
+    margin: 3,
+  },
+  item_subtitle: {
+    fontSize: 14,
+    color: '#8F9BB3',
+    marginHorizontal: 3,
   },
 });
 
