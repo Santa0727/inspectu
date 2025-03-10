@@ -208,9 +208,16 @@ const CompliantModal = ({
   <Modal
     visible={true}
     title="Select compliant status"
+    showHeader={false}
     showFooter={false}
     onClose={onClose}
     size="small">
+    <View style={{ alignItems: 'flex-end' }}>
+      <TouchableOpacity style={styles.close_icon} onPress={onClose}>
+        <FontAwesome name="close" size={24} color="black" />
+      </TouchableOpacity>
+    </View>
+    <Text style={styles.name}>{'Select compliant status'}</Text>
     <TouchButton
       style={{ marginVertical: 10 }}
       label="Compliant"
@@ -257,7 +264,7 @@ const InspectStepForm = ({ form, setForm, data, isReview }: Props) => {
     } else if (com?.options.some((x) => !!x.value)) {
       return COLORS.primary;
     } else {
-      return 'black';
+      return undefined;
     }
   };
   const selectQuestion = (q: any) => {
@@ -373,13 +380,9 @@ const InspectStepForm = ({ form, setForm, data, isReview }: Props) => {
               key={x.id}
               style={styles.question}
               onPress={() => selectQuestion(x)}>
-              <Text style={[styles.question_name, { color: getColor(x.id) }]}>
-                {`${i + 1}) ${x.name}`}
-              </Text>
-              <FontAwesome
-                name={queID === x.id ? 'check-circle-o' : 'circle-o'}
-                size={28}
-                color={getColor(x.id)}
+              <Text style={styles.question_name}>{`${i + 1}. ${x.name}`}</Text>
+              <View
+                style={[styles.check_box, { backgroundColor: getColor(x.id) }]}
               />
             </TouchableOpacity>
           ))}
@@ -441,12 +444,35 @@ const styles = StyleSheet.create({
   question_name: {
     fontSize: 20,
     fontWeight: '500',
+    flex: 1,
   },
   note: {
     marginVertical: 10,
   },
   images: {
     marginVertical: 20,
+  },
+  close_icon: {
+    borderWidth: 2,
+    borderColor: COLORS.blueGrey,
+    borderRadius: 4,
+    width: 43,
+    height: 43,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  name: {
+    marginVertical: 10,
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  check_box: {
+    width: 30,
+    height: 30,
+    borderColor: COLORS.greyBlue,
+    borderWidth: 2,
+    borderRadius: 4,
+    backgroundColor: 'white',
   },
 });
 

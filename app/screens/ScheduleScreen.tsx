@@ -30,6 +30,7 @@ const ScheduleScreen = ({ navigation }: Props) => {
     (async () => {
       const res = await sendRequest('api/member/inspections', {}, 'GET');
       if (res.status) {
+        console.log(res.data.coming[0].id);
         setInspections(res.data.coming);
       } else {
         alert(res.message ?? 'Server error');
