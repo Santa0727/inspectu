@@ -10,6 +10,7 @@ import {
 import { zeroPad } from '../../lib/helper';
 import { StyleSheet } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
+import { COLORS } from '../../config/constants';
 
 const weeks = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
   monthNames = [
@@ -113,7 +114,7 @@ const ViewCalendar = ({ markers, style }: Props) => {
         <TouchableOpacity
           style={styles.year_move_touch}
           onPress={() => monthMove(-1)}>
-          <FontAwesome name="chevron-left" size={20} color="#222B45" />
+          <FontAwesome name="chevron-left" size={20} color={COLORS.dark} />
         </TouchableOpacity>
         <View>
           <Text style={styles.year_txt}>{monthNames[month]}</Text>
@@ -122,7 +123,7 @@ const ViewCalendar = ({ markers, style }: Props) => {
         <TouchableOpacity
           style={styles.year_move_touch}
           onPress={() => monthMove(1)}>
-          <FontAwesome name="chevron-right" size={20} color="#222B45" />
+          <FontAwesome name="chevron-right" size={20} color={COLORS.dark} />
         </TouchableOpacity>
       </View>
       <View style={{ flexDirection: 'row', paddingTop: 5, paddingBottom: 10 }}>
@@ -153,7 +154,7 @@ const ViewCalendar = ({ markers, style }: Props) => {
                   <Text
                     style={[
                       styles.day_txt,
-                      { color: cell.isActive ? undefined : '#8F9BB3' },
+                      { color: cell.isActive ? undefined : COLORS.greyBlue },
                     ]}>
                     {cell.label}
                   </Text>
@@ -177,7 +178,7 @@ const styles = StyleSheet.create({
     flex: 1,
     textAlign: 'center',
     fontSize: 14,
-    color: '#8F9BB3',
+    color: COLORS.greyBlue,
   },
   touch: {
     flex: 1,
@@ -192,7 +193,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 18,
     fontWeight: '600',
-    color: '#222B45',
+    color: COLORS.dark,
   },
   month_txt: {
     textAlign: 'center',
@@ -202,7 +203,7 @@ const styles = StyleSheet.create({
   },
   year_move_touch: {
     borderWidth: 1,
-    borderColor: '#DDE6F8',
+    borderColor: COLORS.blueGrey,
     borderRadius: 4,
     width: 40,
     height: 40,
@@ -218,7 +219,7 @@ const styles = StyleSheet.create({
   day_txt: {
     textAlign: 'center',
     fontSize: 15,
-    color: '#222B45',
+    color: COLORS.dark,
     fontWeight: '500',
   },
 });

@@ -3,6 +3,7 @@ import MainContainer from '../components/container/MainContainer';
 import { HomeStackParamList } from '../navigation/AppStackParams';
 import { StyleSheet, Text, View } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
+import { COLORS } from '../config/constants';
 
 type Props = NativeStackScreenProps<HomeStackParamList, 'Home'>;
 
@@ -10,14 +11,14 @@ const HomeScreen = ({ navigation }: Props) => (
   <MainContainer>
     <View style={styles.panel}>
       <View style={styles.panel_header}>
-        <AntDesign name="clockcircle" size={24} color="#8F9BB3" />
+        <AntDesign name="clockcircle" size={24} color={COLORS.greyBlue} />
         <Text style={styles.panel_label}>Schedule</Text>
       </View>
       <View style={{ height: 100 }} />
     </View>
     <View style={styles.panel}>
       <View style={styles.panel_header}>
-        <AntDesign name="clockcircle" size={24} color="#8F9BB3" />
+        <AntDesign name="clockcircle" size={24} color={COLORS.greyBlue} />
         <Text style={styles.panel_label}>Inspections</Text>
       </View>
       <View style={{ height: 100 }} />
@@ -27,7 +28,7 @@ const HomeScreen = ({ navigation }: Props) => (
 
 const styles = StyleSheet.create({
   panel: {
-    borderColor: '#DDE6F8',
+    borderColor: COLORS.blueGrey,
     borderWidth: 1,
     borderRadius: 10,
     backgroundColor: '#FFFFFF',

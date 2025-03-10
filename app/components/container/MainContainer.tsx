@@ -23,6 +23,7 @@ import {
 } from 'react-native';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { MainStackParamList } from '../../navigation/AppStackParams';
+import { COLORS } from '../../config/constants';
 
 type Props = PropsWithChildren<{
   style?: StyleProp<ViewStyle>;
@@ -47,7 +48,7 @@ const MainContainer = ({ children, style }: Props) => {
         <View style={styles.header_icons}>
           <TouchableOpacity style={styles.header_notify}>
             <View style={styles.notify_dot} />
-            <Ionicons name="notifications" size={28} color="#8F9BB3" />
+            <Ionicons name="notifications" size={28} color={COLORS.greyBlue} />
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.header_btn}
@@ -157,7 +158,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingTop: 5,
     paddingHorizontal: 5,
-    backgroundColor: '#222B45',
+    backgroundColor: COLORS.dark,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
   },

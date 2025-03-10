@@ -10,4 +10,7 @@ export const COLORS = {
   approved: '#00D29A',
   yellow: '#facc15',
   red: '#FF0000',
+  blueGrey: '#DDE6F8',
+  dark: '#222B45',
+  greyBlue: '#8F9BB3',
 };

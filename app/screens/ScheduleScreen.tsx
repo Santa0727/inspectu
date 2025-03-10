@@ -3,33 +3,48 @@ import MainContainer from '../components/container/MainContainer';
 import { useCallback, useState } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { sendRequest } from '../config/compose';
-import { IInspection, IName } from '../lib/entities';
+import { IInspection, IName, ISchool } from '../lib/entities';
 import { defaultDateFormat } from '../lib/helper';
 import SchoolViewModal from '../components/manage/SchoolViewModal';
 import TouchButton from '../components/ui/TouchButton';
+import { COLORS } from '../config/constants';
 
 const ScheduleScreen = () => {
   const [schools, setSchools] = useState<IName[]>();
   const [inspections, setInspections] = useState<IInspection[]>([]);
-  const [curDate, setCurDate] = useState<string>();
   const [curInspect, setCurInspect] = useState<IInspection>();
+  const [curSchool, setCurSchool] = useState<ISchool>();
+  const [disabled, setDisabled] = useState(false);
 
   const loadData = useCallback(() => {
     (async () => {
       const res = await sendRequest('api/member/schools', {}, 'GET');
       if (res.status) {
         setSchools(res.data);
+      } else {
+        alert(res.message ?? 'Server error');
       }
     })();
     (async () => {
       const res = await sendRequest('api/member/inspections', {}, 'GET');
       if (res.status) {
         setInspections(res.data.coming);
+      } else {
+        alert(res.message ?? 'Server error');
       }
     })();
   }, []);
 
-  const clickSchool = async (id: number) => {};
+  const clickSchool = async (id: number) => {
+    setDisabled(true);
+    const res = await sendRequest(`api/member/schools/${id}`, {}, 'GET');
+    if (res.status) {
+      setCurSchool(res.data);
+    } else {
+      alert(res.message ?? 'Server error');
+    }
+    setDisabled(false);
+  };
 
   useFocusEffect(loadData);
 
@@ -41,6 +56,7 @@ const ScheduleScreen = () => {
           <TouchableOpacity
             key={x.id}
             style={styles.school_btn}
+            disabled={disabled}
             onPress={() => clickSchool(x.id)}>
             <Text style={styles.school_name}>{x.name}</Text>
           </TouchableOpacity>
@@ -67,11 +83,11 @@ const ScheduleScreen = () => {
           </View>
         ))}
       </View>
-      {curInspect && (
+      {curSchool && (
         <SchoolViewModal
           visible={true}
-          school={curInspect.school}
-          onClose={() => setCurInspect(undefined)}
+          school={curSchool}
+          onClose={() => setCurSchool(undefined)}
         />
       )}
     </MainContainer>
@@ -85,7 +101,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   school_btn: {
-    borderColor: '#DDE6F8',
+    borderColor: COLORS.blueGrey,
     borderWidth: 1,
     borderRadius: 10,
     backgroundColor: '#ffffff',
@@ -93,12 +109,12 @@ const styles = StyleSheet.create({
     padding: 15,
   },
   school_name: {
-    color: '#222B45',
+    color: COLORS.dark,
     fontSize: 16,
     fontWeight: '500',
   },
   ins_view: {
-    borderColor: '#DDE6F8',
+    borderColor: COLORS.blueGrey,
     borderWidth: 1,
     backgroundColor: '#FFFFFF',
     borderRadius: 10,
@@ -110,12 +126,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   ins_name: {
-    color: '#222B45',
+    color: COLORS.dark,
     fontSize: 16,
     fontWeight: '500',
   },
   ins_date: {
-    color: '#8F9BB3',
+    color: COLORS.greyBlue,
     fontSize: 16,
     fontWeight: '500',
   },

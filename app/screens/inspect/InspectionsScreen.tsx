@@ -114,7 +114,7 @@ const InspectionsScreen = ({ navigation }: Props) => {
 
 const styles = StyleSheet.create({
   panel: {
-    borderColor: '#DDE6F8',
+    borderColor: COLORS.blueGrey,
     borderWidth: 1,
     borderRadius: 10,
     backgroundColor: '#FFFFFF',
@@ -134,19 +134,19 @@ const styles = StyleSheet.create({
   },
   item_time: {
     marginHorizontal: 6,
-    color: '#8F9BB3',
+    color: COLORS.greyBlue,
     fontSize: 12,
     fontWeight: '400',
   },
   item_title: {
     fontSize: 16,
-    color: '#222B45',
+    color: COLORS.dark,
     fontWeight: '600',
     margin: 3,
   },
   item_subtitle: {
     fontSize: 14,
-    color: '#8F9BB3',
+    color: COLORS.greyBlue,
     marginHorizontal: 3,
   },
 });

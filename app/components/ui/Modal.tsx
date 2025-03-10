@@ -16,6 +16,7 @@ import TouchButton from './TouchButton';
 type Props = PropsWithChildren<{
   visible: boolean;
   title: string;
+  showHeader?: boolean;
   showFooter?: boolean;
   onClose?: (d?: any) => void;
   onConfirm?: (d?: any) => void;
@@ -26,6 +27,7 @@ type Props = PropsWithChildren<{
 const Modal = ({
   visible,
   title,
+  showHeader = true,
   showFooter,
   onClose,
   onConfirm,
@@ -39,14 +41,16 @@ const Modal = ({
     coverScreen={true}>
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.modal_wrap}>
-        <View style={styles.modal_header}>
-          <Text style={size === 'small' ? styles.small_title : styles.title}>
-            {title}
-          </Text>
-          <TouchableOpacity style={styles.close_button} onPress={onClose}>
-            <FontAwesome name="close" size={24} color="black" />
-          </TouchableOpacity>
-        </View>
+        {showHeader !== false && (
+          <View style={styles.modal_header}>
+            <Text style={size === 'small' ? styles.small_title : styles.title}>
+              {title}
+            </Text>
+            <TouchableOpacity style={styles.close_button} onPress={onClose}>
+              <FontAwesome name="close" size={24} color="black" />
+            </TouchableOpacity>
+          </View>
+        )}
         <ScrollView style={styles.modal_body}>{children}</ScrollView>
         {showFooter && (
           <View style={styles.modal_footer}>
