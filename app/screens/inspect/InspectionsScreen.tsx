@@ -3,7 +3,7 @@ import MainContainer from '../../components/container/MainContainer';
 import { InspectStackParamList } from '../../navigation/AppStackParams';
 import { useCallback, useState } from 'react';
 import { sendRequest } from '../../config/compose';
-import { IInspection, IName, ISchool } from '../../lib/entities';
+import { IInspection } from '../../lib/entities';
 import { useFocusEffect } from '@react-navigation/native';
 import {
   ActivityIndicator,
@@ -12,7 +12,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import SchoolViewModal from '../../components/manage/SchoolViewModal';
 import { COLORS } from '../../config/constants';
 import ViewCalendar from '../../components/ui/ViewCalendar';
 import moment from 'moment';
@@ -21,9 +20,7 @@ type Props = NativeStackScreenProps<InspectStackParamList, 'Inspections'>;
 
 const InspectionsScreen = ({ navigation }: Props) => {
   const [loading, setLoading] = useState(false);
-  const [curSchool, setCurSchool] = useState<ISchool>();
   const [items, setItems] = useState<IInspection[]>();
-  const [schools, setSchools] = useState<IName[]>();
 
   const loadData = useCallback(() => {
     (async () => {
@@ -110,13 +107,6 @@ const InspectionsScreen = ({ navigation }: Props) => {
           ))}
           <View style={{ height: 20 }} />
         </>
-      )}
-      {curSchool && (
-        <SchoolViewModal
-          visible={true}
-          school={curSchool}
-          onClose={() => setCurSchool(undefined)}
-        />
       )}
     </MainContainer>
   );
