@@ -8,11 +8,13 @@ import { defaultDateFormat } from '../lib/helper';
 import SchoolViewModal from '../components/manage/SchoolViewModal';
 import TouchButton from '../components/ui/TouchButton';
 import { COLORS } from '../config/constants';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-const ScheduleScreen = () => {
+type Props = NativeStackScreenProps<any>;
+
+const ScheduleScreen = ({ navigation }: Props) => {
   const [schools, setSchools] = useState<IName[]>();
   const [inspections, setInspections] = useState<IInspection[]>([]);
-  const [curInspect, setCurInspect] = useState<IInspection>();
   const [curSchool, setCurSchool] = useState<ISchool>();
   const [disabled, setDisabled] = useState(false);
 
@@ -45,6 +47,13 @@ const ScheduleScreen = () => {
     }
     setDisabled(false);
   };
+
+  const goToInspection = (inspection: IInspection) =>
+    navigation.navigate('Inspect', {
+      screen:
+        inspection.status === 'publish' ? 'InspectEntry' : 'InspectReview',
+      params: { inspectID: inspection.id },
+    });
 
   useFocusEffect(loadData);
 
@@ -79,6 +88,7 @@ const ScheduleScreen = () => {
                   ? 'danger'
                   : 'primary'
               }
+              onPress={() => goToInspection(x)}
             />
           </View>
         ))}

@@ -30,8 +30,6 @@ const SchoolViewModal = ({ visible, school, onClose }: Props) => {
     }
   };
 
-  console.log(school);
-
   return (
     <Modal
       visible={visible}
