@@ -5,16 +5,10 @@ import { useCallback, useState } from 'react';
 import { sendRequest } from '../../config/compose';
 import { IInspection } from '../../lib/entities';
 import { useFocusEffect } from '@react-navigation/native';
-import {
-  ActivityIndicator,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { COLORS } from '../../config/constants';
 import ViewCalendar from '../../components/ui/ViewCalendar';
-import moment from 'moment';
+import InspectionCard from '../../components/manage/InspectionCard';
 
 type Props = NativeStackScreenProps<InspectStackParamList, 'Inspections'>;
 
@@ -26,7 +20,7 @@ const InspectionsScreen = ({ navigation }: Props) => {
     (async () => {
       setLoading(true);
 
-      let res = await sendRequest(
+      const res = await sendRequest(
         'api/member/inspections',
         { per_page: 50 },
         'GET',
@@ -72,38 +66,16 @@ const InspectionsScreen = ({ navigation }: Props) => {
             />
           </View>
           {items?.map((item) => (
-            <TouchableOpacity
+            <InspectionCard
               key={item.id}
-              style={styles.panel}
-              onPress={() =>
+              inspection={item}
+              onClick={(t) =>
                 goToDetail(
-                  item.status === 'publish' ? 'InspectEntry' : 'InspectReview',
-                  item.id,
+                  t.status === 'publish' ? 'InspectEntry' : 'InspectReview',
+                  t.id,
                 )
-              }>
-              <View style={styles.item_header}>
-                <View
-                  style={[
-                    styles.item_dot,
-                    {
-                      backgroundColor:
-                        item.status === 'approved'
-                          ? COLORS.approved
-                          : item.status === 'pending_review'
-                          ? COLORS.pending
-                          : item.status === 'review_required'
-                          ? COLORS.danger
-                          : COLORS.inactive,
-                    },
-                  ]}
-                />
-                <Text style={styles.item_time}>
-                  {moment(item.due_date).calendar()}
-                </Text>
-              </View>
-              <Text style={styles.item_title}>{item.name}</Text>
-              <Text style={styles.item_subtitle}>{item.school.name}</Text>
-            </TouchableOpacity>
+              }
+            />
           ))}
           <View style={{ height: 20 }} />
         </>
@@ -121,33 +93,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     marginVertical: 8,
     padding: 10,
-  },
-  item_header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 5,
-  },
-  item_dot: {
-    width: 15,
-    height: 15,
-    borderRadius: 7,
-  },
-  item_time: {
-    marginHorizontal: 6,
-    color: COLORS.greyBlue,
-    fontSize: 12,
-    fontWeight: '400',
-  },
-  item_title: {
-    fontSize: 16,
-    color: COLORS.dark,
-    fontWeight: '600',
-    margin: 3,
-  },
-  item_subtitle: {
-    fontSize: 14,
-    color: COLORS.greyBlue,
-    marginHorizontal: 3,
   },
 });
 

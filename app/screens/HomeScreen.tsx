@@ -4,27 +4,78 @@ import { HomeStackParamList } from '../navigation/AppStackParams';
 import { StyleSheet, Text, View } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import { COLORS } from '../config/constants';
+import { useCallback, useState } from 'react';
+import { IInspection } from '../lib/entities';
+import { sendRequest } from '../config/compose';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import InspectionCard from '../components/manage/InspectionCard';
 
 type Props = NativeStackScreenProps<HomeStackParamList, 'Home'>;
 
-const HomeScreen = ({ navigation }: Props) => (
-  <MainContainer>
-    <View style={styles.panel}>
-      <View style={styles.panel_header}>
-        <AntDesign name="clockcircle" size={24} color={COLORS.greyBlue} />
-        <Text style={styles.panel_label}>Schedule</Text>
+const HomeScreen = ({ navigation }: Props) => {
+  const navBar = useNavigation<any>();
+  const [upItems, setUpItems] = useState<IInspection[]>();
+  const [pastItems, setPastItems] = useState<IInspection[]>();
+
+  const loadData = useCallback(() => {
+    (async () => {
+      const res = await sendRequest(
+        'api/member/inspections',
+        { per_page: 50 },
+        'GET',
+      );
+      if (res.status) {
+        setUpItems(res.data.coming ?? []);
+        setPastItems(res.data.passed ?? []);
+      } else {
+        alert(res.message ?? 'Server error');
+      }
+    })();
+  }, []);
+
+  const clickInspection = (item: IInspection) =>
+    navBar.navigate('Inspect', {
+      screen: item.status === 'publish' ? 'InspectEntry' : 'InspectReview',
+      params: { inspectID: item.id },
+    });
+
+  useFocusEffect(loadData);
+
+  return (
+    <MainContainer>
+      <View style={styles.panel}>
+        <View style={styles.panel_header}>
+          <AntDesign name="clockcircle" size={24} color={COLORS.greyBlue} />
+          <Text style={styles.panel_label}>Schedule</Text>
+        </View>
+        <View style={{ minHeight: 100, paddingVertical: 10 }}>
+          {upItems?.map((x) => (
+            <InspectionCard
+              key={x.id}
+              inspection={x}
+              onClick={clickInspection}
+            />
+          ))}
+        </View>
       </View>
-      <View style={{ height: 100 }} />
-    </View>
-    <View style={styles.panel}>
-      <View style={styles.panel_header}>
-        <AntDesign name="clockcircle" size={24} color={COLORS.greyBlue} />
-        <Text style={styles.panel_label}>Inspections</Text>
+      <View style={styles.panel}>
+        <View style={styles.panel_header}>
+          <AntDesign name="clockcircle" size={24} color={COLORS.greyBlue} />
+          <Text style={styles.panel_label}>Inspections</Text>
+        </View>
+        <View style={{ minHeight: 100, paddingVertical: 10 }}>
+          {pastItems?.map((x) => (
+            <InspectionCard
+              key={x.id}
+              inspection={x}
+              onClick={clickInspection}
+            />
+          ))}
+        </View>
       </View>
-      <View style={{ height: 100 }} />
-    </View>
-  </MainContainer>
-);
+    </MainContainer>
+  );
+};
 
 const styles = StyleSheet.create({
   panel: {
