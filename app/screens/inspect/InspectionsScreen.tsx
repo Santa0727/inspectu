@@ -9,12 +9,14 @@ import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { COLORS } from '../../config/constants';
 import ViewCalendar from '../../components/ui/ViewCalendar';
 import InspectionCard from '../../components/manage/InspectionCard';
+import InspectionModal from '../../components/manage/InspectionModal';
 
 type Props = NativeStackScreenProps<InspectStackParamList, 'Inspections'>;
 
 const InspectionsScreen = ({ navigation }: Props) => {
   const [loading, setLoading] = useState(false);
   const [items, setItems] = useState<IInspection[]>();
+  const [curItem, setCurItem] = useState<IInspection>();
 
   const loadData = useCallback(() => {
     (async () => {
@@ -37,8 +39,15 @@ const InspectionsScreen = ({ navigation }: Props) => {
     })();
   }, []);
 
-  const goToDetail = (t: 'InspectEntry' | 'InspectReview', id: number) =>
-    navigation.navigate(t, { inspectID: id });
+  const clickInspection = (item: IInspection) => {
+    if (item.status === 'publish') {
+      navigation.navigate('InspectEntry', { inspectID: item.id });
+    } else if (item.status === 'review_required') {
+      navigation.navigate('InspectReview', { inspectID: item.id });
+    } else {
+      setCurItem(item);
+    }
+  };
 
   useFocusEffect(loadData);
 
@@ -68,17 +77,19 @@ const InspectionsScreen = ({ navigation }: Props) => {
           {items?.map((item) => (
             <InspectionCard
               key={item.id}
-              inspection={item}
-              onClick={(t) =>
-                goToDetail(
-                  t.status === 'publish' ? 'InspectEntry' : 'InspectReview',
-                  t.id,
-                )
-              }
+              data={item}
+              onClick={clickInspection}
             />
           ))}
           <View style={{ height: 20 }} />
         </>
+      )}
+      {curItem && (
+        <InspectionModal
+          data={curItem}
+          visible={true}
+          onClose={() => setCurItem(undefined)}
+        />
       )}
     </MainContainer>
   );

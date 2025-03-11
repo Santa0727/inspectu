@@ -9,6 +9,7 @@ import { IInspection } from '../lib/entities';
 import { sendRequest } from '../config/compose';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import InspectionCard from '../components/manage/InspectionCard';
+import InspectionModal from '../components/manage/InspectionModal';
 
 type Props = NativeStackScreenProps<HomeStackParamList, 'Home'>;
 
@@ -16,6 +17,7 @@ const HomeScreen = ({ navigation }: Props) => {
   const navBar = useNavigation<any>();
   const [upItems, setUpItems] = useState<IInspection[]>();
   const [pastItems, setPastItems] = useState<IInspection[]>();
+  const [curItem, setCurItem] = useState<IInspection>();
 
   const loadData = useCallback(() => {
     (async () => {
@@ -33,11 +35,21 @@ const HomeScreen = ({ navigation }: Props) => {
     })();
   }, []);
 
-  const clickInspection = (item: IInspection) =>
-    navBar.navigate('Inspect', {
-      screen: item.status === 'publish' ? 'InspectEntry' : 'InspectReview',
-      params: { inspectID: item.id },
-    });
+  const clickInspection = (item: IInspection) => {
+    if (item.status === 'publish') {
+      navBar.navigate('Inspect', {
+        screen: 'InspectEntry',
+        params: { inspectID: item.id },
+      });
+    } else if (item.status === 'review_required') {
+      navBar.navigate('Inspect', {
+        screen: 'InspectReview',
+        params: { inspectID: item.id },
+      });
+    } else {
+      setCurItem(item);
+    }
+  };
 
   useFocusEffect(loadData);
 
@@ -50,11 +62,7 @@ const HomeScreen = ({ navigation }: Props) => {
         </View>
         <View style={{ minHeight: 100, paddingVertical: 10 }}>
           {upItems?.map((x) => (
-            <InspectionCard
-              key={x.id}
-              inspection={x}
-              onClick={clickInspection}
-            />
+            <InspectionCard key={x.id} data={x} onClick={clickInspection} />
           ))}
         </View>
       </View>
@@ -65,14 +73,17 @@ const HomeScreen = ({ navigation }: Props) => {
         </View>
         <View style={{ minHeight: 100, paddingVertical: 10 }}>
           {pastItems?.map((x) => (
-            <InspectionCard
-              key={x.id}
-              inspection={x}
-              onClick={clickInspection}
-            />
+            <InspectionCard key={x.id} data={x} onClick={clickInspection} />
           ))}
         </View>
       </View>
+      {curItem && (
+        <InspectionModal
+          data={curItem}
+          visible={true}
+          onClose={() => setCurItem(undefined)}
+        />
+      )}
     </MainContainer>
   );
 };

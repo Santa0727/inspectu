@@ -22,7 +22,6 @@ import {
   ViewStyle,
 } from 'react-native';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
-import { MainStackParamList } from '../../navigation/AppStackParams';
 import { COLORS } from '../../config/constants';
 
 type Props = PropsWithChildren<{
@@ -30,7 +29,7 @@ type Props = PropsWithChildren<{
 }>;
 
 const MainContainer = ({ children, style }: Props) => {
-  const navigation = useNavigation<NavigationProp<MainStackParamList>>();
+  const navigation = useNavigation<NavigationProp<any>>();
 
   return (
     <KeyboardAvoidingView
@@ -81,7 +80,9 @@ const MainContainer = ({ children, style }: Props) => {
             alignItems: 'center',
             alignSelf: 'flex-end',
           }}
-          onPress={() => navigation.navigate('Inspect')}>
+          onPress={() =>
+            navigation.navigate('Inspect', { screen: 'Inspections' })
+          }>
           <View style={styles.footer_center}>
             <AntDesign name="pluscircle" size={60} color="#FF0000" />
           </View>

@@ -16,7 +16,7 @@ import { useCallback, useState, FC } from 'react';
 import { ISchool } from '../../lib/entities';
 import { useFocusEffect } from '@react-navigation/native';
 import { sendRequest } from '../../config/compose';
-import { statusLabel, statusLabels } from '../../lib/lang';
+import { statusLabel } from '../../lib/lang';
 
 const OverviewRoute: FC<{ school: ISchool }> = ({ school }) => {
   const openLink = async (url: string) => {

@@ -4,36 +4,34 @@ import { COLORS } from '../../config/constants';
 import moment from 'moment';
 
 interface Props {
-  inspection: IInspection;
+  data: IInspection;
   onClick?: (data: IInspection) => void;
 }
 
-const InspectionCard = ({ inspection, onClick }: Props) => (
+const InspectionCard = ({ data, onClick }: Props) => (
   <TouchableOpacity
     style={styles.panel}
-    onPress={() => onClick && onClick(inspection)}>
+    onPress={() => onClick && onClick(data)}>
     <View style={styles.item_header}>
       <View
         style={[
           styles.item_dot,
           {
             backgroundColor:
-              inspection.status === 'approved'
+              data.status === 'approved'
                 ? COLORS.approved
-                : inspection.status === 'pending_review'
+                : data.status === 'pending_review'
                 ? COLORS.pending
-                : inspection.status === 'review_required'
+                : data.status === 'review_required'
                 ? COLORS.danger
                 : COLORS.inactive,
           },
         ]}
       />
-      <Text style={styles.item_time}>
-        {moment(inspection.due_date).calendar()}
-      </Text>
+      <Text style={styles.item_time}>{moment(data.due_date).calendar()}</Text>
     </View>
-    <Text style={styles.item_title}>{inspection.name}</Text>
-    <Text style={styles.item_subtitle}>{inspection.school.name}</Text>
+    <Text style={styles.item_title}>{data.name}</Text>
+    <Text style={styles.item_subtitle}>{data.school.name}</Text>
   </TouchableOpacity>
 );
 
