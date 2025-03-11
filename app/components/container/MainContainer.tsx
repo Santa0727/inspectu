@@ -1,4 +1,11 @@
-import { FontAwesome, Ionicons } from '@expo/vector-icons';
+import {
+  AntDesign,
+  FontAwesome,
+  Foundation,
+  Ionicons,
+  MaterialCommunityIcons,
+  MaterialIcons,
+} from '@expo/vector-icons';
 import { PropsWithChildren } from 'react';
 import {
   Image,
@@ -15,14 +22,14 @@ import {
   ViewStyle,
 } from 'react-native';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
-import { MainStackParamList } from '../../navigation/AppStackParams';
+import { COLORS } from '../../config/constants';
 
 type Props = PropsWithChildren<{
   style?: StyleProp<ViewStyle>;
 }>;
 
 const MainContainer = ({ children, style }: Props) => {
-  const navigation = useNavigation<NavigationProp<MainStackParamList>>();
+  const navigation = useNavigation<NavigationProp<any>>();
 
   return (
     <KeyboardAvoidingView
@@ -31,15 +38,16 @@ const MainContainer = ({ children, style }: Props) => {
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.header_logo}
-          onPress={() => navigation.navigate('Inspect')}>
+          onPress={() => navigation.navigate('Home')}>
           <Image
             source={require('../../images/header-logo.png')}
             style={styles.header_img}
           />
         </TouchableOpacity>
         <View style={styles.header_icons}>
-          <TouchableOpacity style={styles.header_btn}>
-            <Ionicons name="notifications" size={45} color="black" />
+          <TouchableOpacity style={styles.header_notify}>
+            <View style={styles.notify_dot} />
+            <Ionicons name="notifications" size={28} color={COLORS.greyBlue} />
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.header_btn}
@@ -55,19 +63,45 @@ const MainContainer = ({ children, style }: Props) => {
       </ScrollView>
       <View style={styles.footer}>
         <TouchableOpacity
-          style={[styles.footer_btn, styles.footer_left]}
-          onPress={() => navigation.navigate('Inspect')}>
-          <Text style={styles.footer_txt}>Inspections</Text>
+          style={styles.footer_btn}
+          onPress={() => navigation.navigate('Home')}>
+          <Foundation name="home" size={24} color="#A4ACBD" />
+          <Text style={styles.footer_txt}>Home</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.footer_btn, styles.footer_center]}
+          style={styles.footer_btn}
           onPress={() => navigation.navigate('Schedule')}>
+          <MaterialCommunityIcons name="clock" size={24} color="#A4ACBD" />
           <Text style={styles.footer_txt}>Schedule</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.footer_btn, styles.footer_right]}
+          style={{
+            flex: 1.4,
+            alignItems: 'center',
+            alignSelf: 'flex-end',
+            display: 'none',
+          }}
+          onPress={() =>
+            navigation.navigate('Inspect', { screen: 'Inspections' })
+          }>
+          <View style={styles.footer_center}>
+            <AntDesign name="pluscircle" size={60} color="#FF0000" />
+          </View>
+          <Text style={[styles.footer_txt, { marginBottom: 5 }]}>
+            Inspections
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.footer_btn}
           onPress={() => navigation.navigate('Help')}>
+          <MaterialIcons name="help" size={24} color="#A4ACBD" />
           <Text style={styles.footer_txt}>Help</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.footer_btn}
+          onPress={() => navigation.navigate('Profile')}>
+          <FontAwesome name="user" size={24} color="#A4ACBD" />
+          <Text style={styles.footer_txt}>Profile</Text>
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
@@ -80,6 +114,7 @@ const styles = StyleSheet.create({
   },
   scroll: {
     paddingVertical: 15,
+    backgroundColor: '#F1F5F9',
   },
   header: {
     flexDirection: 'row',
@@ -87,6 +122,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingTop: 15,
     paddingHorizontal: 10,
+    backgroundColor: '#FFFFFF',
   },
   header_logo: {
     minHeight: 100,
@@ -104,35 +140,47 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  header_notify: {
+    padding: 7,
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+  },
+  notify_dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 8,
+    backgroundColor: '#FF0000',
+    position: 'absolute',
+    top: 12,
+    right: 8,
+  },
   footer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingTop: 5,
+    paddingHorizontal: 5,
+    backgroundColor: COLORS.dark,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
   },
   footer_btn: {
-    backgroundColor: '#666666',
     flex: 1,
-    height: 50,
+    height: 55,
     justifyContent: 'center',
     alignItems: 'center',
   },
   footer_txt: {
     textAlign: 'center',
-    color: 'white',
-    fontSize: 20,
-    fontWeight: '600',
-  },
-  footer_left: {
-    borderTopLeftRadius: 5,
-    borderBottomLeftRadius: 5,
+    color: '#A4ACBD',
+    fontSize: 12,
+    marginTop: 3,
   },
   footer_center: {
-    marginHorizontal: 5,
-  },
-  footer_right: {
-    borderTopRightRadius: 5,
-    borderBottomRightRadius: 5,
+    backgroundColor: 'white',
+    position: 'absolute',
+    borderRadius: '50%',
+    bottom: 25,
   },
 });
 

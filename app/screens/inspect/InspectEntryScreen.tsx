@@ -18,6 +18,7 @@ import InspectStepForm from '../../components/manage/InspectStepForm';
 import ImageBox from '../../components/ui/ImageBox';
 import Input from '../../components/ui/Input';
 import SingleSelect from '../../components/ui/SingleSelect';
+import { MaterialIcons } from '@expo/vector-icons';
 
 interface IEntry {
   first: string;
@@ -223,11 +224,48 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
     <MainContainer style={{ padding: 5 }}>
       {entry ? (
         <>
+          <View style={styles.steps_view}>
+            <TouchableOpacity
+              style={styles.step_touch}
+              onPress={() =>
+                step <= 0 ? navigation.goBack() : setStep(step - 1)
+              }
+              disabled={disabled || step > entry.steps.length + 1}>
+              <MaterialIcons
+                name="navigate-before"
+                size={26}
+                color={
+                  disabled || step > entry.steps.length + 1
+                    ? COLORS.disabled
+                    : COLORS.dark
+                }
+              />
+            </TouchableOpacity>
+            <View style={styles.steps_bar}>
+              <View style={styles.step_circle} />
+              {Array.from(
+                { length: entry.steps.length + 2 },
+                (_, id) => id + 1,
+              ).map((x) => (
+                <StepSector key={x} isActive={step >= x} />
+              ))}
+            </View>
+            <TouchableOpacity
+              style={styles.step_touch}
+              onPress={nextClick}
+              disabled={disabled}>
+              <MaterialIcons
+                name="navigate-next"
+                size={26}
+                color={disabled ? COLORS.disabled : COLORS.dark}
+              />
+            </TouchableOpacity>
+          </View>
           <View style={{ padding: 10, minHeight: 300 }}>
             {step === 0 ? (
-              <View>
-                <Text style={{ fontSize: 24, fontWeight: '600' }}>
-                  Read before start
+              <View style={styles.panel}>
+                <Text style={{ fontSize: 20, fontWeight: '600' }}>
+                  {'Read before you start'}
                 </Text>
                 <HTMLView style={{ marginTop: 10 }} value={entry.first} />
               </View>
@@ -280,47 +318,6 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
               </>
             )}
           </View>
-          <View style={styles.steps_view}>
-            <View style={styles.steps_btn}>
-              {step < entry.steps.length + 2 ? (
-                <TouchableOpacity
-                  style={[styles.next_btn, disabled ? styles.disabled : {}]}
-                  onPress={() =>
-                    step <= 0 ? navigation.goBack() : setStep(step - 1)
-                  }
-                  disabled={disabled}>
-                  <Text style={styles.next_txt}>
-                    {step <= 0 ? 'Go Back' : 'Previous'}
-                  </Text>
-                </TouchableOpacity>
-              ) : (
-                <View />
-              )}
-              <TouchableOpacity
-                style={[styles.next_btn, disabled ? styles.disabled : {}]}
-                onPress={nextClick}
-                disabled={disabled}>
-                <Text style={styles.next_txt}>
-                  {step === entry.steps.length
-                    ? 'Review'
-                    : step === entry.steps.length + 1
-                    ? 'Submit'
-                    : step === entry.steps.length + 2
-                    ? 'Finish'
-                    : 'Next'}
-                </Text>
-              </TouchableOpacity>
-            </View>
-            <View style={styles.steps_bar}>
-              <View style={styles.step_circle} />
-              {Array.from(
-                { length: entry.steps.length + 2 },
-                (_, id) => id + 1,
-              ).map((x) => (
-                <StepSector key={x} isActive={step >= x} />
-              ))}
-            </View>
-          </View>
         </>
       ) : (
         <View style={{ paddingTop: '50%' }}>
@@ -333,58 +330,56 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
 
 const styles = StyleSheet.create({
   steps_view: {
-    paddingVertical: 30,
+    paddingBottom: 30,
     paddingHorizontal: 10,
-  },
-  steps_btn: {
     flexDirection: 'row',
+    alignItems: 'baseline',
     justifyContent: 'space-between',
+  },
+  step_touch: {
+    width: 43,
+    height: 43,
     alignItems: 'center',
-  },
-  next_btn: {
-    backgroundColor: '#414BB2',
-    paddingHorizontal: 25,
-    paddingVertical: 10,
-    borderRadius: 5,
-  },
-  next_txt: {
-    color: 'white',
-    fontSize: 19,
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderRadius: 4,
+    borderColor: COLORS.blueGrey,
+    backgroundColor: '#FFFFFF',
   },
   steps_bar: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     marginTop: 20,
+    marginHorizontal: 25,
+    height: 43,
   },
   step_circle: {
-    backgroundColor: '#414BB2',
-    width: 15,
-    height: 15,
-    borderRadius: 15,
+    backgroundColor: COLORS.dark,
+    width: 20,
+    height: 20,
+    borderRadius: 20,
     margin: -5,
     zIndex: 1,
   },
   step_line: {
     flex: 1,
     height: 5,
-    backgroundColor: '#414BB2',
+    backgroundColor: COLORS.dark,
   },
   inactive_circle: {
-    backgroundColor: COLORS.inactive,
-    width: 15,
-    height: 15,
-    borderRadius: 15,
+    backgroundColor: '#C4CFE5',
+    width: 20,
+    height: 20,
+    borderRadius: 20,
     margin: -5,
     zIndex: 1,
   },
   inactive_line: {
     flex: 1,
     height: 5,
-    backgroundColor: COLORS.inactive,
-  },
-  disabled: {
-    backgroundColor: COLORS.disabled,
+    backgroundColor: '#C4CFE5',
   },
   card_container: {
     marginVertical: 5,
@@ -410,6 +405,13 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '400',
     marginBottom: 10,
+  },
+  panel: {
+    borderColor: COLORS.blueGrey,
+    borderWidth: 1,
+    borderRadius: 10,
+    backgroundColor: 'white',
+    padding: 15,
   },
 });
 

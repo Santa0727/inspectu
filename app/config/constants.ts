@@ -6,7 +6,11 @@ export const COLORS = {
   danger: '#e11d48',
   success: '#16a34a',
   inactive: '#d9dbf0',
-  pending: '#eab308',
-  approved: '#8FD14F',
+  pending: '#FFBB00',
+  approved: '#00D29A',
   yellow: '#facc15',
+  red: '#FF0000',
+  blueGrey: '#DDE6F8',
+  dark: '#222B45',
+  greyBlue: '#8F9BB3',
 };

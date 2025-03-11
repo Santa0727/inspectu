@@ -1,68 +1,54 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import MainContainer from '../components/container/MainContainer';
-import InspectsTable from '../components/manage/InspectsTable';
-import { InspectStackParamList } from '../navigation/AppStackParams';
+import { HomeStackParamList } from '../navigation/AppStackParams';
+import { StyleSheet, Text, View } from 'react-native';
+import { AntDesign } from '@expo/vector-icons';
+import { COLORS } from '../config/constants';
 import { useCallback, useState } from 'react';
+import { IInspection } from '../lib/entities';
 import { sendRequest } from '../config/compose';
-import { IInspection, IName, ISchool } from '../lib/entities';
-import { useFocusEffect } from '@react-navigation/native';
-import {
-  ActivityIndicator,
-  Linking,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import SchoolViewModal from '../components/manage/SchoolViewModal';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import InspectionCard from '../components/manage/InspectionCard';
+import InspectionModal from '../components/manage/InspectionModal';
+import ViewCalendar from '../components/ui/ViewCalendar';
 
-type Props = NativeStackScreenProps<InspectStackParamList, 'Inspections'>;
+type Props = NativeStackScreenProps<HomeStackParamList, 'Home'>;
 
 const HomeScreen = ({ navigation }: Props) => {
-  const [loading, setLoading] = useState(false);
-  const [comingItems, setComingItems] = useState<IInspection[]>();
+  const navBar = useNavigation<any>();
+  const [upItems, setUpItems] = useState<IInspection[]>();
   const [pastItems, setPastItems] = useState<IInspection[]>();
-  const [curSchool, setCurSchool] = useState<ISchool>();
-  const [schools, setSchools] = useState<IName[]>();
+  const [curItem, setCurItem] = useState<IInspection>();
 
   const loadData = useCallback(() => {
     (async () => {
-      setLoading(true);
-
-      let res = await sendRequest('api/member/inspections', {}, 'GET');
+      const res = await sendRequest(
+        'api/member/inspections',
+        { per_page: 50 },
+        'GET',
+      );
       if (res.status) {
-        setComingItems(res.data.coming);
-        setPastItems(res.data.passed);
+        setUpItems(res.data.coming ?? []);
+        setPastItems(res.data.passed ?? []);
       } else {
         alert(res.message ?? 'Server error');
       }
-
-      res = await sendRequest('api/member/schools', {}, 'GET');
-      if (res.status) {
-        setSchools(res.data);
-      } else {
-        alert(res.message ?? 'Server error');
-      }
-
-      setLoading(false);
     })();
   }, []);
 
-  const goToDetail = (t: 'InspectEntry' | 'InspectReview', id: number) =>
-    navigation.navigate(t, { inspectID: id });
-  const goToSchool = (id: number) =>
-    navigation.navigate('School', { schoolID: id });
-
-  const openSchool = async (url: string) => {
-    try {
-      const supported = await Linking.canOpenURL(url);
-      if (supported) {
-        await Linking.openURL(url);
-      } else {
-        alert('Unable to open');
-      }
-    } catch (error: any) {
-      alert('An error occurred ' + error?.message);
+  const clickInspection = (item: IInspection) => {
+    if (item.status === 'publish') {
+      navBar.navigate('Inspect', {
+        screen: 'InspectEntry',
+        params: { inspectID: item.id },
+      });
+    } else if (item.status === 'review_required') {
+      navBar.navigate('Inspect', {
+        screen: 'InspectReview',
+        params: { inspectID: item.id },
+      });
+    } else {
+      setCurItem(item);
     }
   };
 
@@ -70,41 +56,48 @@ const HomeScreen = ({ navigation }: Props) => {
 
   return (
     <MainContainer>
-      {loading ? (
-        <View style={{ paddingTop: '50%' }}>
-          <ActivityIndicator size="large" color={'black'} />
+      <View style={styles.panel}>
+        <ViewCalendar
+          markers={[...(pastItems ?? []), ...(upItems ?? [])].map((x) => ({
+            date: x.due_date.slice(0, 10),
+            color:
+              x.status === 'approved'
+                ? COLORS.approved
+                : x.status === 'pending_review'
+                ? COLORS.pending
+                : x.status === 'review_required'
+                ? COLORS.danger
+                : COLORS.inactive,
+          }))}
+        />
+      </View>
+      <View style={styles.panel}>
+        <View style={styles.panel_header}>
+          <AntDesign name="clockcircle" size={24} color={COLORS.greyBlue} />
+          <Text style={styles.panel_label}>Schedule</Text>
         </View>
-      ) : (
-        <>
-          <View style={{ padding: 10 }}>
-            <Text style={styles.subtitle}>Schools</Text>
-            {schools?.map((x) => (
-              <TouchableOpacity
-                key={x.id}
-                onPress={goToSchool.bind(this, x.id)}>
-                <Text style={styles.school_name}>{x.name}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-          <InspectsTable
-            items={comingItems ?? []}
-            status="upcoming"
-            goToInspect={(t, id) => goToDetail(t, id)}
-            onClickSchool={(s) => setCurSchool(s)}
-          />
-          <InspectsTable
-            items={pastItems ?? []}
-            status="past"
-            goToInspect={(t, id) => goToDetail(t, id)}
-            onClickSchool={(s) => setCurSchool(s)}
-          />
-        </>
-      )}
-      {curSchool && (
-        <SchoolViewModal
+        <View style={{ minHeight: 100, paddingVertical: 10 }}>
+          {upItems?.map((x) => (
+            <InspectionCard key={x.id} data={x} onClick={clickInspection} />
+          ))}
+        </View>
+      </View>
+      <View style={styles.panel}>
+        <View style={styles.panel_header}>
+          <AntDesign name="clockcircle" size={24} color={COLORS.greyBlue} />
+          <Text style={styles.panel_label}>Inspections</Text>
+        </View>
+        <View style={{ minHeight: 100, paddingVertical: 10 }}>
+          {pastItems?.map((x) => (
+            <InspectionCard key={x.id} data={x} onClick={clickInspection} />
+          ))}
+        </View>
+      </View>
+      {curItem && (
+        <InspectionModal
+          data={curItem}
           visible={true}
-          school={curSchool}
-          onClose={() => setCurSchool(undefined)}
+          onClose={() => setCurItem(undefined)}
         />
       )}
     </MainContainer>
@@ -112,31 +105,23 @@ const HomeScreen = ({ navigation }: Props) => {
 };
 
 const styles = StyleSheet.create({
-  name: {
-    marginVertical: 20,
-    fontSize: 24,
-    fontWeight: '600',
-    textAlign: 'center',
-  },
-  link: {
-    marginVertical: 15,
-    fontSize: 22,
-    fontWeight: '500',
-    textAlign: 'center',
-    textDecorationLine: 'underline',
-  },
-  subtitle: {
-    fontSize: 22,
-    marginVertical: 5,
+  panel: {
+    borderColor: COLORS.blueGrey,
+    borderWidth: 1,
+    borderRadius: 10,
+    backgroundColor: '#FFFFFF',
     marginHorizontal: 10,
-    fontWeight: '500',
-  },
-  school_name: {
-    fontSize: 20,
     marginVertical: 8,
-    marginHorizontal: 10,
-    fontWeight: '400',
-    textDecorationLine: 'underline',
+    padding: 10,
+  },
+  panel_header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  panel_label: {
+    fontWeight: '600',
+    fontSize: 18,
+    marginLeft: 12,
   },
 });
 

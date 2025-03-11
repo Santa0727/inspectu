@@ -1,4 +1,4 @@
-import { FontAwesome } from '@expo/vector-icons';
+import { AntDesign, FontAwesome } from '@expo/vector-icons';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import {
   IEntryStep,
@@ -208,9 +208,16 @@ const CompliantModal = ({
   <Modal
     visible={true}
     title="Select compliant status"
+    showHeader={false}
     showFooter={false}
     onClose={onClose}
     size="small">
+    <View style={{ alignItems: 'flex-end' }}>
+      <TouchableOpacity style={styles.close_icon} onPress={onClose}>
+        <FontAwesome name="close" size={24} color="black" />
+      </TouchableOpacity>
+    </View>
+    <Text style={styles.name}>{'Select compliant status'}</Text>
     <TouchButton
       style={{ marginVertical: 10 }}
       label="Compliant"
@@ -257,7 +264,7 @@ const InspectStepForm = ({ form, setForm, data, isReview }: Props) => {
     } else if (com?.options.some((x) => !!x.value)) {
       return COLORS.primary;
     } else {
-      return 'black';
+      return undefined;
     }
   };
   const selectQuestion = (q: any) => {
@@ -351,35 +358,25 @@ const InspectStepForm = ({ form, setForm, data, isReview }: Props) => {
     : data.questions;
 
   return (
-    <View>
+    <View style={styles.panel}>
       <View style={styles.header}>
-        <FontAwesome name="home" size={30} />
-        <View style={{ marginLeft: 10 }}>
-          <Text style={{ fontSize: 22, fontWeight: '500' }}>Location</Text>
-          <Text style={{ fontSize: 18, fontWeight: '400' }}>{data.name}</Text>
-        </View>
+        <Text style={{ fontSize: 19, fontWeight: '600' }}>Location</Text>
+        <Text style={{ fontSize: 17, fontWeight: '500' }}>{data.name}</Text>
       </View>
       <View style={styles.body}>
-        <TouchButton
-          style={styles.clear_button}
-          label="Clear"
-          scheme="danger"
-          size="small"
-          onPress={clearClick}
-        />
+        <TouchableOpacity style={styles.clear_btn} onPress={clearClick}>
+          <AntDesign name="close" size={20} color="white" />
+          <Text style={styles.clear_txt}>{'Clear'}</Text>
+        </TouchableOpacity>
         <View style={styles.questions}>
           {questions.map((x, i) => (
             <TouchableOpacity
               key={x.id}
               style={styles.question}
               onPress={() => selectQuestion(x)}>
-              <Text style={[styles.question_name, { color: getColor(x.id) }]}>
-                {`${i + 1}) ${x.name}`}
-              </Text>
-              <FontAwesome
-                name={queID === x.id ? 'check-circle-o' : 'circle-o'}
-                size={28}
-                color={getColor(x.id)}
+              <Text style={styles.question_name}>{`${i + 1}. ${x.name}`}</Text>
+              <View
+                style={[styles.check_box, { backgroundColor: getColor(x.id) }]}
               />
             </TouchableOpacity>
           ))}
@@ -411,20 +408,37 @@ const InspectStepForm = ({ form, setForm, data, isReview }: Props) => {
 };
 
 const styles = StyleSheet.create({
+  panel: {
+    backgroundColor: 'white',
+    borderColor: COLORS.blueGrey,
+    borderWidth: 1,
+    borderRadius: 10,
+    padding: 10,
+  },
   header: {
-    flexDirection: 'row',
-    borderColor: '#d1d1d1',
-    borderBottomWidth: 1,
-    marginHorizontal: 20,
-    alignItems: 'center',
+    marginHorizontal: 10,
     paddingBottom: 10,
   },
   body: {
     marginTop: 20,
     paddingHorizontal: 5,
   },
-  clear_button: {
+  clear_btn: {
     marginBottom: 20,
+    alignSelf: 'flex-end',
+    width: 100,
+    backgroundColor: COLORS.dark,
+    borderRadius: 4,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+  },
+  clear_txt: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '500',
   },
   questions: {
     marginVertical: 10,
@@ -441,12 +455,35 @@ const styles = StyleSheet.create({
   question_name: {
     fontSize: 20,
     fontWeight: '500',
+    flex: 1,
   },
   note: {
     marginVertical: 10,
   },
   images: {
     marginVertical: 20,
+  },
+  close_icon: {
+    borderWidth: 2,
+    borderColor: COLORS.blueGrey,
+    borderRadius: 4,
+    width: 43,
+    height: 43,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  name: {
+    marginVertical: 10,
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  check_box: {
+    width: 30,
+    height: 30,
+    borderColor: COLORS.greyBlue,
+    borderWidth: 2,
+    borderRadius: 4,
+    backgroundColor: 'white',
   },
 });
 
