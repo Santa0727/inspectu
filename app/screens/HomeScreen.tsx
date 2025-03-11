@@ -10,6 +10,7 @@ import { sendRequest } from '../config/compose';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import InspectionCard from '../components/manage/InspectionCard';
 import InspectionModal from '../components/manage/InspectionModal';
+import ViewCalendar from '../components/ui/ViewCalendar';
 
 type Props = NativeStackScreenProps<HomeStackParamList, 'Home'>;
 
@@ -55,6 +56,21 @@ const HomeScreen = ({ navigation }: Props) => {
 
   return (
     <MainContainer>
+      <View style={styles.panel}>
+        <ViewCalendar
+          markers={[...(pastItems ?? []), ...(upItems ?? [])].map((x) => ({
+            date: x.due_date.slice(0, 10),
+            color:
+              x.status === 'approved'
+                ? COLORS.approved
+                : x.status === 'pending_review'
+                ? COLORS.pending
+                : x.status === 'review_required'
+                ? COLORS.danger
+                : COLORS.inactive,
+          }))}
+        />
+      </View>
       <View style={styles.panel}>
         <View style={styles.panel_header}>
           <AntDesign name="clockcircle" size={24} color={COLORS.greyBlue} />

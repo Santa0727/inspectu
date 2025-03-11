@@ -79,6 +79,7 @@ const MainContainer = ({ children, style }: Props) => {
             flex: 1.4,
             alignItems: 'center',
             alignSelf: 'flex-end',
+            display: 'none',
           }}
           onPress={() =>
             navigation.navigate('Inspect', { screen: 'Inspections' })
