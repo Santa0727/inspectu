@@ -34,7 +34,7 @@ const MainContainer = ({ children, style }: Props) => {
   return (
     <KeyboardAvoidingView
       style={styles.wrapper}
-      behavior={Platform.OS === 'android' ? 'height' : 'padding'}>
+      behavior={Platform.OS === 'android' ? undefined : 'padding'}>
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.header_logo}
