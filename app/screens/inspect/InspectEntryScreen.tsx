@@ -294,7 +294,7 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
               </View>
             ) : (
               <>
-                <SingleSelect
+                {/* <SingleSelect
                   label=""
                   options={entry.steps.map((x) => ({
                     value: x.id,
@@ -303,7 +303,7 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
                   value={entry.steps[step - 1].id}
                   onChange={selectLocation}
                   style={{ marginBottom: 20 }}
-                />
+                /> */}
                 {!!entry.steps_intro && (
                   <HTMLView
                     style={{ marginVertical: 20, marginHorizontal: 10 }}
