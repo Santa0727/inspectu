@@ -8,7 +8,6 @@ import {
 import MainContainer from '../../components/container/MainContainer';
 import { useCallback, useState } from 'react';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { InspectStackParamList } from '../../navigation/AppStackParams';
 import { sendRequest } from '../../config/compose';
 import { useFocusEffect } from '@react-navigation/native';
 import HTMLView from 'react-native-htmlview';
@@ -19,6 +18,7 @@ import ImageBox from '../../components/ui/ImageBox';
 import Input from '../../components/ui/Input';
 import SingleSelect from '../../components/ui/SingleSelect';
 import { MaterialIcons } from '@expo/vector-icons';
+import { HomeStackParamList } from '../../navigation/AppStackParams';
 
 interface IEntry {
   first: string;
@@ -142,7 +142,7 @@ const StepSector = ({ isActive }: { isActive: boolean }) => (
   </>
 );
 
-type Props = NativeStackScreenProps<InspectStackParamList, 'InspectEntry'>;
+type Props = NativeStackScreenProps<HomeStackParamList, 'InspectEntry'>;
 
 const InspectEntryScreen = ({ navigation, route }: Props) => {
   const inspectID = route.params.inspectID;

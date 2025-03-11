@@ -7,15 +7,14 @@ import { COLORS } from '../config/constants';
 import { useCallback, useState } from 'react';
 import { IInspection } from '../lib/entities';
 import { sendRequest } from '../config/compose';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { useFocusEffect } from '@react-navigation/native';
 import InspectionCard from '../components/manage/InspectionCard';
 import InspectionModal from '../components/manage/InspectionModal';
 import ViewCalendar from '../components/ui/ViewCalendar';
 
-type Props = NativeStackScreenProps<HomeStackParamList, 'Home'>;
+type Props = NativeStackScreenProps<HomeStackParamList, 'Inspections'>;
 
 const HomeScreen = ({ navigation }: Props) => {
-  const navBar = useNavigation<any>();
   const [upItems, setUpItems] = useState<IInspection[]>();
   const [pastItems, setPastItems] = useState<IInspection[]>();
   const [curItem, setCurItem] = useState<IInspection>();
@@ -38,15 +37,9 @@ const HomeScreen = ({ navigation }: Props) => {
 
   const clickInspection = (item: IInspection) => {
     if (item.status === 'publish') {
-      navBar.navigate('Inspect', {
-        screen: 'InspectEntry',
-        params: { inspectID: item.id },
-      });
+      navigation.navigate('InspectEntry', { inspectID: item.id });
     } else if (item.status === 'review_required') {
-      navBar.navigate('Inspect', {
-        screen: 'InspectReview',
-        params: { inspectID: item.id },
-      });
+      navigation.navigate('InspectReview', { inspectID: item.id });
     } else {
       setCurItem(item);
     }

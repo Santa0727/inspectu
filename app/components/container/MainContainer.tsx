@@ -38,7 +38,7 @@ const MainContainer = ({ children, style }: Props) => {
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.header_logo}
-          onPress={() => navigation.navigate('Home')}>
+          onPress={() => navigation.navigate('Inspections')}>
           <Image
             source={require('../../images/header-logo.png')}
             style={styles.header_img}
@@ -64,7 +64,7 @@ const MainContainer = ({ children, style }: Props) => {
       <View style={styles.footer}>
         <TouchableOpacity
           style={styles.footer_btn}
-          onPress={() => navigation.navigate('Home')}>
+          onPress={() => navigation.navigate('Inspections')}>
           <Foundation name="home" size={24} color="#A4ACBD" />
           <Text style={styles.footer_txt}>Home</Text>
         </TouchableOpacity>
@@ -80,10 +80,7 @@ const MainContainer = ({ children, style }: Props) => {
             alignItems: 'center',
             alignSelf: 'flex-end',
             display: 'none',
-          }}
-          onPress={() =>
-            navigation.navigate('Inspect', { screen: 'Inspections' })
-          }>
+          }}>
           <View style={styles.footer_center}>
             <AntDesign name="pluscircle" size={60} color="#FF0000" />
           </View>

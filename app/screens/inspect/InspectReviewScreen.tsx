@@ -7,7 +7,6 @@ import {
   View,
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { InspectStackParamList } from '../../navigation/AppStackParams';
 import { IInspectAnswer, IReviewStep } from '../../lib/entities';
 import { sendRequest } from '../../config/compose';
 import { useFocusEffect } from '@react-navigation/native';
@@ -21,6 +20,7 @@ import { COLORS } from '../../config/constants';
 import ImageBox from '../../components/ui/ImageBox';
 import Checkbox from '../../components/ui/Checkbox';
 import InspectStepForm from '../../components/manage/InspectStepForm';
+import { HomeStackParamList } from '../../navigation/AppStackParams';
 
 const itemColor = (status: string | undefined) => {
   if (status === 'c') {
@@ -95,7 +95,7 @@ interface IEntryData {
   entry: IReviewStep[];
 }
 
-type Props = NativeStackScreenProps<InspectStackParamList, 'InspectReview'>;
+type Props = NativeStackScreenProps<HomeStackParamList, 'InspectReview'>;
 
 const InspectReviewScreen = ({ navigation, route }: Props) => {
   const inspectID = route.params.inspectID;
@@ -172,7 +172,7 @@ const InspectReviewScreen = ({ navigation, route }: Props) => {
   useFocusEffect(loadData);
 
   return (
-    <MainContainer style={{ padding: 5 }}>
+    <MainContainer style={{ padding: 5, backgroundColor: '#cfc' }}>
       {entryData ? (
         <>
           {clarifyData ? (

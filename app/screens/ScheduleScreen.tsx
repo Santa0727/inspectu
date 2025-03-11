@@ -9,8 +9,9 @@ import SchoolViewModal from '../components/manage/SchoolViewModal';
 import TouchButton from '../components/ui/TouchButton';
 import { COLORS } from '../config/constants';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { HomeStackParamList } from '../navigation/AppStackParams';
 
-type Props = NativeStackScreenProps<any>;
+type Props = NativeStackScreenProps<HomeStackParamList, 'Schedule'>;
 
 const ScheduleScreen = ({ navigation }: Props) => {
   const [schools, setSchools] = useState<IName[]>();
@@ -48,12 +49,13 @@ const ScheduleScreen = ({ navigation }: Props) => {
     setDisabled(false);
   };
 
-  const goToInspection = (inspection: IInspection) =>
-    navigation.navigate('Inspect', {
-      screen:
-        inspection.status === 'publish' ? 'InspectEntry' : 'InspectReview',
-      params: { inspectID: inspection.id },
-    });
+  const goToInspection = (inspection: IInspection) => {
+    if (inspection.status === 'publish') {
+      navigation.navigate('InspectEntry', { inspectID: inspection.id });
+    } else if (inspection.status === 'review_required') {
+      navigation.navigate('InspectReview', { inspectID: inspection.id });
+    }
+  };
 
   useFocusEffect(loadData);
 

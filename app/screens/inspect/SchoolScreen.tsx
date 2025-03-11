@@ -1,5 +1,4 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { InspectStackParamList } from '../../navigation/AppStackParams';
 import MainContainer from '../../components/container/MainContainer';
 import {
   ActivityIndicator,
@@ -17,6 +16,7 @@ import { ISchool } from '../../lib/entities';
 import { useFocusEffect } from '@react-navigation/native';
 import { sendRequest } from '../../config/compose';
 import { statusLabel } from '../../lib/lang';
+import { HomeStackParamList } from '../../navigation/AppStackParams';
 
 const OverviewRoute: FC<{ school: ISchool }> = ({ school }) => {
   const openLink = async (url: string) => {
@@ -131,7 +131,7 @@ const routes = [
   { key: 'history', title: 'History' },
 ];
 
-type Props = NativeStackScreenProps<InspectStackParamList, 'School'>;
+type Props = NativeStackScreenProps<HomeStackParamList, 'School'>;
 
 const SchoolScreen = ({ navigation, route }: Props) => {
   const [index, setIndex] = useState(0);
