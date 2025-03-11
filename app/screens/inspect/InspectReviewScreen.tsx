@@ -172,7 +172,7 @@ const InspectReviewScreen = ({ navigation, route }: Props) => {
   useFocusEffect(loadData);
 
   return (
-    <MainContainer style={{ padding: 5, backgroundColor: '#cfc' }}>
+    <MainContainer style={{ padding: 5 }}>
       {entryData ? (
         <>
           {clarifyData ? (
