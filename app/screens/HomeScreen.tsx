@@ -4,13 +4,13 @@ import { HomeStackParamList } from '../navigation/AppStackParams';
 import { StyleSheet, Text, View } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import { COLORS } from '../config/constants';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { IInspection } from '../lib/entities';
 import { sendRequest } from '../config/compose';
 import { useFocusEffect } from '@react-navigation/native';
 import InspectionCard from '../components/manage/InspectionCard';
 import InspectionModal from '../components/manage/InspectionModal';
-import ViewCalendar from '../components/ui/ViewCalendar';
+import Calendar from '../components/ui/Calendar';
 
 type Props = NativeStackScreenProps<HomeStackParamList, 'Inspections'>;
 
@@ -18,6 +18,7 @@ const HomeScreen = ({ navigation }: Props) => {
   const [upItems, setUpItems] = useState<IInspection[]>();
   const [pastItems, setPastItems] = useState<IInspection[]>();
   const [curItem, setCurItem] = useState<IInspection>();
+  const [fltDate, setFltDate] = useState<string>();
 
   const loadData = useCallback(() => {
     (async () => {
@@ -45,12 +46,20 @@ const HomeScreen = ({ navigation }: Props) => {
     }
   };
 
+  const filteredItems = useMemo(
+    () =>
+      fltDate
+        ? pastItems?.filter((x) => x.due_date.slice(0, 10) === fltDate)
+        : pastItems,
+    [fltDate, pastItems],
+  );
+
   useFocusEffect(loadData);
 
   return (
     <MainContainer>
       <View style={styles.panel}>
-        <ViewCalendar
+        <Calendar
           markers={[...(pastItems ?? []), ...(upItems ?? [])].map((x) => ({
             date: x.due_date.slice(0, 10),
             color:
@@ -62,6 +71,8 @@ const HomeScreen = ({ navigation }: Props) => {
                 ? COLORS.danger
                 : COLORS.inactive,
           }))}
+          selectedDate={fltDate}
+          onClick={(d) => setFltDate(d)}
         />
       </View>
       <View style={styles.panel}>
@@ -81,7 +92,7 @@ const HomeScreen = ({ navigation }: Props) => {
           <Text style={styles.panel_label}>Inspections</Text>
         </View>
         <View style={{ minHeight: 100, paddingVertical: 10 }}>
-          {pastItems?.map((x) => (
+          {filteredItems?.map((x) => (
             <InspectionCard key={x.id} data={x} onClick={clickInspection} />
           ))}
         </View>

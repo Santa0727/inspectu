@@ -12,7 +12,7 @@ import { StyleSheet } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { COLORS } from '../../config/constants';
 
-const weeks = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
+const weeks = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
   monthNames = [
     'January',
     'February',
@@ -29,21 +29,27 @@ const weeks = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
   ];
 
 interface ICell {
-  value?: number;
-  label?: string | number;
-  date_str?: string;
+  value: number;
+  label: string | number;
+  date_str: string;
+  isActive: boolean;
+}
+
+interface IMarker {
+  date: string;
+  color: string;
 }
 
 interface Props {
-  markers?: string[];
+  markers?: IMarker[];
   style?: StyleProp<ViewStyle>;
-  onSelectDate?: (date: string) => void;
+  selectedDate?: string;
+  onClick?: (date?: string) => void;
 }
 
-const Calendar = ({ markers, style, onSelectDate }: Props) => {
+const Calendar = ({ markers, style, selectedDate, onClick }: Props) => {
   const [year, setYear] = useState(moment().toDate().getFullYear());
   const [month, setMonth] = useState(moment().toDate().getMonth());
-  const valStr = moment().format('YYYY-MM-DD');
 
   const grid = useMemo(() => {
     const day = `${year}-${zeroPad(month + 1)}-01`;
@@ -53,7 +59,13 @@ const Calendar = ({ markers, style, onSelectDate }: Props) => {
       rows: ICell[] = [];
 
     for (let i = 0; i < fW; i++) {
-      rows.push({});
+      const mt = moment(new Date(year, month, i - fW + 1));
+      rows.push({
+        value: mt.toDate().getTime(),
+        label: mt.format('D'),
+        date_str: mt.format('YYYY-MM-DD'),
+        isActive: false,
+      });
     }
     for (let i = 1; i <= lD; i++) {
       rows.push({
@@ -64,6 +76,7 @@ const Calendar = ({ markers, style, onSelectDate }: Props) => {
         date_str: moment(`${year}-${zeroPad(month + 1)}-${zeroPad(i)}`).format(
           'YYYY-MM-DD',
         ),
+        isActive: true,
       });
       if (rows.length >= 7) {
         result.push(rows);
@@ -71,7 +84,15 @@ const Calendar = ({ markers, style, onSelectDate }: Props) => {
       }
     }
     if (rows.length > 0) {
-      for (let i = 0; rows.length < 7; i++) rows.push({});
+      for (let i = 0; rows.length < 7; i++) {
+        const mt = moment(`${year}-${zeroPad(month + 1)}-${zeroPad(i + 1)}`);
+        rows.push({
+          value: mt.toDate().getTime(),
+          label: mt.format('D'),
+          date_str: mt.format('YYYY-MM-DD'),
+          isActive: false,
+        });
+      }
       result.push(rows);
     }
     return result;
@@ -92,22 +113,22 @@ const Calendar = ({ markers, style, onSelectDate }: Props) => {
   return (
     <View style={[styles.wrapper, style]}>
       <View style={styles.control_row}>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <TouchableOpacity
-            style={styles.year_move_touch}
-            onPress={() => monthMove(-1)}>
-            <FontAwesome name="chevron-left" size={22} color="black" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.year_move_touch}
-            onPress={() => monthMove(1)}>
-            <FontAwesome name="chevron-right" size={22} color="black" />
-          </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.year_move_touch}
+          onPress={() => monthMove(-1)}>
+          <FontAwesome name="chevron-left" size={20} color={COLORS.dark} />
+        </TouchableOpacity>
+        <View>
+          <Text style={styles.year_txt}>{monthNames[month]}</Text>
+          <Text style={styles.month_txt}>{year}</Text>
         </View>
-        <Text style={styles.year_txt}>{monthNames[month]}</Text>
-        <Text style={styles.year_txt}>{year}</Text>
+        <TouchableOpacity
+          style={styles.year_move_touch}
+          onPress={() => monthMove(1)}>
+          <FontAwesome name="chevron-right" size={20} color={COLORS.dark} />
+        </TouchableOpacity>
       </View>
-      <View style={{ flexDirection: 'row', padding: 5 }}>
+      <View style={{ flexDirection: 'row', paddingTop: 5, paddingBottom: 10 }}>
         {weeks.map((x) => (
           <Text key={x} style={styles.week_txt}>
             {x}
@@ -117,28 +138,42 @@ const Calendar = ({ markers, style, onSelectDate }: Props) => {
       {grid.map((rows, i) => (
         <View key={i} style={{ flexDirection: 'row' }}>
           {rows.map((cell, j) => (
-            <View key={j} style={{ flex: 1 }}>
+            <TouchableOpacity
+              key={j}
+              style={{ flex: 1 }}
+              onPress={() =>
+                onClick &&
+                onClick(
+                  cell.date_str === selectedDate ? undefined : cell.date_str,
+                )
+              }>
               {!!cell.label && (
-                <TouchableOpacity
+                <View
                   style={[
-                    cell.date_str === valStr ? styles.sel_touch : styles.touch,
-                    cell.date_str && markers && markers.includes(cell.date_str)
-                      ? styles.marked
+                    styles.touch,
+                    cell.date_str &&
+                    markers &&
+                    markers.some((x) => x.date === cell.date_str)
+                      ? {
+                          backgroundColor: markers.find(
+                            (x) => x.date === cell.date_str,
+                          )?.color,
+                        }
                       : {},
-                  ]}
-                  onPress={() =>
-                    cell.date_str && onSelectDate && onSelectDate(cell.date_str)
-                  }>
+                    selectedDate === cell.date_str
+                      ? styles.focus_touch
+                      : undefined,
+                  ]}>
                   <Text
-                    style={{
-                      color: cell.date_str === valStr ? 'white' : 'black',
-                      textAlign: 'center',
-                    }}>
+                    style={[
+                      styles.day_txt,
+                      { color: cell.isActive ? undefined : COLORS.greyBlue },
+                    ]}>
                     {cell.label}
                   </Text>
-                </TouchableOpacity>
+                </View>
               )}
-            </View>
+            </TouchableOpacity>
           ))}
         </View>
       ))}
@@ -149,55 +184,44 @@ const Calendar = ({ markers, style, onSelectDate }: Props) => {
 const styles = StyleSheet.create({
   wrapper: {
     paddingHorizontal: 8,
-    backgroundColor: '#fef3c7',
     borderRadius: 5,
-    paddingVertical: 16,
+    paddingVertical: 10,
   },
   week_txt: {
     flex: 1,
     textAlign: 'center',
-    fontWeight: 'bold',
-    fontSize: 18,
-  },
-  sel_touch: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#da2127',
-    minHeight: 36,
-    borderColor: '#f8f8f8',
-    borderWidth: 1,
+    fontSize: 14,
+    color: COLORS.greyBlue,
   },
   touch: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#e1e1e1',
-    borderColor: '#f8f8f8',
-    borderWidth: 1,
-    minHeight: 36,
-  },
-  btn_touch: {
-    backgroundColor: '#F2F2F2',
-    paddingHorizontal: 11,
-    paddingVertical: 9,
-    borderRadius: 8,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    height: 36,
+    width: 36,
+    alignSelf: 'center',
+    borderRadius: 5,
   },
   year_txt: {
-    borderWidth: 1,
-    borderRadius: 5,
-    borderColor: '#a8a29e',
-    minWidth: 80,
     textAlign: 'center',
     fontSize: 18,
-    padding: 3,
-    color: '#27272a',
+    fontWeight: '600',
+    color: COLORS.dark,
+  },
+  month_txt: {
+    textAlign: 'center',
+    color: '2025',
+    fontSize: 14,
+    fontWeight: '400',
   },
   year_move_touch: {
-    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: COLORS.blueGrey,
+    borderRadius: 4,
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   control_row: {
     flexDirection: 'row',
@@ -205,8 +229,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingBottom: 10,
   },
-  marked: {
-    backgroundColor: COLORS.yellow,
+  day_txt: {
+    textAlign: 'center',
+    fontSize: 15,
+    color: COLORS.dark,
+    fontWeight: '500',
+  },
+  focus_touch: {
+    borderWidth: 1,
+    borderColor: COLORS.primary,
+    borderRadius: 4,
   },
 });
 
