@@ -4,10 +4,7 @@ import { createDrawerNavigator } from '@react-navigation/drawer';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LoginScreen from '../screens/auth/LoginScreen';
 import RegisterScreen from '../screens/auth/RegisterScreen';
-import { useDispatch, useSelector } from 'react-redux';
-import { selectToken } from '../store/auth/auth.selector';
 import ProfileScreen from '../screens/auth/ProfileScreen';
-import { loadMyProfile } from '../store/auth/auth.actions';
 import InspectEntryScreen from '../screens/inspect/InspectEntryScreen';
 import {
   AuthStackParamList,
@@ -19,6 +16,8 @@ import SchoolScreen from '../screens/inspect/SchoolScreen';
 import InspectReviewScreen from '../screens/inspect/InspectReviewScreen';
 import HomeScreen from '../screens/HomeScreen';
 import ScheduleScreen from '../screens/ScheduleScreen';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { loadMyProfile, selectToken } from '../store/auth/authSlice';
 
 const AuthStack = createNativeStackNavigator<AuthStackParamList>();
 
@@ -72,7 +71,7 @@ const HomeNavigator = () => (
 const MainStack = createDrawerNavigator<MainStackParamList>();
 
 const MainNavigator = () => {
-  const dispatch = useDispatch<any>();
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     dispatch(loadMyProfile());
@@ -100,7 +99,7 @@ const MainNavigator = () => {
 };
 
 const AppNavigator = () => {
-  const token = useSelector(selectToken);
+  const token = useAppSelector(selectToken);
 
   return (
     <NavigationContainer>

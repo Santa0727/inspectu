@@ -3,15 +3,18 @@ import { StyleSheet, Text, View } from 'react-native';
 import Input from '../../components/ui/Input';
 import MainContainer from '../../components/container/MainContainer';
 import TouchButton from '../../components/ui/TouchButton';
-import { useDispatch, useSelector } from 'react-redux';
-import { selectProfile } from '../../store/auth/auth.selector';
 import { toastError, toastSuccess } from '../../lib/helper';
 import { sendRequest } from '../../config/compose';
-import { authLogout, loadMyProfile } from '../../store/auth/auth.actions';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import {
+  loadMyProfile,
+  logoutAsync,
+  selectProfile,
+} from '../../store/auth/authSlice';
 
 const ProfileScreen = () => {
-  const dispatch = useDispatch<any>();
-  const profile = useSelector(selectProfile);
+  const dispatch = useAppDispatch();
+  const profile = useAppSelector(selectProfile);
 
   const [disabled, setDisabled] = useState(false);
   const [name, setName] = useState(profile?.name ?? '');
@@ -86,7 +89,7 @@ const ProfileScreen = () => {
   };
   const logoutClick = async () => {
     setDisabled(true);
-    await dispatch(authLogout());
+    await dispatch(logoutAsync());
   };
 
   return (

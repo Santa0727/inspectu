@@ -9,18 +9,18 @@ import {
 import Input from '../../components/ui/Input';
 import TouchButton from '../../components/ui/TouchButton';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useDispatch } from 'react-redux';
-import { authLogin } from '../../store/auth/auth.actions';
 import AppContainer from '../../components/container/AppContainer';
 import { AuthStackParamList } from '../../navigation/AppStackParams';
 import { isEmailFormat } from '../../lib/helper';
 import Checkbox from '../../components/ui/Checkbox';
 import { COLORS } from '../../config/constants';
+import { useAppDispatch } from '../../store/hooks';
+import { login as authLogin } from '../../store/auth/authSlice';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'SignIn'>;
 
 const LoginScreen = ({ navigation }: Props) => {
-  const dispatch = useDispatch<any>();
+  const dispatch = useAppDispatch();
 
   const [email, setEmail] = useState('inspector@sfh.com');
   const [password, setPassword] = useState('Futurelab2023+');
@@ -50,11 +50,12 @@ const LoginScreen = ({ navigation }: Props) => {
     if (!isValid()) return;
 
     setDisabled(true);
-    const res = await dispatch(authLogin(email, password));
+    const res = await dispatch(authLogin({ email, password }));
     setDisabled(false);
 
-    if (res !== true) {
-      alert(res);
+    if (authLogin.rejected.match(res)) {
+      alert(res.payload);
+      return;
     }
   };
 

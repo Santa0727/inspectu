@@ -3,11 +3,11 @@ import { StyleSheet, Text, View } from 'react-native';
 import Input from '../../components/ui/Input';
 import TouchButton from '../../components/ui/TouchButton';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useDispatch } from 'react-redux';
-import { authRegister } from '../../store/auth/auth.actions';
 import AppContainer from '../../components/container/AppContainer';
 import { AuthStackParamList } from '../../navigation/AppStackParams';
 import { isEmailFormat } from '../../lib/helper';
+import { useAppDispatch } from '../../store/hooks';
+import { register } from '../../store/auth/authSlice';
 
 interface IForm {
   name: string;
@@ -25,7 +25,7 @@ interface IError {
 type Props = NativeStackScreenProps<AuthStackParamList, 'SignUp'>;
 
 const RegisterScreen = ({ navigation }: Props) => {
-  const dispatch = useDispatch<any>();
+  const dispatch = useAppDispatch();
 
   const [form, setForm] = useState<IForm>({
     name: '',
@@ -65,11 +65,11 @@ const RegisterScreen = ({ navigation }: Props) => {
     if (!isFormValid()) return;
 
     setDisabled(true);
-    const res = await dispatch(authRegister(form));
+    const res = await dispatch(register(form));
     setDisabled(false);
 
-    if (res !== true) {
-      alert(res);
+    if (register.rejected.match(res)) {
+      alert(res.payload);
     }
   };
 
