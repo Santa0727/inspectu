@@ -38,7 +38,9 @@ const MainContainer = ({ children, style }: Props) => {
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.header_logo}
-          onPress={() => navigation.navigate('Inspections')}>
+          onPress={() =>
+            navigation.navigate('Home', { screen: 'Inspections' })
+          }>
           <Image
             source={require('../../images/header-logo.png')}
             style={styles.header_img}
@@ -64,14 +66,16 @@ const MainContainer = ({ children, style }: Props) => {
       <View style={styles.footer}>
         <TouchableOpacity
           style={styles.footer_btn}
-          onPress={() => navigation.navigate('Inspections')}>
-          <Foundation name="home" size={24} color="#A4ACBD" />
+          onPress={() =>
+            navigation.navigate('Home', { screen: 'Inspections' })
+          }>
+          <Foundation name="home" size={26} color="#A4ACBD" />
           <Text style={styles.footer_txt}>Home</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.footer_btn}
-          onPress={() => navigation.navigate('Schedule')}>
-          <MaterialCommunityIcons name="clock" size={24} color="#A4ACBD" />
+          onPress={() => navigation.navigate('Home', { screen: 'Schedule' })}>
+          <MaterialCommunityIcons name="clock" size={26} color="#A4ACBD" />
           <Text style={styles.footer_txt}>Schedule</Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -91,13 +95,13 @@ const MainContainer = ({ children, style }: Props) => {
         <TouchableOpacity
           style={styles.footer_btn}
           onPress={() => navigation.navigate('Help')}>
-          <MaterialIcons name="help" size={24} color="#A4ACBD" />
+          <MaterialIcons name="help" size={26} color="#A4ACBD" />
           <Text style={styles.footer_txt}>Help</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.footer_btn}
           onPress={() => navigation.navigate('Profile')}>
-          <FontAwesome name="user" size={24} color="#A4ACBD" />
+          <FontAwesome name="user" size={26} color="#A4ACBD" />
           <Text style={styles.footer_txt}>Profile</Text>
         </TouchableOpacity>
       </View>
@@ -155,22 +159,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingTop: 5,
     paddingHorizontal: 5,
     backgroundColor: COLORS.dark,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
+    paddingBottom: 10,
   },
   footer_btn: {
     flex: 1,
-    height: 55,
+    height: 75,
     justifyContent: 'center',
     alignItems: 'center',
   },
   footer_txt: {
     textAlign: 'center',
     color: '#A4ACBD',
-    fontSize: 12,
+    fontSize: 15,
     marginTop: 3,
   },
   footer_center: {
