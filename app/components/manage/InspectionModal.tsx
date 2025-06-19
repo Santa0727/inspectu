@@ -1,5 +1,5 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { IInspection } from '../../lib/entities';
+import { IInspection } from '../../lib/manage.entities';
 import Modal from '../ui/Modal';
 import { FontAwesome } from '@expo/vector-icons';
 import { COLORS } from '../../config/constants';

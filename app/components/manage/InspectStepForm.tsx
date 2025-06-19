@@ -5,7 +5,7 @@ import {
   IInspectAnswer,
   IReviewStep,
   TQuestionType,
-} from '../../lib/entities';
+} from '../../lib/manage.entities';
 import Modal from '../ui/Modal';
 import Checkbox from '../ui/Checkbox';
 import CommentBox from '../ui/CommentBox';

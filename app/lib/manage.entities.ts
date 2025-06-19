@@ -1,12 +1,4 @@
-export interface IName {
-  id: number;
-  name: string;
-}
-
-interface IValue {
-  id: string;
-  value: boolean | string;
-}
+import { IName, IValue } from './general.entities';
 
 interface IVisit {
   name: string;

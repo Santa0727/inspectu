@@ -2,7 +2,6 @@ import {
   AntDesign,
   FontAwesome,
   Foundation,
-  Ionicons,
   MaterialCommunityIcons,
   MaterialIcons,
 } from '@expo/vector-icons';
@@ -23,6 +22,7 @@ import {
 } from 'react-native';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { COLORS } from '../../config/constants';
+import NotificationIcon from '../common/NotificationIcon';
 
 type Props = PropsWithChildren<{
   style?: StyleProp<ViewStyle>;
@@ -47,10 +47,7 @@ const MainContainer = ({ children, style }: Props) => {
           />
         </TouchableOpacity>
         <View style={styles.header_icons}>
-          <TouchableOpacity style={styles.header_notify}>
-            <View style={styles.notify_dot} />
-            <Ionicons name="notifications" size={28} color={COLORS.greyBlue} />
-          </TouchableOpacity>
+          <NotificationIcon />
           <TouchableOpacity
             style={styles.header_btn}
             onPress={() => navigation.navigate('Profile')}>
@@ -140,20 +137,6 @@ const styles = StyleSheet.create({
     padding: 7,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  header_notify: {
-    padding: 7,
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-  },
-  notify_dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 8,
-    backgroundColor: '#FF0000',
-    position: 'absolute',
-    top: 12,
-    right: 8,
   },
   footer: {
     flexDirection: 'row',

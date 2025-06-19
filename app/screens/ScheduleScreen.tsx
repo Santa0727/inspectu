@@ -3,13 +3,14 @@ import MainContainer from '../components/container/MainContainer';
 import { useCallback, useState } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { sendRequest } from '../config/compose';
-import { IInspection, IName, ISchool } from '../lib/entities';
+import { IInspection, ISchool } from '../lib/manage.entities';
 import { defaultDateFormat } from '../lib/helper';
 import SchoolViewModal from '../components/manage/SchoolViewModal';
 import TouchButton from '../components/ui/TouchButton';
 import { COLORS } from '../config/constants';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { HomeStackParamList } from '../navigation/AppStackParams';
+import { IName } from '../lib/general.entities';
 
 type Props = NativeStackScreenProps<HomeStackParamList, 'Schedule'>;
 

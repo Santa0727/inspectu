@@ -11,7 +11,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { sendRequest } from '../../config/compose';
 import { useFocusEffect } from '@react-navigation/native';
 import HTMLView from 'react-native-htmlview';
-import { IEntryStep, IInspectAnswer } from '../../lib/entities';
+import { IEntryStep, IInspectAnswer } from '../../lib/manage.entities';
 import { COLORS } from '../../config/constants';
 import InspectStepForm from '../../components/manage/InspectStepForm';
 import ImageBox from '../../components/ui/ImageBox';

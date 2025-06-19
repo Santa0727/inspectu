@@ -1,5 +1,5 @@
 import { Platform, StyleSheet, Text, TextInput, View } from 'react-native';
-import { IReviewStep } from '../../lib/entities';
+import { IReviewStep } from '../../lib/manage.entities';
 import { useState } from 'react';
 import { FontAwesome } from '@expo/vector-icons';
 import TouchButton from '../ui/TouchButton';

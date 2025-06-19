@@ -5,7 +5,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import { COLORS } from '../config/constants';
 import { useCallback, useMemo, useState } from 'react';
-import { IInspection } from '../lib/entities';
+import { IInspection } from '../lib/manage.entities';
 import { sendRequest } from '../config/compose';
 import { useFocusEffect } from '@react-navigation/native';
 import InspectionCard from '../components/manage/InspectionCard';

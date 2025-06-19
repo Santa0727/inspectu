@@ -7,7 +7,7 @@ import {
   View,
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { IInspectAnswer, IReviewStep } from '../../lib/entities';
+import { IInspectAnswer, IReviewStep } from '../../lib/manage.entities';
 import { sendRequest } from '../../config/compose';
 import { useFocusEffect } from '@react-navigation/native';
 import MainContainer from '../../components/container/MainContainer';

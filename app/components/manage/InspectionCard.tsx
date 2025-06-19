@@ -1,5 +1,5 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { IInspection } from '../../lib/entities';
+import { IInspection } from '../../lib/manage.entities';
 import { COLORS } from '../../config/constants';
 import moment from 'moment';
 

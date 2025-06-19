@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { ISchool } from '../../lib/entities';
+import { ISchool } from '../../lib/manage.entities';
 import Modal from '../ui/Modal';
 import { FontAwesome, Fontisto } from '@expo/vector-icons';
 import { COLORS } from '../../config/constants';

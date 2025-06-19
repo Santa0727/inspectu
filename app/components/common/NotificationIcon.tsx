@@ -1,0 +1,100 @@
+import { Ionicons } from '@expo/vector-icons';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { COLORS } from '../../config/constants';
+import { useCallback, useEffect, useState } from 'react';
+import { sendRequest } from '../../config/compose';
+import Modal from '../ui/Modal';
+import moment from 'moment';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import {
+  loadNotes,
+  readNotes,
+  selectHasNew,
+  selectNotes,
+} from '../../store/ui/uiSlice';
+
+interface ModalProps {
+  onClose: () => void;
+}
+
+const NotesModal = ({ onClose }: ModalProps) => {
+  const notes = useAppSelector(selectNotes);
+
+  return (
+    <Modal visible={true} title="Notifications" onClose={onClose}>
+      {notes.map((note) => (
+        <TouchableOpacity key={note.id}>
+          <View style={styles.note_view}>
+            <Text style={styles.note_txt}>{note.data.message}</Text>
+            <Text style={styles.note_time}>
+              {moment.utc(note.created_at).format('MM-DD-YYYY HH:mm')}
+            </Text>
+          </View>
+        </TouchableOpacity>
+      ))}
+    </Modal>
+  );
+};
+
+const NotificationIcon = () => {
+  const dispatch = useAppDispatch();
+  const hasNew = useAppSelector(selectHasNew);
+
+  const [visible, setVisible] = useState(false);
+
+  const clickIcon = () => {
+    dispatch(readNotes());
+    setVisible(true);
+  };
+
+  useEffect(() => {
+    dispatch(loadNotes());
+
+    const timer = setInterval(() => dispatch(loadNotes()), 10000);
+
+    return () => {
+      clearInterval(timer);
+    };
+  }, []);
+
+  return (
+    <TouchableOpacity style={styles.header_notify} onPress={clickIcon}>
+      {hasNew && <View style={styles.notify_dot} />}
+      <Ionicons name="notifications" size={28} color={COLORS.greyBlue} />
+      {visible && <NotesModal onClose={() => setVisible(false)} />}
+    </TouchableOpacity>
+  );
+};
+
+const styles = StyleSheet.create({
+  header_notify: {
+    padding: 7,
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+  },
+  notify_dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 8,
+    backgroundColor: '#FF0000',
+    position: 'absolute',
+    top: 12,
+    right: 8,
+  },
+  note_view: {
+    marginBottom: 5,
+    paddingVertical: 5,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E2E8F0',
+  },
+  note_txt: {
+    fontSize: 18,
+  },
+  note_time: {
+    fontSize: 14,
+    marginTop: 5,
+    paddingHorizontal: 5,
+  },
+});
+
+export default NotificationIcon;

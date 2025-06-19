@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { SceneMap, TabView } from 'react-native-tab-view';
 import { useCallback, useState, FC } from 'react';
-import { ISchool } from '../../lib/entities';
+import { ISchool } from '../../lib/manage.entities';
 import { useFocusEffect } from '@react-navigation/native';
 import { sendRequest } from '../../config/compose';
 import { statusLabel } from '../../lib/lang';

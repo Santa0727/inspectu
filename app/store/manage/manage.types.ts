@@ -1,4 +1,5 @@
-import { IName, ISchool, IUser } from '../../lib/entities';
+import { ISchool, IUser } from '../../lib/manage.entities';
+import { IName } from '../../lib/general.entities';
 
 export interface IManageState {
   schools: ISchool[];
