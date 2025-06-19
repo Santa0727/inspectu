@@ -11,6 +11,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import InspectionCard from '../components/manage/InspectionCard';
 import InspectionModal from '../components/manage/InspectionModal';
 import Calendar from '../components/ui/Calendar';
+import SingleSelect from '../components/ui/SingleSelect';
 
 type Props = NativeStackScreenProps<HomeStackParamList, 'Inspections'>;
 
@@ -18,7 +19,8 @@ const HomeScreen = ({ navigation }: Props) => {
   const [upItems, setUpItems] = useState<IInspection[]>();
   const [pastItems, setPastItems] = useState<IInspection[]>();
   const [curItem, setCurItem] = useState<IInspection>();
-  const [fltDate, setFltDate] = useState<string>();
+
+  const [filter, setFilter] = useState<{ date?: string; status?: string }>({});
 
   const loadData = useCallback(() => {
     (async () => {
@@ -46,13 +48,16 @@ const HomeScreen = ({ navigation }: Props) => {
     }
   };
 
-  const filteredItems = useMemo(
-    () =>
-      fltDate
-        ? pastItems?.filter((x) => x.due_date.slice(0, 10) === fltDate)
-        : pastItems,
-    [fltDate, pastItems],
-  );
+  const filteredItems = useMemo(() => {
+    let result = pastItems ?? [];
+    if (filter.date) {
+      result = result.filter((x) => x.due_date.slice(0, 10) === filter.date);
+    }
+    if (filter.status) {
+      result = result.filter((x) => x.status === filter.status);
+    }
+    return result;
+  }, [filter, pastItems]);
 
   useFocusEffect(loadData);
 
@@ -71,8 +76,8 @@ const HomeScreen = ({ navigation }: Props) => {
                 ? COLORS.danger
                 : COLORS.inactive,
           }))}
-          selectedDate={fltDate}
-          onClick={(d) => setFltDate(d)}
+          selectedDate={filter.date}
+          onClick={(d) => setFilter((f) => ({ ...f, date: d }))}
         />
       </View>
       <View style={styles.panel}>
@@ -91,6 +96,24 @@ const HomeScreen = ({ navigation }: Props) => {
           <AntDesign name="clockcircle" size={24} color={COLORS.greyBlue} />
           <Text style={styles.panel_label}>Inspections</Text>
         </View>
+        <SingleSelect
+          style={{ marginHorizontal: 10, marginTop: 10, marginBottom: -10 }}
+          label="Status"
+          options={[
+            { label: 'All', value: '' },
+            { label: 'Approved', value: 'approved' },
+            { label: 'Pending Review', value: 'pending_review' },
+            { label: 'Review Required', value: 'review_required' },
+            { label: 'Inactive', value: 'inactive' },
+          ]}
+          value={filter.status ?? ''}
+          onChange={(v) =>
+            setFilter((f) => ({
+              ...f,
+              status: v === '' ? undefined : String(v),
+            }))
+          }
+        />
         <View style={{ minHeight: 100, paddingVertical: 10 }}>
           {filteredItems?.map((x) => (
             <InspectionCard key={x.id} data={x} onClick={clickInspection} />

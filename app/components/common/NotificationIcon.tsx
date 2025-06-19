@@ -1,8 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { COLORS } from '../../config/constants';
-import { useCallback, useEffect, useState } from 'react';
-import { sendRequest } from '../../config/compose';
+import { useEffect, useState } from 'react';
 import Modal from '../ui/Modal';
 import moment from 'moment';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';

@@ -3,37 +3,48 @@ import { IInspection } from '../../lib/manage.entities';
 import { COLORS } from '../../config/constants';
 import moment from 'moment';
 
+const StatusLabels = {
+  approved: 'Approved',
+  pending_review: 'Pending Review',
+  review_required: 'Review Required',
+  publish: 'Published',
+};
+
 interface Props {
   data: IInspection;
   onClick?: (data: IInspection) => void;
 }
 
-const InspectionCard = ({ data, onClick }: Props) => (
-  <TouchableOpacity
-    style={styles.panel}
-    onPress={() => onClick && onClick(data)}>
-    <View style={styles.item_header}>
-      <View
-        style={[
-          styles.item_dot,
-          {
-            backgroundColor:
-              data.status === 'approved'
-                ? COLORS.approved
-                : data.status === 'pending_review'
-                ? COLORS.pending
-                : data.status === 'review_required'
-                ? COLORS.danger
-                : COLORS.inactive,
-          },
-        ]}
-      />
-      <Text style={styles.item_time}>{moment(data.due_date).calendar()}</Text>
-    </View>
-    <Text style={styles.item_title}>{data.name}</Text>
-    <Text style={styles.item_subtitle}>{data.school.name}</Text>
-  </TouchableOpacity>
-);
+const InspectionCard = ({ data, onClick }: Props) => {
+  const colorCode =
+    data.status === 'approved'
+      ? COLORS.approved
+      : data.status === 'pending_review'
+      ? COLORS.pending
+      : data.status === 'review_required'
+      ? COLORS.danger
+      : COLORS.inactive;
+
+  return (
+    <TouchableOpacity
+      style={styles.panel}
+      onPress={() => onClick && onClick(data)}>
+      <View style={styles.item_header}>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <View style={[styles.item_dot, { backgroundColor: colorCode }]} />
+          <Text style={styles.item_time}>
+            {moment(data.due_date).calendar()}
+          </Text>
+        </View>
+        <Text style={styles.status_txt}>
+          {StatusLabels[data.status] ?? 'Unknown'}
+        </Text>
+      </View>
+      <Text style={styles.item_title}>{data.name}</Text>
+      <Text style={styles.item_subtitle}>{data.school.name}</Text>
+    </TouchableOpacity>
+  );
+};
 
 const styles = StyleSheet.create({
   panel: {
@@ -49,6 +60,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 5,
+    justifyContent: 'space-between',
   },
   item_dot: {
     width: 15,
@@ -71,6 +83,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: COLORS.greyBlue,
     marginHorizontal: 3,
+  },
+  status_txt: {
+    marginLeft: 10,
+    fontSize: 12,
+    fontStyle: 'italic',
   },
 });
 

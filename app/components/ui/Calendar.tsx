@@ -85,7 +85,7 @@ const Calendar = ({ markers, style, selectedDate, onClick }: Props) => {
     }
     if (rows.length > 0) {
       for (let i = 0; rows.length < 7; i++) {
-        const mt = moment(`${year}-${zeroPad(month + 1)}-${zeroPad(i + 1)}`);
+        const mt = moment(`${year}-${zeroPad(month + 2)}-${zeroPad(i + 1)}`);
         rows.push({
           value: mt.toDate().getTime(),
           label: mt.format('D'),
