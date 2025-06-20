@@ -35,6 +35,8 @@ const NotesModal = ({ onClose }: ModalProps) => {
   );
 };
 
+let LoadingNotesTimer: NodeJS.Timeout | null = null;
+
 const NotificationIcon = () => {
   const dispatch = useAppDispatch();
   const hasNew = useAppSelector(selectHasNew);
@@ -47,12 +49,17 @@ const NotificationIcon = () => {
   };
 
   useEffect(() => {
-    dispatch(loadNotes());
+    if (LoadingNotesTimer === null) {
+      dispatch(loadNotes());
 
-    const timer = setInterval(() => dispatch(loadNotes()), 10000);
+      LoadingNotesTimer = setInterval(() => dispatch(loadNotes()), 10000);
+    }
 
     return () => {
-      clearInterval(timer);
+      if (LoadingNotesTimer) {
+        clearInterval(LoadingNotesTimer);
+        LoadingNotesTimer = null;
+      }
     };
   }, []);
 

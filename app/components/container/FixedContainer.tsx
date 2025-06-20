@@ -1,3 +1,18 @@
+import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { StatusBar } from 'expo-status-bar';
+import { PropsWithChildren } from 'react';
+import {
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  StyleProp,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+} from 'react-native';
+import NotificationIcon from '../common/NotificationIcon';
 import {
   AntDesign,
   FontAwesome,
@@ -5,31 +20,13 @@ import {
   MaterialCommunityIcons,
   MaterialIcons,
 } from '@expo/vector-icons';
-import { PropsWithChildren } from 'react';
-import {
-  Image,
-  Keyboard,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  StyleProp,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  View,
-  ViewStyle,
-} from 'react-native';
-import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { COLORS } from '../../config/constants';
-import NotificationIcon from '../common/NotificationIcon';
-import { StatusBar } from 'expo-status-bar';
 
 type Props = PropsWithChildren<{
   style?: StyleProp<ViewStyle>;
 }>;
 
-const MainContainer = ({ children, style }: Props) => {
+const FixedContainer = ({ children, style }: Props) => {
   const navigation = useNavigation<NavigationProp<any>>();
 
   return (
@@ -57,11 +54,7 @@ const MainContainer = ({ children, style }: Props) => {
           </TouchableOpacity>
         </View>
       </View>
-      <ScrollView style={styles.scroll} keyboardShouldPersistTaps={'always'}>
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <View style={style}>{children}</View>
-        </TouchableWithoutFeedback>
-      </ScrollView>
+      <View style={[{ flex: 1 }, style]}>{children}</View>
       <View style={styles.footer}>
         <TouchableOpacity
           style={styles.footer_btn}
@@ -112,10 +105,6 @@ const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
     paddingTop: Platform.OS === 'android' ? undefined : 15,
-  },
-  scroll: {
-    paddingVertical: 15,
-    backgroundColor: '#F1F5F9',
   },
   header: {
     flexDirection: 'row',
@@ -171,4 +160,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MainContainer;
+export default FixedContainer;
