@@ -1,6 +1,13 @@
 import { useState } from 'react';
 import { FontAwesome } from '@expo/vector-icons';
-import { StyleSheet, TouchableOpacity, Text, View } from 'react-native';
+import {
+  StyleSheet,
+  TouchableOpacity,
+  Text,
+  View,
+  StyleProp,
+  ViewStyle,
+} from 'react-native';
 import Modal from 'react-native-modal';
 
 interface IOption {
@@ -13,9 +20,10 @@ interface Props {
   label: string;
   value?: string[] | number[];
   onChange: (v: Array<string | number>) => void;
+  style?: StyleProp<ViewStyle>;
 }
 
-const MultiSelect = ({ label, options, value, onChange }: Props) => {
+const MultiSelect = ({ label, options, value, onChange, style }: Props) => {
   const selected = options.filter((x) => value?.some((y) => y === x.value));
 
   const [show, setShow] = useState(false);
@@ -30,7 +38,7 @@ const MultiSelect = ({ label, options, value, onChange }: Props) => {
   };
 
   return (
-    <View>
+    <View style={style}>
       {!!label && <Text style={styles.label}>{label}</Text>}
       <TouchableOpacity style={styles.select_btn} onPress={() => setShow(true)}>
         {selected.map((x) => (

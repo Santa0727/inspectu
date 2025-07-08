@@ -15,7 +15,7 @@ import TouchButton from './TouchButton';
 
 type Props = PropsWithChildren<{
   visible: boolean;
-  title: string;
+  title?: string;
   showHeader?: boolean;
   showFooter?: boolean;
   onClose?: (d?: any) => void;

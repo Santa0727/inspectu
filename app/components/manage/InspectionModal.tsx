@@ -4,7 +4,6 @@ import Modal from '../ui/Modal';
 import { FontAwesome } from '@expo/vector-icons';
 import { COLORS } from '../../config/constants';
 import { statusLabel } from '../../lib/lang';
-import { defaultFormat } from 'moment';
 import { defaultDateFormat } from '../../lib/helper';
 
 interface Props {

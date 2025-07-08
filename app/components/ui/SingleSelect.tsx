@@ -20,14 +20,23 @@ interface Props {
   label: string;
   value?: string | number;
   onChange: (v: string | number) => void;
+  showLabel?: boolean;
   style?: StyleProp<ViewStyle>;
 }
 
-const SingleSelect = ({ options, label, value, onChange, style }: Props) => {
+const SingleSelect = ({
+  options,
+  label,
+  value,
+  onChange,
+  showLabel,
+  style,
+}: Props) => {
   const [show, setShow] = useState(false);
 
   return (
     <View style={style}>
+      {showLabel && <Text style={styles.label}>{label ?? ''}</Text>}
       <TouchableOpacity style={styles.type_touch} onPress={() => setShow(true)}>
         <Text
           style={

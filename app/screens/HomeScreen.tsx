@@ -12,6 +12,8 @@ import InspectionCard from '../components/manage/InspectionCard';
 import InspectionModal from '../components/manage/InspectionModal';
 import Calendar from '../components/ui/Calendar';
 import SingleSelect from '../components/ui/SingleSelect';
+import TouchButton from '../components/ui/TouchButton';
+import TaskModal from '../components/manage/TaskModal';
 
 type Props = NativeStackScreenProps<HomeStackParamList, 'Inspections'>;
 
@@ -21,6 +23,7 @@ const HomeScreen = ({ navigation }: Props) => {
   const [curItem, setCurItem] = useState<IInspection>();
 
   const [filter, setFilter] = useState<{ date?: string; status?: string }>({});
+  const [visCreateTask, setVisCreateTask] = useState(false);
 
   const loadData = useCallback(() => {
     (async () => {
@@ -80,6 +83,13 @@ const HomeScreen = ({ navigation }: Props) => {
           onClick={(d) => setFilter((f) => ({ ...f, date: d }))}
         />
       </View>
+      {!!filter.date && (
+        <TouchButton
+          style={{ margin: 10 }}
+          label="Schedule Task"
+          onPress={() => setVisCreateTask(true)}
+        />
+      )}
       <View style={styles.panel}>
         <View style={styles.panel_header}>
           <AntDesign name="clockcircle" size={24} color={COLORS.greyBlue} />
@@ -125,6 +135,13 @@ const HomeScreen = ({ navigation }: Props) => {
           data={curItem}
           visible={true}
           onClose={() => setCurItem(undefined)}
+        />
+      )}
+      {visCreateTask && (
+        <TaskModal
+          visible={visCreateTask}
+          onClose={() => setVisCreateTask(false)}
+          data={{ due_date: filter.date }}
         />
       )}
     </MainContainer>
