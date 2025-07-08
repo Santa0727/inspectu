@@ -33,11 +33,13 @@ interface ICell {
   label: string | number;
   date_str: string;
   isActive: boolean;
+  isDot?: boolean;
 }
 
 interface IMarker {
   date: string;
-  color: string;
+  color?: string;
+  isDot?: boolean;
 }
 
 interface Props {
@@ -60,23 +62,27 @@ const Calendar = ({ markers, style, selectedDate, onClick }: Props) => {
 
     for (let i = 0; i < fW; i++) {
       const mt = moment(new Date(year, month, i - fW + 1));
+      const date_str = mt.format('YYYY-MM-DD');
       rows.push({
         value: mt.toDate().getTime(),
         label: mt.format('D'),
-        date_str: mt.format('YYYY-MM-DD'),
+        date_str,
         isActive: false,
+        isDot: markers?.some((y) => y.date === date_str && !!y.isDot),
       });
     }
     for (let i = 1; i <= lD; i++) {
+      const date_str = moment(
+        `${year}-${zeroPad(month + 1)}-${zeroPad(i)}`,
+      ).format('YYYY-MM-DD');
       rows.push({
         value: moment(`${year}-${zeroPad(month + 1)}-${zeroPad(i)}`)
           .toDate()
           .getTime(),
         label: i,
-        date_str: moment(`${year}-${zeroPad(month + 1)}-${zeroPad(i)}`).format(
-          'YYYY-MM-DD',
-        ),
+        date_str,
         isActive: true,
+        isDot: markers?.some((y) => y.date === date_str && !!y.isDot),
       });
       if (rows.length >= 7) {
         result.push(rows);
@@ -86,17 +92,19 @@ const Calendar = ({ markers, style, selectedDate, onClick }: Props) => {
     if (rows.length > 0) {
       for (let i = 0; rows.length < 7; i++) {
         const mt = moment(`${year}-${zeroPad(month + 2)}-${zeroPad(i + 1)}`);
+        const date_str = mt.format('YYYY-MM-DD');
         rows.push({
           value: mt.toDate().getTime(),
           label: mt.format('D'),
-          date_str: mt.format('YYYY-MM-DD'),
+          date_str,
           isActive: false,
+          isDot: markers?.some((y) => y.date === date_str && !!y.isDot),
         });
       }
       result.push(rows);
     }
     return result;
-  }, [year, month]);
+  }, [year, month, markers]);
 
   const monthMove = (k: -1 | 1) => {
     let m = month + k;
@@ -164,6 +172,7 @@ const Calendar = ({ markers, style, selectedDate, onClick }: Props) => {
                       ? styles.focus_touch
                       : undefined,
                   ]}>
+                  {!!cell.isDot && <View style={styles.dot} />}
                   <Text
                     style={[
                       styles.day_txt,
@@ -239,6 +248,15 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.primary,
     borderRadius: 4,
+  },
+  dot: {
+    backgroundColor: 'red',
+    width: 8,
+    height: 8,
+    borderRadius: 8,
+    position: 'absolute',
+    top: 3,
+    right: 3,
   },
 });
 

@@ -1,7 +1,7 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import MainContainer from '../components/container/MainContainer';
 import { HomeStackParamList } from '../navigation/AppStackParams';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import { COLORS } from '../config/constants';
 import { useCallback, useMemo, useState } from 'react';
@@ -14,6 +14,7 @@ import Calendar from '../components/ui/Calendar';
 import SingleSelect from '../components/ui/SingleSelect';
 import TouchButton from '../components/ui/TouchButton';
 import TaskModal from '../components/manage/TaskModal';
+import { ITask } from '../lib/task.entities';
 
 type Props = NativeStackScreenProps<HomeStackParamList, 'Inspections'>;
 
@@ -24,19 +25,29 @@ const HomeScreen = ({ navigation }: Props) => {
 
   const [filter, setFilter] = useState<{ date?: string; status?: string }>({});
   const [visCreateTask, setVisCreateTask] = useState(false);
+  const [viewTask, setViewTask] = useState<ITask>();
+  const [tasks, setTasks] = useState<ITask[]>();
 
   const loadData = useCallback(() => {
     (async () => {
-      const res = await sendRequest(
+      const insResponse = await sendRequest(
         'api/member/inspections',
         { per_page: 50 },
         'GET',
       );
-      if (res.status) {
-        setUpItems(res.data.coming ?? []);
-        setPastItems(res.data.passed ?? []);
+      if (insResponse.status) {
+        setUpItems(insResponse.data.coming ?? []);
+        setPastItems(insResponse.data.passed ?? []);
       } else {
-        alert(res.message ?? 'Server error');
+        alert(insResponse.message ?? 'Server error');
+      }
+      const taskResponse = await sendRequest(
+        'api/tasks',
+        { per_page: 1000 },
+        'GET',
+      );
+      if (taskResponse.status) {
+        setTasks(taskResponse.data?.data ?? []);
       }
     })();
   }, []);
@@ -64,31 +75,57 @@ const HomeScreen = ({ navigation }: Props) => {
 
   useFocusEffect(loadData);
 
+  const markers = [
+    ...[...(pastItems ?? []), ...(upItems ?? [])].map((x) => ({
+      date: x.due_date.slice(0, 10),
+      color:
+        x.status === 'approved'
+          ? COLORS.approved
+          : x.status === 'pending_review'
+          ? COLORS.pending
+          : x.status === 'review_required'
+          ? COLORS.danger
+          : COLORS.inactive,
+    })),
+    ...(tasks ?? []).map((x) => ({
+      date: x.due_date.slice(0, 10),
+      isDot: true,
+    })),
+  ];
+
   return (
     <MainContainer>
       <View style={styles.panel}>
         <Calendar
-          markers={[...(pastItems ?? []), ...(upItems ?? [])].map((x) => ({
-            date: x.due_date.slice(0, 10),
-            color:
-              x.status === 'approved'
-                ? COLORS.approved
-                : x.status === 'pending_review'
-                ? COLORS.pending
-                : x.status === 'review_required'
-                ? COLORS.danger
-                : COLORS.inactive,
-          }))}
+          markers={markers}
           selectedDate={filter.date}
           onClick={(d) => setFilter((f) => ({ ...f, date: d }))}
         />
       </View>
       {!!filter.date && (
-        <TouchButton
-          style={{ margin: 10 }}
-          label="Schedule Task"
-          onPress={() => setVisCreateTask(true)}
-        />
+        <>
+          {tasks
+            ?.filter((x) => x.due_date.slice(0, 10) === filter.date)
+            .map((task) => (
+              <TouchableOpacity
+                key={task.id}
+                style={styles.task_touch}
+                onPress={() => setViewTask(task)}>
+                <Text style={styles.task_name}>{task.name}</Text>
+                <Text style={styles.task_assigned}>
+                  {task.assigned_to.map((x) => x.name).join(', ')}
+                </Text>
+                <Text style={styles.task_categories}>
+                  {task.category.map((x) => x.name).join(', ')}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          <TouchButton
+            style={{ margin: 10 }}
+            label="Schedule Task"
+            onPress={() => setVisCreateTask(true)}
+          />
+        </>
       )}
       <View style={styles.panel}>
         <View style={styles.panel_header}>
@@ -144,6 +181,13 @@ const HomeScreen = ({ navigation }: Props) => {
           data={{ due_date: filter.date }}
         />
       )}
+      {viewTask && (
+        <TaskModal
+          visible={true}
+          onClose={() => setViewTask(undefined)}
+          taskData={viewTask}
+        />
+      )}
     </MainContainer>
   );
 };
@@ -166,6 +210,29 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     fontSize: 18,
     marginLeft: 12,
+  },
+  task_touch: {
+    padding: 10,
+    marginHorizontal: 10,
+    marginVertical: 5,
+    borderColor: COLORS.blueGrey,
+    borderWidth: 1,
+    borderRadius: 10,
+    backgroundColor: '#F9F9F9',
+  },
+  task_name: {
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  task_assigned: {
+    fontSize: 15,
+    color: COLORS.greyBlue,
+    fontStyle: 'italic',
+  },
+  task_categories: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    textAlign: 'right',
   },
 });
 
