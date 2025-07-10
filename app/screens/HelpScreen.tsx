@@ -6,7 +6,7 @@ const HelpScreen = () => {
     <FixedContainer style={{ paddingHorizontal: 5 }}>
       <WebView
         source={{
-          uri: 'https://gistcdn.githack.com/Santa0727/ad27e72873127f07b191c9a435d52122/raw/7ab49815978a7d40b5816b36e2278d1c782ff09e/zendesk.html',
+          uri: 'https://gistcdn.githack.com/Santa0727/ad27e72873127f07b191c9a435d52122/raw/ffb8189315a92c08aae6fe061f6308144ef38276/zendesk.html',
         }}
         originWhitelist={['*']}
         javaScriptEnabled
