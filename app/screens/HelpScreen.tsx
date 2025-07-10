@@ -1,42 +1,16 @@
 import FixedContainer from '../components/container/FixedContainer';
 import WebView from 'react-native-webview';
 
-const zendeskKey = 'b885303b625c52b2815f5b3ed89f5ccac6d74b3b816e4626';
-
 const HelpScreen = () => {
-  const html = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <script id="ze-snippet" src="https://static.zdassets.com/ekr/snippet.js?key=${zendeskKey}"></script>
-      <script>
-        window.zE || (window.zE = []);
-        window.zE('webWidget:on', 'open', function() {
-        });
-        window.zE('webWidget', 'open');
-      </script>
-      <style>
-        html, body {
-          margin: 0;
-          padding: 0;
-          height: 100%;
-          background: white;
-        }
-      </style>
-    </head>
-    <body></body>
-    </html>
-  `;
-
   return (
-    <FixedContainer style={{ paddingHorizontal: 5, backgroundColor: 'black' }}>
+    <FixedContainer style={{ paddingHorizontal: 5 }}>
       <WebView
-        source={{ html }}
+        source={{
+          uri: 'https://gistcdn.githack.com/Santa0727/ad27e72873127f07b191c9a435d52122/raw/12287d43c921d8d1ae0a8716a9e00edcbdfc30a4/zendesk.html',
+        }}
         originWhitelist={['*']}
         javaScriptEnabled
         domStorageEnabled
-        style={{ flex: 1 }}
       />
     </FixedContainer>
   );
