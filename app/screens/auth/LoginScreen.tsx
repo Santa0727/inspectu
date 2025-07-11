@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import {
   Dimensions,
+  Image,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -16,6 +17,8 @@ import Checkbox from '../../components/ui/Checkbox';
 import { COLORS } from '../../config/constants';
 import { useAppDispatch } from '../../store/hooks';
 import { login as authLogin } from '../../store/auth/authSlice';
+
+const loginImage = require('../../images/login-logo.png');
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'SignIn'>;
 
@@ -60,13 +63,28 @@ const LoginScreen = ({ navigation }: Props) => {
   };
 
   return (
-    <AppContainer style={{ height: Dimensions.get('window').height - 39 }}>
+    <AppContainer
+      style={{
+        height: Dimensions.get('window').height - 39,
+        backgroundColor: 'white',
+      }}>
       <View
         style={{
           height: Dimensions.get('window').height / 2 - 90,
           justifyContent: 'center',
         }}>
-        <Text style={styles.title}>Login</Text>
+        <View
+          style={{
+            justifyContent: 'center',
+            alignItems: 'center',
+            paddingHorizontal: 10,
+          }}>
+          <Image
+            source={loginImage}
+            style={{ height: 120, width: '98%' }}
+            resizeMode="contain"
+          />
+        </View>
       </View>
       <View
         style={{
