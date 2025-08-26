@@ -35,8 +35,8 @@ yarn-error.*
 *.tsbuildinfo
 
 /.expo-shared
-/yarn.lock
-/package-lock.json
+# /yarn.lock
+# /package-lock.json
 # /app/config/settings.ts
 
 .vscode/settings.json
