@@ -15,7 +15,15 @@
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "CFBundleAllowMixedLocalizations": true,
+        "NSCameraUsageDescription": "InspectU Pro uses the camera to capture inspection photos that are attached to your checklists and reports.",
+        "NSPhotoLibraryUsageDescription": "InspectU Pro needs access to your photo library so you can attach existing images to inspections and include them in reports.",
+        "ITSAppUsesNonExemptEncryption": false
+      },
+      "buildNumber": "1",
+      "bundleIdentifier": "inspectu.app"
     },
     "android": {
       "adaptiveIcon": {
