@@ -44,7 +44,7 @@ const MainContainer = ({ children, style }: Props) => {
             navigation.navigate('Home', { screen: 'Inspections' })
           }>
           <Image
-            source={require('../../images/header-logo.png')}
+            source={require('../../images/login-logo.png')}
             style={styles.header_img}
           />
         </TouchableOpacity>
