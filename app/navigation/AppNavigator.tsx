@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -18,6 +18,10 @@ import HomeScreen from '../screens/HomeScreen';
 import ScheduleScreen from '../screens/ScheduleScreen';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { loadMyProfile, selectToken } from '../store/auth/authSlice';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Image, View, StyleSheet, Dimensions } from 'react-native';
+
+const splashImage = require('../../assets/splash.png');
 
 const AuthStack = createNativeStackNavigator<AuthStackParamList>();
 
@@ -99,13 +103,50 @@ const MainNavigator = () => {
 };
 
 const AppNavigator = () => {
+  const dispatch = useAppDispatch();
   const token = useAppSelector(selectToken);
 
+  const [appLoading, setAppLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      const savedToken = await AsyncStorage.getItem('__token');
+      if (savedToken) {
+        await dispatch(loadMyProfile());
+      }
+      setAppLoading(false);
+    })();
+  }, []);
+
+  if (appLoading) {
+    return (
+      <View style={styles.splash}>
+        <Image
+          source={splashImage}
+          style={styles.splashImage}
+          resizeMode="cover"
+        />
+      </View>
+    );
+  }
   return (
     <NavigationContainer>
       {!token ? <AuthNavigator /> : <MainNavigator />}
     </NavigationContainer>
   );
 };
+
+const styles = StyleSheet.create({
+  splash: {
+    flex: 1,
+    backgroundColor: 'white',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  splashImage: {
+    width: Dimensions.get('window').width,
+    height: Dimensions.get('window').height,
+  },
+});
 
 export default AppNavigator;

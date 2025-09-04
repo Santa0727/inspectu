@@ -27,7 +27,9 @@ const authSlice = createAppSlice({
             thunkAPI.dispatch(manageSlice.actions.loadRoles());
           })();
 
-          return response.data;
+          const token = await AsyncStorage.getItem('__token');
+
+          return { ...response.data, token };
         } catch (err: any) {
           thunkAPI.dispatch(authSlice.actions.logout());
 
@@ -37,9 +39,12 @@ const authSlice = createAppSlice({
         }
       },
       {
-        pending: (state) => {},
         fulfilled: (state, action) => {
-          state.profile = action.payload;
+          const { token, ...profile } = action.payload;
+          state.profile = profile;
+          if (!state.token && token) {
+            state.token = token;
+          }
         },
         rejected: (state, action) => {
           state.profile = undefined;

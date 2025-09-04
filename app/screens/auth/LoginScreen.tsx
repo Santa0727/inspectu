@@ -13,7 +13,6 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import AppContainer from '../../components/container/AppContainer';
 import { AuthStackParamList } from '../../navigation/AppStackParams';
 import { isEmailFormat } from '../../lib/helper';
-import Checkbox from '../../components/ui/Checkbox';
 import { COLORS } from '../../config/constants';
 import { useAppDispatch } from '../../store/hooks';
 import { login as authLogin } from '../../store/auth/authSlice';
@@ -30,7 +29,6 @@ const LoginScreen = ({ navigation }: Props) => {
   const [valid, setValid] = useState({ email: '', password: '' });
   const [disabled, setDisabled] = useState(false);
   const [hidePass, setHidePass] = useState(true);
-  const [remember, setRemember] = useState(false);
 
   const isValid = () => {
     let tmp = { email: '', password: '' };
@@ -119,12 +117,6 @@ const LoginScreen = ({ navigation }: Props) => {
           error={valid.password}
           icon={hidePass ? 'eye-on' : 'eye-off'}
           onIconTouch={() => setHidePass(!hidePass)}
-        />
-        <Checkbox
-          label="Remember me"
-          value={remember}
-          onChange={setRemember}
-          style={{ width: 165, marginLeft: 10, marginTop: 15 }}
         />
         <TouchButton
           label="Sign In"
