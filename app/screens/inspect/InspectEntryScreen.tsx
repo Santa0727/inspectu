@@ -6,19 +6,21 @@ import {
   View,
 } from 'react-native';
 import MainContainer from '../../components/container/MainContainer';
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { sendRequest } from '../../config/compose';
 import { useFocusEffect } from '@react-navigation/native';
-import HTMLView from 'react-native-htmlview';
+import ReactNativeHtmlView from 'react-native-htmlview';
 import { IEntryStep, IInspectAnswer } from '../../lib/manage.entities';
 import { COLORS } from '../../config/constants';
 import InspectStepForm from '../../components/manage/InspectStepForm';
 import ImageBox from '../../components/ui/ImageBox';
 import Input from '../../components/ui/Input';
-import SingleSelect from '../../components/ui/SingleSelect';
 import { MaterialIcons } from '@expo/vector-icons';
 import { HomeStackParamList } from '../../navigation/AppStackParams';
+
+const HTMLView: any = ReactNativeHtmlView as any;
 
 interface IEntry {
   first: string;
@@ -147,6 +149,8 @@ type Props = NativeStackScreenProps<HomeStackParamList, 'InspectEntry'>;
 const InspectEntryScreen = ({ navigation, route }: Props) => {
   const inspectID = route.params.inspectID;
 
+  const storageKey = `__inspect_form_${inspectID}`;
+
   const [step, setStep] = useState(0);
   const [entry, setEntry] = useState<IEntry>();
   const [form, setForm] = useState<IInspectAnswer[]>([]);
@@ -159,6 +163,10 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
     };
   };
 
+  const updateForm = (data: IInspectAnswer[]) => {
+    AsyncStorage.setItem(storageKey, JSON.stringify(data));
+    setForm(data);
+  };
   const nextClick = async () => {
     if (!entry) return;
     if (step === entry.steps.length + 1) {
@@ -174,6 +182,9 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
       if (!res.status) {
         alert(res.message ?? 'Server error');
       } else {
+        try {
+          await AsyncStorage.removeItem(storageKey);
+        } catch (e) {}
         setStep(step + 1);
       }
       setDisabled(false);
@@ -196,12 +207,6 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
       setStep(step + 1);
     }
   };
-  const selectLocation = (id: string | number) => {
-    const i = entry?.steps.findIndex((x) => x.id === id) ?? -1;
-    if (i >= 0) {
-      setStep(i + 1);
-    }
-  };
 
   const loadData = useCallback(() => {
     (async () => {
@@ -212,11 +217,20 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
       );
       if (res.status) {
         setEntry(res.data);
+        try {
+          const saved = await AsyncStorage.getItem(storageKey);
+          if (saved) {
+            const parsed = JSON.parse(saved) as IInspectAnswer[];
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              setForm(parsed);
+            }
+          }
+        } catch (e) {}
       } else {
         alert(res.message ?? 'Server error');
       }
     })();
-  }, [inspectID]);
+  }, [inspectID, storageKey]);
 
   useFocusEffect(loadData);
 
@@ -294,16 +308,6 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
               </View>
             ) : (
               <>
-                {/* <SingleSelect
-                  label=""
-                  options={entry.steps.map((x) => ({
-                    value: x.id,
-                    label: x.name,
-                  }))}
-                  value={entry.steps[step - 1].id}
-                  onChange={selectLocation}
-                  style={{ marginBottom: 20 }}
-                /> */}
                 {!!entry.steps_intro && (
                   <HTMLView
                     style={{ marginVertical: 20, marginHorizontal: 10 }}
@@ -313,7 +317,7 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
                 <InspectStepForm
                   data={entry.steps[step - 1]}
                   form={form}
-                  setForm={setForm}
+                  setForm={updateForm}
                 />
               </>
             )}
