@@ -24,6 +24,8 @@ import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { COLORS } from '../../config/constants';
 import NotificationIcon from '../common/NotificationIcon';
 import { StatusBar } from 'expo-status-bar';
+import { useAppSelector } from '../../store/hooks';
+import { selectProfile } from '../../store/auth/authSlice';
 
 type Props = PropsWithChildren<{
   style?: StyleProp<ViewStyle>;
@@ -31,6 +33,7 @@ type Props = PropsWithChildren<{
 
 const MainContainer = ({ children, style }: Props) => {
   const navigation = useNavigation<NavigationProp<any>>();
+  const profile = useAppSelector(selectProfile);
 
   return (
     <KeyboardAvoidingView
@@ -53,7 +56,21 @@ const MainContainer = ({ children, style }: Props) => {
           <TouchableOpacity
             style={styles.header_btn}
             onPress={() => navigation.navigate('Profile')}>
-            <FontAwesome name="user-circle" size={42} color="black" />
+            {!profile?.avatar ? (
+              <FontAwesome name="user-circle" size={42} color="black" />
+            ) : (
+              <Image
+                source={{ uri: profile.avatar }}
+                style={{
+                  width: 50,
+                  height: 50,
+                  borderRadius: 25,
+                  borderWidth: 1,
+                  borderColor: '#1C2434',
+                }}
+                resizeMode="cover"
+              />
+            )}
           </TouchableOpacity>
         </View>
       </View>
