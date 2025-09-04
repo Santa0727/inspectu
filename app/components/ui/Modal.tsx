@@ -2,12 +2,10 @@ import { FontAwesome } from '@expo/vector-icons';
 import { PropsWithChildren } from 'react';
 import {
   Dimensions,
-  Keyboard,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   View,
 } from 'react-native';
 import ReactNativeModal from 'react-native-modal';
@@ -38,42 +36,49 @@ const Modal = ({
   <ReactNativeModal
     isVisible={visible}
     onBackdropPress={onClose}
-    coverScreen={true}>
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <View style={styles.modal_wrap}>
-        {showHeader !== false && (
-          <View style={styles.modal_header}>
-            <Text style={size === 'small' ? styles.small_title : styles.title}>
-              {title}
-            </Text>
-            <TouchableOpacity style={styles.close_button} onPress={onClose}>
-              <FontAwesome name="close" size={24} color="black" />
-            </TouchableOpacity>
+    coverScreen={true}
+    propagateSwipe={true}
+    avoidKeyboard={true}>
+    <View style={styles.modal_wrap}>
+      {showHeader !== false && (
+        <View style={styles.modal_header}>
+          <Text style={size === 'small' ? styles.small_title : styles.title}>
+            {title}
+          </Text>
+          <TouchableOpacity style={styles.close_button} onPress={onClose}>
+            <FontAwesome name="close" size={24} color="black" />
+          </TouchableOpacity>
+        </View>
+      )}
+      <ScrollView
+        style={styles.modal_body}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
+        nestedScrollEnabled={true}
+        contentContainerStyle={{ paddingBottom: 10 }}>
+        {children}
+      </ScrollView>
+      {showFooter && (
+        <View style={styles.modal_footer}>
+          <View style={{ marginHorizontal: 10 }}>
+            <TouchButton
+              label="Close"
+              scheme="danger"
+              onPress={onClose}
+              disabled={disabled}
+            />
           </View>
-        )}
-        <ScrollView style={styles.modal_body}>{children}</ScrollView>
-        {showFooter && (
-          <View style={styles.modal_footer}>
-            <View style={{ marginHorizontal: 10 }}>
-              <TouchButton
-                label="Close"
-                scheme="danger"
-                onPress={onClose}
-                disabled={disabled}
-              />
-            </View>
-            <View style={{ marginHorizontal: 10 }}>
-              <TouchButton
-                label="Confirm"
-                scheme="success"
-                onPress={onConfirm}
-                disabled={disabled}
-              />
-            </View>
+          <View style={{ marginHorizontal: 10 }}>
+            <TouchButton
+              label="Confirm"
+              scheme="success"
+              onPress={onConfirm}
+              disabled={disabled}
+            />
           </View>
-        )}
-      </View>
-    </TouchableWithoutFeedback>
+        </View>
+      )}
+    </View>
   </ReactNativeModal>
 );
 
