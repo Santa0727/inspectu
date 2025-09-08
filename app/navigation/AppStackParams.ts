@@ -9,6 +9,7 @@ export type HomeStackParamList = {
   InspectEntry: { inspectID: number };
   InspectReview: { inspectID: number };
   School: { schoolID: number };
+  MyTasks: undefined;
 };
 
 export type MainStackParamList = {

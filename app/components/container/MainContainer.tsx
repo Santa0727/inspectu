@@ -1,6 +1,7 @@
 import {
   AntDesign,
   FontAwesome,
+  FontAwesome5,
   Foundation,
   MaterialCommunityIcons,
   MaterialIcons,
@@ -116,9 +117,9 @@ const MainContainer = ({ children, style }: Props) => {
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.footer_btn}
-          onPress={() => navigation.navigate('Profile')}>
-          <FontAwesome name="user" size={26} color="#A4ACBD" />
-          <Text style={styles.footer_txt}>Profile</Text>
+          onPress={() => navigation.navigate('Home', { screen: 'MyTasks' })}>
+          <FontAwesome5 name="tasks" size={26} color="#A4ACBD" />
+          <Text style={styles.footer_txt}>{'My Tasks'}</Text>
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>

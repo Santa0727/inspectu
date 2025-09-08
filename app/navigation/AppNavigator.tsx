@@ -20,6 +20,7 @@ import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { loadMyProfile, selectToken } from '../store/auth/authSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Image, View, StyleSheet, Dimensions } from 'react-native';
+import MyTasksScreen from '../screens/MyTasksScreen';
 
 const splashImage = require('../../assets/splash.png');
 
@@ -68,6 +69,11 @@ const HomeNavigator = () => (
       options={{ headerShown: false }}
       name="Schedule"
       component={ScheduleScreen}
+    />
+    <HomeStack.Screen
+      options={{ headerShown: false }}
+      name="MyTasks"
+      component={MyTasksScreen}
     />
   </HomeStack.Navigator>
 );

@@ -96,8 +96,9 @@ const UserSelect = ({ districtID, values, onChange }: UserProps) => {
                 size={24}
                 color="white"
               />
-              <Text
-                style={styles.item_txt}>{`${item.name} (${item.email})`}</Text>
+              <Text style={styles.item_txt}>
+                {`${item.name} (${item.email})`}
+              </Text>
             </TouchableOpacity>
           ))}
           <View style={{ height: 20 }} />

@@ -6,7 +6,7 @@ import {
   View,
 } from 'react-native';
 import MainContainer from '../../components/container/MainContainer';
-import { useCallback, useState, useEffect } from 'react';
+import { useCallback, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { sendRequest } from '../../config/compose';
