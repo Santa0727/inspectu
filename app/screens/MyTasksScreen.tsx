@@ -1,11 +1,18 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { HomeStackParamList } from '../navigation/AppStackParams';
 import MainContainer from '../components/container/MainContainer';
-import { Text, View, StyleSheet, ActivityIndicator } from 'react-native';
+import {
+  Text,
+  View,
+  StyleSheet,
+  ActivityIndicator,
+  TouchableOpacity,
+} from 'react-native';
 import { useCallback, useEffect, useState } from 'react';
 import { sendRequest } from '../config/compose';
 import { COLORS } from '../config/constants';
 import moment from 'moment';
+import MyTaskModal from '../components/manage/MyTaskModal';
 
 interface ITask {
   id: number;
@@ -15,11 +22,23 @@ interface ITask {
   date_submitted?: string;
 }
 
+interface IListItem {
+  id: string;
+  name: string;
+}
+
+interface ITaskDetail extends ITask {
+  intro: string;
+  task_list: IListItem[];
+}
+
 type Props = NativeStackScreenProps<HomeStackParamList, 'MyTasks'>;
 
 const MyTasksScreen = ({ navigation }: Props) => {
   const [tasks, setTasks] = useState<ITask[]>([]);
   const [loading, setLoading] = useState(false);
+  const [detail, setDetail] = useState<ITaskDetail>();
+  const [loadingTaskId, setLoadingTaskId] = useState<number | null>(null);
 
   const loadMyTasks = useCallback(async () => {
     setLoading(true);
@@ -35,6 +54,18 @@ const MyTasksScreen = ({ navigation }: Props) => {
       alert(response.message ?? 'Server error');
     }
   }, []);
+
+  const clickTask = async (taskId: number) => {
+    setLoadingTaskId(taskId);
+    const response = await sendRequest(`api/member/tasks/${taskId}`, {}, 'GET');
+    setLoadingTaskId(null);
+
+    if (response.status) {
+      setDetail(response.data);
+    } else {
+      alert(response.message ?? 'Failed to load task details');
+    }
+  };
 
   useEffect(() => {
     loadMyTasks();
@@ -52,7 +83,17 @@ const MyTasksScreen = ({ navigation }: Props) => {
       ) : (
         <View style={styles.listContainer}>
           {tasks.map((task) => (
-            <View key={task.id} style={styles.taskCard}>
+            <TouchableOpacity
+              key={task.id}
+              style={[
+                styles.taskCard,
+                task.status !== 'completed' && styles.clickableCard,
+                loadingTaskId === task.id && styles.loadingCard,
+              ]}
+              onPress={() => task.status !== 'completed' && clickTask(task.id)}
+              disabled={
+                task.status === 'completed' || loadingTaskId === task.id
+              }>
               <View style={styles.taskHeader}>
                 <Text style={styles.taskName}>{task.name}</Text>
                 <View
@@ -88,9 +129,24 @@ const MyTasksScreen = ({ navigation }: Props) => {
                   </View>
                 )}
               </View>
-            </View>
+
+              {loadingTaskId === task.id && (
+                <View style={styles.loadingOverlay}>
+                  <ActivityIndicator size="small" color={COLORS.secondary} />
+                  <Text style={styles.loadingText}>Loading details...</Text>
+                </View>
+              )}
+            </TouchableOpacity>
           ))}
         </View>
+      )}
+      {!!detail && (
+        <MyTaskModal
+          visible={true}
+          task={detail}
+          onClose={() => setDetail(undefined)}
+          onSuccess={loadMyTasks}
+        />
       )}
     </MainContainer>
   );
@@ -123,6 +179,18 @@ const styles = StyleSheet.create({
     elevation: 5,
     borderLeftWidth: 4,
     borderLeftColor: COLORS.primary,
+  },
+  clickableCard: {
+    shadowOpacity: 0.15,
+    elevation: 6,
+    borderLeftWidth: 5,
+  },
+  loadingCard: {
+    backgroundColor: '#f8f9fa',
+    borderLeftColor: COLORS.secondary,
+    shadowOpacity: 0.2,
+    elevation: 8,
+    opacity: 0.8,
   },
   taskHeader: {
     flexDirection: 'row',
@@ -167,6 +235,21 @@ const styles = StyleSheet.create({
   },
   completedDate: {
     color: COLORS.success,
+  },
+  loadingOverlay: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 12,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.inactive,
+  },
+  loadingText: {
+    fontSize: 14,
+    color: COLORS.secondary,
+    marginLeft: 8,
+    fontWeight: '500',
   },
   loadingContainer: {
     flex: 1,
