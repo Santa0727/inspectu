@@ -463,7 +463,7 @@ const CreateTaskModal = ({
         />
       )}
       <CommentBox
-        label={'Instructions for completing task List'}
+        label={'Instructions for completing task'}
         value={form.intro}
         onChange={(v) => updateForm('intro', v)}
         style={{ marginVertical: 10 }}
