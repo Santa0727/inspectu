@@ -10,6 +10,7 @@ import {
   AuthStackParamList,
   HomeStackParamList,
   MainStackParamList,
+  MessageStackParamList,
 } from './AppStackParams';
 import HelpScreen from '../screens/HelpScreen';
 import SchoolScreen from '../screens/inspect/SchoolScreen';
@@ -21,6 +22,8 @@ import { loadMyProfile, selectToken } from '../store/auth/authSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Image, View, StyleSheet, Dimensions } from 'react-native';
 import MyTasksScreen from '../screens/MyTasksScreen';
+import MessagesScreen from '../screens/messages/MessagesScreen';
+import MessageDetailScreen from '../screens/messages/MessageDetailScreen';
 
 const splashImage = require('../../assets/splash.png');
 
@@ -78,6 +81,23 @@ const HomeNavigator = () => (
   </HomeStack.Navigator>
 );
 
+const MessageStack = createNativeStackNavigator<MessageStackParamList>();
+
+const MessageNavigator = () => (
+  <MessageStack.Navigator>
+    <MessageStack.Screen
+      options={{ headerShown: false }}
+      name="Messages"
+      component={MessagesScreen}
+    />
+    <MessageStack.Screen
+      options={{ headerShown: false }}
+      name="MessageDetail"
+      component={MessageDetailScreen}
+    />
+  </MessageStack.Navigator>
+);
+
 const MainStack = createDrawerNavigator<MainStackParamList>();
 
 const MainNavigator = () => {
@@ -93,6 +113,11 @@ const MainNavigator = () => {
         name="Home"
         options={{ headerShown: false, drawerLabel: 'Home' }}
         component={HomeNavigator}
+      />
+      <MainStack.Screen
+        name="Message"
+        options={{ headerShown: false, drawerLabel: 'Messages' }}
+        component={MessageNavigator}
       />
       <MainStack.Screen
         name="Profile"
