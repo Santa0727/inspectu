@@ -8,6 +8,7 @@ import {
   Image,
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { useFocusEffect } from '@react-navigation/native';
 import { MessageStackParamList } from '../../navigation/AppStackParams';
 import MainContainer from '../../components/container/MainContainer';
 import { sendRequest } from '../../config/compose';
@@ -40,9 +41,11 @@ const MessagesScreen = ({ navigation }: Props) => {
   const conversationClick = (conversation: IConversation) =>
     navigation.navigate('MessageDetail', { conversation });
 
-  useEffect(() => {
-    loadConversations();
-  }, [loadConversations]);
+  useFocusEffect(
+    useCallback(() => {
+      loadConversations();
+    }, [loadConversations]),
+  );
 
   return (
     <MainContainer>
