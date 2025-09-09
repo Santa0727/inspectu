@@ -53,6 +53,15 @@ const MainContainer = ({ children, style }: Props) => {
           />
         </TouchableOpacity>
         <View style={styles.header_icons}>
+          <TouchableOpacity
+            style={styles.header_btn}
+            onPress={() => navigation.navigate('Message')}>
+            <MaterialCommunityIcons
+              name="android-messages"
+              size={30}
+              color={COLORS.dark}
+            />
+          </TouchableOpacity>
           <NotificationIcon />
           <TouchableOpacity
             style={styles.header_btn}

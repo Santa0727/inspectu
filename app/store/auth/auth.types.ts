@@ -1,4 +1,4 @@
-interface IProfile {
+export interface IProfile {
   id: number;
   name: string;
   email: string;

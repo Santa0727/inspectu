@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
   header_notify: {
     padding: 7,
     alignItems: 'center',
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
   },
   notify_dot: {
     width: 8,
