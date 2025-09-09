@@ -30,9 +30,16 @@ import { selectProfile } from '../../store/auth/authSlice';
 
 type Props = PropsWithChildren<{
   style?: StyleProp<ViewStyle>;
+  footerComponent?: React.ReactNode;
+  headerComponent?: React.ReactNode;
 }>;
 
-const MainContainer = ({ children, style }: Props) => {
+const MainContainer = ({
+  children,
+  style,
+  headerComponent,
+  footerComponent,
+}: Props) => {
   const navigation = useNavigation<NavigationProp<any>>();
   const profile = useAppSelector(selectProfile);
 
@@ -84,11 +91,13 @@ const MainContainer = ({ children, style }: Props) => {
           </TouchableOpacity>
         </View>
       </View>
+      {headerComponent}
       <ScrollView style={styles.scroll} keyboardShouldPersistTaps={'always'}>
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={style}>{children}</View>
         </TouchableWithoutFeedback>
       </ScrollView>
+      {footerComponent}
       <View style={styles.footer}>
         <TouchableOpacity
           style={styles.footer_btn}

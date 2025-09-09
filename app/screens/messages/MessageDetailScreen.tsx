@@ -1,85 +1,142 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { MessageStackParamList } from '../../navigation/AppStackParams';
 import MainContainer from '../../components/container/MainContainer';
 import Input from '../../components/ui/Input';
-import TouchButton from '../../components/ui/TouchButton';
 import { COLORS } from '../../config/constants';
+import { Ionicons, FontAwesome } from '@expo/vector-icons';
+import { useAppSelector } from '../../store/hooks';
+import { selectProfile } from '../../store/auth/authSlice';
+import { sendRequest } from '../../config/compose';
 
 type Props = NativeStackScreenProps<MessageStackParamList, 'MessageDetail'>;
 
 const MessageDetailScreen = ({ route, navigation }: Props) => {
-  const { conversation } = route.params;
+  const { conversation: initialConversation } = route.params;
+  const profile = useAppSelector(selectProfile);
 
+  const [conversation, setConversation] = useState(initialConversation);
   const [newMessage, setNewMessage] = useState('');
   const [sending, setSending] = useState(false);
+
+  const reloadMessages = async () => {
+    const response = await sendRequest(
+      `api/conversations/${conversation.id}/messages`,
+      {},
+      'GET',
+    );
+    if (response.status && response.data) {
+      setConversation((prv) => ({ ...prv, messages: response.data || [] }));
+    }
+  };
 
   const handleSendMessage = async () => {
     if (!newMessage.trim()) {
       return;
     }
-
     setSending(true);
     try {
-      setTimeout(() => {
+      const payload = {
+        conversation_id: conversation.id,
+        body: newMessage.trim(),
+      };
+      const response = await sendRequest(
+        'api/conversations/messages',
+        payload,
+        'POST',
+      );
+      if (response.status) {
+        await reloadMessages();
         setNewMessage('');
-        setSending(false);
-        alert('Message sent successfully! (Demo mode)');
-      }, 1000);
+      } else {
+        alert(response.message ?? 'Failed to send message');
+      }
     } catch (error) {
-      setSending(false);
       alert('Error sending message');
+    } finally {
+      setSending(false);
     }
   };
 
   return (
-    <MainContainer style={styles.container}>
-      <View style={styles.header}>
-        <TouchButton
-          label="← Back"
-          scheme="secondary"
-          size="small"
+    <MainContainer
+      style={styles.container}
+      headerComponent={
+        <TouchableOpacity
           onPress={() => navigation.goBack()}
-          style={styles.backButton}
-        />
-        <Text style={styles.conversationTitle}>
-          Chat with {conversation.user.name}
-        </Text>
-      </View>
-
+          style={styles.backButton}>
+          <Ionicons name="arrow-back-circle-outline" size={38} color="black" />
+        </TouchableOpacity>
+      }
+      footerComponent={
+        <View style={styles.inputContainer}>
+          <View style={styles.inputRow}>
+            <Input
+              placeholder="Type your message..."
+              value={newMessage}
+              onChange={setNewMessage}
+              style={styles.messageInput}
+              disabled={sending}
+            />
+            <TouchableOpacity
+              onPress={handleSendMessage}
+              disabled={sending || !newMessage.trim()}
+              style={[
+                styles.sendButton,
+                (sending || !newMessage.trim()) && styles.sendButtonDisabled,
+              ]}>
+              <FontAwesome
+                name="send"
+                size={24}
+                color={sending || !newMessage.trim() ? '#555' : 'white'}
+              />
+            </TouchableOpacity>
+          </View>
+        </View>
+      }>
       <View style={styles.messagesContainer}>
         <View style={styles.messagesList}>
-          {conversation.messages.map((message) => (
-            <View key={message.id} style={styles.messageContainer}>
-              <View style={styles.messageContent}>
-                <Text style={styles.messageBody}>{message.body}</Text>
-                <Text style={styles.messageDateTime}>
-                  {`${message.created_date} ${message.created_time}`}
-                </Text>
+          {conversation.messages.map((message) => {
+            const isMyMessage = message.user_id === profile?.id;
+            return (
+              <View
+                key={message.id}
+                style={[
+                  styles.messageContainer,
+                  isMyMessage
+                    ? styles.myMessageContainer
+                    : styles.otherMessageContainer,
+                ]}>
+                <View
+                  style={[
+                    styles.messageContent,
+                    isMyMessage
+                      ? styles.myMessageContent
+                      : styles.otherMessageContent,
+                  ]}>
+                  <Text
+                    style={[
+                      styles.messageBody,
+                      isMyMessage
+                        ? styles.myMessageBody
+                        : styles.otherMessageBody,
+                    ]}>
+                    {message.body}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.messageDateTime,
+                      isMyMessage
+                        ? styles.myMessageDateTime
+                        : styles.otherMessageDateTime,
+                    ]}>
+                    {`${message.created_date} ${message.created_time}`}
+                  </Text>
+                </View>
               </View>
-            </View>
-          ))}
-        </View>
-      </View>
-
-      <View style={styles.inputContainer}>
-        <View style={styles.inputRow}>
-          <Input
-            placeholder="Type your message..."
-            value={newMessage}
-            onChange={setNewMessage}
-            style={styles.messageInput}
-            disabled={sending}
-          />
-          <TouchButton
-            label="Send"
-            scheme="primary"
-            size="small"
-            onPress={handleSendMessage}
-            disabled={sending || !newMessage.trim()}
-            style={styles.sendButton}
-          />
+            );
+          })}
         </View>
       </View>
     </MainContainer>
@@ -90,21 +147,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  header: {
-    paddingHorizontal: 16,
-    paddingBottom: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.inactive,
-  },
   backButton: {
-    alignSelf: 'flex-start',
-    marginBottom: 10,
-  },
-  conversationTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: COLORS.dark,
-    textAlign: 'center',
+    position: 'absolute',
+    top: 120,
+    zIndex: 1,
+    left: 10,
   },
   messagesContainer: {
     flex: 1,
@@ -115,26 +162,48 @@ const styles = StyleSheet.create({
   },
   messageContainer: {
     marginBottom: 16,
-    alignSelf: 'flex-start',
     maxWidth: '80%',
   },
+  myMessageContainer: {
+    alignSelf: 'flex-end',
+  },
+  otherMessageContainer: {
+    alignSelf: 'flex-start',
+  },
   messageContent: {
-    backgroundColor: COLORS.blueGrey,
     borderRadius: 12,
     padding: 12,
   },
+  myMessageContent: {
+    backgroundColor: 'rgb(60, 80, 224)',
+    borderBottomRightRadius: 0,
+  },
+  otherMessageContent: {
+    backgroundColor: COLORS.blueGrey,
+    borderTopLeftRadius: 0,
+  },
   messageBody: {
     fontSize: 16,
-    color: COLORS.dark,
     marginBottom: 4,
+  },
+  myMessageBody: {
+    color: 'white',
+  },
+  otherMessageBody: {
+    color: COLORS.dark,
   },
   messageDateTime: {
     fontSize: 12,
-    color: COLORS.greyBlue,
     textAlign: 'right',
   },
+  myMessageDateTime: {
+    color: 'rgba(255, 255, 255, 0.7)',
+  },
+  otherMessageDateTime: {
+    color: COLORS.greyBlue,
+  },
   inputContainer: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 10,
     paddingVertical: 12,
     borderTopWidth: 1,
     borderTopColor: COLORS.inactive,
@@ -151,7 +220,16 @@ const styles = StyleSheet.create({
     paddingVertical: 0,
   },
   sendButton: {
-    minWidth: 70,
+    padding: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgb(60, 80, 224)',
+    borderRadius: 8,
+    opacity: 1,
+  },
+  sendButtonDisabled: {
+    backgroundColor: COLORS.disabled,
+    opacity: 0.6,
   },
 });
 
