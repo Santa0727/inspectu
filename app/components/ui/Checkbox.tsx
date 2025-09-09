@@ -17,6 +17,7 @@ interface Props {
   disabled?: boolean;
   colorScheme?: 'success' | 'danger';
   markPosition?: 'left' | 'right';
+  position?: 'left' | 'right' | 'between';
 }
 
 const Checkbox = ({
@@ -27,10 +28,21 @@ const Checkbox = ({
   disabled,
   colorScheme,
   markPosition,
+  position = 'between',
 }: Props) => (
   <View style={style}>
     <TouchableOpacity
-      style={styles.touch_view}
+      style={[
+        styles.touch_view,
+        {
+          justifyContent:
+            position === 'between'
+              ? 'space-between'
+              : position === 'left'
+              ? 'flex-start'
+              : 'flex-end',
+        },
+      ]}
       onPress={() => onChange && onChange(!value)}
       disabled={disabled}>
       {markPosition === 'right' && (

@@ -12,6 +12,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import CommentBox from '../ui/CommentBox';
 import TouchButton from '../ui/TouchButton';
 import DatePicker from '../ui/DatePicker';
+import Checkbox from '../ui/Checkbox';
 
 interface IUser {
   id: number;
@@ -188,6 +189,123 @@ const ToDoListForm = ({
   );
 };
 
+interface RecurrenceProps {
+  form?: IRecurrence;
+  onChange: (v: IRecurrence | undefined) => void;
+}
+
+const RecurrenceSettings = ({ form, onChange }: RecurrenceProps) => {
+  const monthOptions = [
+    { value: 1, label: 'January' },
+    { value: 2, label: 'February' },
+    { value: 3, label: 'March' },
+    { value: 4, label: 'April' },
+    { value: 5, label: 'May' },
+    { value: 6, label: 'June' },
+    { value: 7, label: 'July' },
+    { value: 8, label: 'August' },
+    { value: 9, label: 'September' },
+    { value: 10, label: 'October' },
+    { value: 11, label: 'November' },
+    { value: 12, label: 'December' },
+  ];
+  const periodOptions = [
+    { value: 'monthly', label: 'Monthly' },
+    { value: 'quarterly', label: 'Quarterly' },
+    { value: 'yearly', label: 'Yearly' },
+  ];
+  const quarterMonthOptions = [
+    { value: 1, label: '1' },
+    { value: 2, label: '2' },
+    { value: 3, label: '3' },
+  ];
+
+  const handleRecurringToggle = (checked: boolean) => {
+    if (checked) {
+      onChange({
+        period: 'monthly',
+        month: 1,
+        quarterMonth: 1,
+        dayOfTheMonth: 1,
+        dueDays: 7,
+      });
+    } else {
+      onChange(undefined);
+    }
+  };
+  const updateForm = (key: keyof IRecurrence, value: any) => {
+    if (form) onChange({ ...form, [key]: value });
+  };
+
+  return (
+    <View style={{ marginVertical: 10, paddingHorizontal: 5 }}>
+      <Checkbox
+        label="Make task Recurring?"
+        value={!!form}
+        onChange={handleRecurringToggle}
+        position="left"
+      />
+
+      {!!form && (
+        <View style={{ marginVertical: 10 }}>
+          <SingleSelect
+            style={{ marginBottom: 5 }}
+            label="Period"
+            showLabel={true}
+            options={periodOptions}
+            value={form.period}
+            onChange={(v) => updateForm('period', v)}
+          />
+          {form.period === 'quarterly' && (
+            <SingleSelect
+              style={{ marginBottom: 5 }}
+              label="Month of the quarter"
+              showLabel={true}
+              options={quarterMonthOptions}
+              value={form.quarterMonth}
+              onChange={(v) => updateForm('quarterMonth', v)}
+            />
+          )}
+          {form.period === 'yearly' && (
+            <SingleSelect
+              style={{ marginBottom: 5 }}
+              label="Month"
+              showLabel={true}
+              options={monthOptions}
+              value={form.month}
+              onChange={(v) => updateForm('month', v)}
+            />
+          )}
+          <Input
+            label="Day of the months"
+            type="number-pad"
+            value={String(form.dayOfTheMonth)}
+            onChange={(v) =>
+              updateForm('dayOfTheMonth', Math.min(30, Number(v) || 0))
+            }
+            style={{ paddingHorizontal: 0 }}
+          />
+          <Input
+            label="Due days"
+            type="number-pad"
+            value={String(form.dueDays)}
+            onChange={(v) => updateForm('dueDays', Number(v) || 0)}
+            style={{ marginBottom: 5, paddingHorizontal: 0 }}
+          />
+        </View>
+      )}
+    </View>
+  );
+};
+
+interface IRecurrence {
+  period: 'monthly' | 'quarterly' | 'yearly';
+  month: number;
+  quarterMonth: number;
+  dayOfTheMonth: number;
+  dueDays: number;
+}
+
 interface IForm {
   name: string;
   district_id?: number;
@@ -197,6 +315,7 @@ interface IForm {
   assigned_to: IUser[];
   task_list: IList[];
   due_date?: string;
+  recurrence_settings?: IRecurrence;
 }
 
 interface CreateProps {
@@ -288,6 +407,9 @@ const CreateTaskModal = ({
       assigned_to: JSON.stringify(form.assigned_to.map((x) => x.id)),
       task_list: JSON.stringify(form.task_list),
       categories: form.categories.join(','),
+      recurrence_settings: form.recurrence_settings
+        ? JSON.stringify(form.recurrence_settings)
+        : undefined,
     };
     setDisabled(true);
     const response = await sendRequest('api/tasks/create', data, 'POST');
@@ -354,6 +476,10 @@ const CreateTaskModal = ({
         label={'Due Date'}
         value={form.due_date}
         onChange={(v) => updateForm('due_date', v)}
+      />
+      <RecurrenceSettings
+        form={form.recurrence_settings}
+        onChange={(v) => updateForm('recurrence_settings', v)}
       />
       <SingleSelect
         style={{ marginVertical: 10 }}
