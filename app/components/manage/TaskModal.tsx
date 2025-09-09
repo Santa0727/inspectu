@@ -331,13 +331,15 @@ const CreateTaskModal = ({
         onChange={(v) => updateForm('assigned_to', v)}
         districtID={form.district_id}
       />
-      <MultiSelect
-        label="Categories"
-        value={form.categories}
-        options={categories.map((c) => ({ value: c.id, label: c.name }))}
-        onChange={(v) => updateForm('categories', v)}
-        style={{ marginVertical: 10 }}
-      />
+      {!!form.district_id && (
+        <MultiSelect
+          label="Categories"
+          value={form.categories}
+          options={categories.map((c) => ({ value: c.id, label: c.name }))}
+          onChange={(v) => updateForm('categories', v)}
+          style={{ marginVertical: 10 }}
+        />
+      )}
       <CommentBox
         label={'Instructions for completing task List'}
         value={form.intro}
