@@ -15,6 +15,26 @@ import Checkbox from '../ui/Checkbox';
 import { COLORS } from '../../config/constants';
 import { sendRequest } from '../../config/compose';
 
+const makeHtml = (content: string, basePx = 22) => `
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root { --base: ${basePx}px; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; padding: 8px; line-height: 1.6; font-size: var(--base) !important; }
+  p, li, a, span, div { font-size: var(--base) !important; }
+  h1 { font-size: calc(var(--base) * 1.8) !important; }
+  h2 { font-size: calc(var(--base) * 1.5) !important; }
+  h3 { font-size: calc(var(--base) * 1.25) !important; }
+  img, video { max-width: 100%; height: auto; }
+</style>
+</head>
+<body style="overflow:auto;">${content}</body>
+</html>
+`;
+
 interface IListItem {
   id: string;
   name: string;
@@ -157,7 +177,7 @@ const MyTaskModal = ({ visible, task, onClose, onSuccess }: Props) => {
       <View style={styles.container}>
         <View style={styles.introSection}>
           <WebView
-            source={{ html: task.intro }}
+            source={{ html: makeHtml(task.intro) }}
             style={styles.webView}
             scalesPageToFit={false}
             scrollEnabled={false}
@@ -225,7 +245,7 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   webView: {
-    height: 100,
+    height: 300,
     backgroundColor: 'transparent',
   },
   taskListSection: {
