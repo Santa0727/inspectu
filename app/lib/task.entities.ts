@@ -9,7 +9,7 @@ export interface ITask {
   category: IName[];
   owned_by: IName;
   school: IName;
-  status: 'publish' | 'draft';
+  status: 'publish' | 'draft' | 'completed';
 }
 
 interface IMessage {

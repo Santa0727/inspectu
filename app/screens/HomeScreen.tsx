@@ -15,10 +15,15 @@ import SingleSelect from '../components/ui/SingleSelect';
 import TouchButton from '../components/ui/TouchButton';
 import TaskModal from '../components/manage/TaskModal';
 import { ITask } from '../lib/task.entities';
+import { useAppSelector } from '../store/hooks';
+import { selectProfile } from '../store/auth/authSlice';
+import MyTaskModal from '../components/manage/MyTaskModal';
 
 type Props = NativeStackScreenProps<HomeStackParamList, 'Inspections'>;
 
 const HomeScreen = ({ navigation }: Props) => {
+  const profile = useAppSelector(selectProfile);
+
   const [upItems, setUpItems] = useState<IInspection[]>();
   const [pastItems, setPastItems] = useState<IInspection[]>();
   const [curItem, setCurItem] = useState<IInspection>();
@@ -26,6 +31,7 @@ const HomeScreen = ({ navigation }: Props) => {
   const [filter, setFilter] = useState<{ date?: string; status?: string }>({});
   const [visCreateTask, setVisCreateTask] = useState(false);
   const [viewTask, setViewTask] = useState<ITask>();
+  const [myTask, setMyTask] = useState<ITask>();
   const [tasks, setTasks] = useState<ITask[]>();
 
   const loadData = useCallback(() => {
@@ -59,6 +65,15 @@ const HomeScreen = ({ navigation }: Props) => {
       navigation.navigate('InspectReview', { inspectID: item.id });
     } else {
       setCurItem(item);
+    }
+  };
+  const fetchMyTask = async (taskId: number) => {
+    const response = await sendRequest(`api/member/tasks/${taskId}`, {}, 'GET');
+
+    if (response.status) {
+      setMyTask(response.data);
+    } else {
+      alert(response.message ?? 'Failed to load task details');
     }
   };
 
@@ -109,8 +124,16 @@ const HomeScreen = ({ navigation }: Props) => {
             .map((task) => (
               <TouchableOpacity
                 key={task.id}
-                style={styles.task_touch}
-                onPress={() => setViewTask(task)}>
+                style={[
+                  styles.task_touch,
+                  task.status === 'completed' && styles.task_completed,
+                ]}
+                onPress={() =>
+                  task.status !== 'completed' &&
+                  task.assigned_to.some((x) => x.id === profile?.id)
+                    ? fetchMyTask(task.id)
+                    : setViewTask(task)
+                }>
                 <Text style={styles.task_name}>{task.name}</Text>
                 <Text style={styles.task_assigned}>
                   {task.assigned_to.map((x) => x.name).join(', ')}
@@ -120,11 +143,13 @@ const HomeScreen = ({ navigation }: Props) => {
                 </Text>
               </TouchableOpacity>
             ))}
-          <TouchButton
-            style={{ margin: 10 }}
-            label="Schedule Task"
-            onPress={() => setVisCreateTask(true)}
-          />
+          {profile?.user_permissions.includes('manage_tasks') && (
+            <TouchButton
+              style={{ margin: 10 }}
+              label="Schedule Task"
+              onPress={() => setVisCreateTask(true)}
+            />
+          )}
         </>
       )}
       <View style={styles.panel}>
@@ -188,6 +213,14 @@ const HomeScreen = ({ navigation }: Props) => {
           taskData={viewTask}
         />
       )}
+      {myTask && (
+        <MyTaskModal
+          visible={true}
+          task={myTask as any}
+          onClose={() => setMyTask(undefined)}
+          onSuccess={loadData}
+        />
+      )}
     </MainContainer>
   );
 };
@@ -219,6 +252,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 10,
     backgroundColor: '#F9F9F9',
+  },
+  task_completed: {
+    backgroundColor: '#E8F5E8',
+    borderColor: '#4CAF50',
+    opacity: 0.7,
   },
   task_name: {
     fontSize: 18,

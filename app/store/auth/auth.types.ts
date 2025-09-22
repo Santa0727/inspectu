@@ -3,6 +3,7 @@ export interface IProfile {
   name: string;
   email: string;
   avatar: string | null;
+  user_permissions: string[];
 }
 
 export interface IAuthState {
