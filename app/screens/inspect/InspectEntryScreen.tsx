@@ -17,6 +17,7 @@ import { COLORS } from '../../config/constants';
 import InspectStepForm from '../../components/manage/InspectStepForm';
 import ImageBox from '../../components/ui/ImageBox';
 import Input from '../../components/ui/Input';
+import SignaturePanel from '../../components/common/SignaturePanel';
 import { MaterialIcons } from '@expo/vector-icons';
 import { HomeStackParamList } from '../../navigation/AppStackParams';
 
@@ -154,22 +155,84 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
   const [step, setStep] = useState(0);
   const [entry, setEntry] = useState<IEntry>();
   const [form, setForm] = useState<IInspectAnswer[]>([]);
+  const [signature, setSignature] = useState<string>('');
   const [disabled, setDisabled] = useState(false);
 
   const validForm = () => {
+    const questions = (entry?.steps.flatMap((x) => x.questions) ?? []).map(
+      (qs) => {
+        const answer = form.find((y) => y.question_id === qs.id);
+        if (answer) {
+          if (
+            qs.type === 'checkbox' ||
+            qs.type === 'compliance' ||
+            qs.type === 'radio'
+          ) {
+            return {
+              ...answer,
+              options: [
+                ...answer.options,
+                ...(qs.options
+                  ?.filter((x) => !answer.options?.some((y) => y.id === x.id))
+                  .map((x) => ({ id: x.id, value: false })) ?? []),
+              ],
+            };
+          } else {
+            return answer;
+          }
+        }
+        let res: any = { question_id: qs.id };
+        if (qs.type === 'checkbox') {
+          res = {
+            ...res,
+            options: qs.options?.map((y) => ({ id: y.id, value: false })),
+          };
+        } else if (qs.type === 'compliance' || qs.type === 'radio') {
+          res = {
+            ...res,
+            options: qs.options?.map((y, k) => ({ id: y.id, value: k === 0 })),
+          };
+        } else {
+          res = {
+            ...res,
+            notes: '',
+            options: qs.options?.map((y) => ({ id: y.id, value: '' })),
+          };
+        }
+        return res;
+      },
+    );
     return {
       inspection_id: inspectID,
-      questions: form,
+      questions,
+      signature,
     };
   };
-
-  const updateForm = (data: IInspectAnswer[]) => {
-    AsyncStorage.setItem(storageKey, JSON.stringify(data));
-    setForm(data);
-  };
+  const updateForm = useCallback(
+    (data: IInspectAnswer[]) => {
+      const formData = {
+        answers: data,
+        signature,
+      };
+      AsyncStorage.setItem(storageKey, JSON.stringify(formData));
+      setForm(data);
+    },
+    [signature, storageKey],
+  );
+  const updateSignature = useCallback(
+    (signatureData: string) => {
+      const formData = {
+        answers: form,
+        signature: signatureData,
+      };
+      AsyncStorage.setItem(storageKey, JSON.stringify(formData));
+      setSignature(signatureData);
+    },
+    [form, storageKey],
+  );
   const nextClick = async () => {
     if (!entry) return;
-    if (step === entry.steps.length + 1) {
+    if (step === entry.steps.length + 2) {
       const data = validForm();
       if (!data) return;
 
@@ -180,7 +243,9 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
         'POST',
       );
       if (!res.status) {
+        const { signature, ...rest } = data;
         alert(res.message ?? 'Server error');
+        setStep(step - 1);
       } else {
         try {
           await AsyncStorage.removeItem(storageKey);
@@ -188,7 +253,7 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
         setStep(step + 1);
       }
       setDisabled(false);
-    } else if (step === entry.steps.length + 2) {
+    } else if (step === entry.steps.length + 3) {
       navigation.goBack();
     } else if (step === 0) {
       setDisabled(true);
@@ -220,9 +285,18 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
         try {
           const saved = await AsyncStorage.getItem(storageKey);
           if (saved) {
-            const parsed = JSON.parse(saved) as IInspectAnswer[];
-            if (Array.isArray(parsed) && parsed.length > 0) {
-              setForm(parsed);
+            const parsed = JSON.parse(saved);
+            if (Array.isArray(parsed)) {
+              if (parsed.length > 0) {
+                setForm(parsed);
+              }
+            } else if (parsed && typeof parsed === 'object') {
+              if (Array.isArray(parsed.answers) && parsed.answers.length > 0) {
+                setForm(parsed.answers);
+              }
+              if (parsed.signature) {
+                setSignature(parsed.signature);
+              }
             }
           }
         } catch (e) {}
@@ -244,12 +318,12 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
               onPress={() =>
                 step <= 0 ? navigation.goBack() : setStep(step - 1)
               }
-              disabled={disabled || step > entry.steps.length + 1}>
+              disabled={disabled || step > entry.steps.length + 2}>
               <MaterialIcons
                 name="navigate-before"
                 size={26}
                 color={
-                  disabled || step > entry.steps.length + 1
+                  disabled || step > entry.steps.length + 2
                     ? COLORS.disabled
                     : COLORS.dark
                 }
@@ -258,7 +332,7 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
             <View style={styles.steps_bar}>
               <View style={styles.step_circle} />
               {Array.from(
-                { length: entry.steps.length + 2 },
+                { length: entry.steps.length + 3 },
                 (_, id) => id + 1,
               ).map((x) => (
                 <StepSector key={x} isActive={step >= x} />
@@ -283,12 +357,22 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
                 </Text>
                 <HTMLView style={{ marginTop: 10 }} value={entry.first} />
               </View>
-            ) : step === entry.steps.length + 2 ? (
+            ) : step === entry.steps.length + 3 ? (
               <View>
                 <Text style={{ fontSize: 24, fontWeight: '600' }}>
                   {'Thank you for your submitting report'}
                 </Text>
                 <HTMLView style={{ marginTop: 10 }} value={entry.last} />
+              </View>
+            ) : step === entry.steps.length + 2 ? (
+              <View>
+                <Text style={{ fontSize: 24, fontWeight: '600' }}>
+                  Signature
+                </Text>
+                <Text style={{ fontSize: 16, marginTop: 10, marginBottom: 20 }}>
+                  Please provide your signature to complete the inspection.
+                </Text>
+                <SignaturePanel value={signature} onChange={updateSignature} />
               </View>
             ) : step === entry.steps.length + 1 ? (
               <View>
