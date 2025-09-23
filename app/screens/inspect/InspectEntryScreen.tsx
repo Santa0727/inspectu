@@ -243,7 +243,6 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
         'POST',
       );
       if (!res.status) {
-        const { signature, ...rest } = data;
         alert(res.message ?? 'Server error');
         setStep(step - 1);
       } else {
