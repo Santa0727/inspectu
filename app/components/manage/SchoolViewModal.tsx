@@ -33,7 +33,7 @@ const SchoolViewModal = ({ visible, school, onClose }: Props) => {
   return (
     <Modal
       visible={visible}
-      title="School info"
+      title="Site info"
       showHeader={false}
       showFooter={false}
       onClose={onClose}>
