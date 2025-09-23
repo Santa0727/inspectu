@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 import { WebView } from 'react-native-webview';
 import * as DocumentPicker from 'expo-document-picker';
+import * as FileSystem from 'expo-file-system';
 import { MaterialIcons } from '@expo/vector-icons';
 import Modal from '../ui/Modal';
 import Checkbox from '../ui/Checkbox';
@@ -45,6 +46,7 @@ interface ISelectedFile {
   name: string;
   type: string;
   size: number;
+  base64: string;
 }
 
 interface Props {
@@ -76,11 +78,19 @@ const MyTaskModal = ({ visible, task, onClose, onSuccess }: Props) => {
 
       if (!result.canceled && result.assets && result.assets.length > 0) {
         const file = result.assets[0];
+
+        const base64 = await FileSystem.readAsStringAsync(file.uri, {
+          encoding: FileSystem.EncodingType.Base64,
+        });
+        const mimeType = file.mimeType || 'application/octet-stream';
+        const dataUri = `base64,${base64}`;
+
         const newFile: ISelectedFile = {
           uri: file.uri,
           name: file.name,
-          type: file.mimeType || 'application/octet-stream',
+          type: mimeType,
           size: file.size || 0,
+          base64: dataUri,
         };
         setSelectedFiles([...selectedFiles, newFile]);
       }
@@ -104,23 +114,15 @@ const MyTaskModal = ({ visible, task, onClose, onSuccess }: Props) => {
         id: item.id,
         checked: checkedItems.includes(item.id),
       }));
-
-      const formData = new FormData();
-      formData.append('task_id', task.id.toString());
-      formData.append('task_list', JSON.stringify(taskList));
-
-      for (let i = 0; i < selectedFiles.length; i++) {
-        const file = selectedFiles[i];
-
-        formData.append('files[]', {
-          uri: file.uri,
-          type: file.type,
-          name: file.name,
-        } as any);
-      }
+      const base64Files = selectedFiles.map((file) => file.base64);
+      const requestData = {
+        task_id: task.id.toString(),
+        task_list: taskList,
+        base64_files: base64Files,
+      };
       const response = await sendRequest(
         'api/member/tasks/submit',
-        formData,
+        requestData,
         'POST',
       );
       if (response.status) {
