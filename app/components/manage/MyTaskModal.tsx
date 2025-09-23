@@ -1,15 +1,8 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Alert,
-  TouchableOpacity,
-  Image,
-} from 'react-native';
+import { View, Text, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 import { WebView } from 'react-native-webview';
-import * as ImagePicker from 'expo-image-picker';
-import { FontAwesome, AntDesign } from '@expo/vector-icons';
+import * as DocumentPicker from 'expo-document-picker';
+import { MaterialIcons } from '@expo/vector-icons';
 import Modal from '../ui/Modal';
 import Checkbox from '../ui/Checkbox';
 import { COLORS } from '../../config/constants';
@@ -47,6 +40,13 @@ interface ITaskDetail {
   task_list: IListItem[];
 }
 
+interface ISelectedFile {
+  uri: string;
+  name: string;
+  type: string;
+  size: number;
+}
+
 interface Props {
   visible: boolean;
   task: ITaskDetail;
@@ -56,7 +56,7 @@ interface Props {
 
 const MyTaskModal = ({ visible, task, onClose, onSuccess }: Props) => {
   const [checkedItems, setCheckedItems] = useState<string[]>([]);
-  const [selectedImages, setSelectedImages] = useState<string[]>([]);
+  const [selectedFiles, setSelectedFiles] = useState<ISelectedFile[]>([]);
   const [submitting, setSubmitting] = useState(false);
 
   const handleCheckboxChange = (itemId: string, checked: boolean) => {
@@ -66,51 +66,32 @@ const MyTaskModal = ({ visible, task, onClose, onSuccess }: Props) => {
       setCheckedItems(checkedItems.filter((id) => id !== itemId));
     }
   };
-  const pickImage = async () => {
-    const permissionResult =
-      await ImagePicker.requestMediaLibraryPermissionsAsync();
+  const pickFile = async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: '*/*',
+        copyToCacheDirectory: true,
+        multiple: false,
+      });
 
-    if (permissionResult.granted === false) {
-      Alert.alert(
-        'Permission required',
-        'Permission to access camera roll is required!',
-      );
-      return;
-    }
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
-
-    if (!result.canceled && result.assets[0]) {
-      setSelectedImages([...selectedImages, result.assets[0].uri]);
-    }
-  };
-  const takePhoto = async () => {
-    const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
-
-    if (permissionResult.granted === false) {
-      Alert.alert(
-        'Permission required',
-        'Permission to access camera is required!',
-      );
-      return;
-    }
-    const result = await ImagePicker.launchCameraAsync({
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
-    if (!result.canceled && result.assets[0]) {
-      setSelectedImages([...selectedImages, result.assets[0].uri]);
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        const file = result.assets[0];
+        const newFile: ISelectedFile = {
+          uri: file.uri,
+          name: file.name,
+          type: file.mimeType || 'application/octet-stream',
+          size: file.size || 0,
+        };
+        setSelectedFiles([...selectedFiles, newFile]);
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Failed to pick file');
     }
   };
-  const removeImage = (index: number) => {
-    const newImages = selectedImages.filter((_, i) => i !== index);
-    setSelectedImages(newImages);
+
+  const removeFile = (index: number) => {
+    const newFiles = selectedFiles.filter((_, i) => i !== index);
+    setSelectedFiles(newFiles);
   };
 
   const handleSubmit = async () => {
@@ -128,14 +109,13 @@ const MyTaskModal = ({ visible, task, onClose, onSuccess }: Props) => {
       formData.append('task_id', task.id.toString());
       formData.append('task_list', JSON.stringify(taskList));
 
-      for (let i = 0; i < selectedImages.length; i++) {
-        const imageUri = selectedImages[i];
-        const filename = `image_${i}_${Date.now()}.jpg`;
+      for (let i = 0; i < selectedFiles.length; i++) {
+        const file = selectedFiles[i];
 
         formData.append('files[]', {
-          uri: imageUri,
-          type: 'image/jpeg',
-          name: filename,
+          uri: file.uri,
+          type: file.type,
+          name: file.name,
         } as any);
       }
       const response = await sendRequest(
@@ -148,7 +128,7 @@ const MyTaskModal = ({ visible, task, onClose, onSuccess }: Props) => {
           onSuccess();
         }
         setCheckedItems([]);
-        setSelectedImages([]);
+        setSelectedFiles([]);
 
         onClose();
       } else {
@@ -163,7 +143,7 @@ const MyTaskModal = ({ visible, task, onClose, onSuccess }: Props) => {
 
   const handleClose = () => {
     setCheckedItems([]);
-    setSelectedImages([]);
+    setSelectedFiles([]);
     onClose();
   };
   return (
@@ -198,32 +178,41 @@ const MyTaskModal = ({ visible, task, onClose, onSuccess }: Props) => {
           ))}
         </View>
 
-        <View style={styles.imageSection}>
-          <View style={styles.imageButtons}>
+        <View style={styles.fileSection}>
+          <View style={styles.fileButtons}>
             <TouchableOpacity
-              style={[styles.iconButton, styles.galleryButton]}
-              onPress={pickImage}>
-              <AntDesign name="picture" size={32} color="white" />
-              <Text style={styles.iconButtonText}>Gallery</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.iconButton, styles.cameraButton]}
-              onPress={takePhoto}>
-              <FontAwesome name="camera" size={32} color="white" />
-              <Text style={styles.iconButtonText}>Camera</Text>
+              style={[styles.iconButton, styles.fileButton]}
+              onPress={pickFile}>
+              <MaterialIcons name="attach-file" size={32} color="white" />
+              <Text style={styles.iconButtonText}>Select File</Text>
             </TouchableOpacity>
           </View>
 
-          {selectedImages.length > 0 && (
-            <View style={styles.imagePreviewContainer}>
-              <Text style={styles.previewTitle}>Selected Images:</Text>
-              <View style={styles.imageGrid}>
-                {selectedImages.map((uri, index) => (
-                  <View key={index} style={styles.imagePreview}>
-                    <Image source={{ uri }} style={styles.previewImage} />
+          {selectedFiles.length > 0 && (
+            <View style={styles.filePreviewContainer}>
+              <Text style={styles.previewTitle}>Selected Files:</Text>
+              <View style={styles.fileList}>
+                {selectedFiles.map((file, index) => (
+                  <View key={index} style={styles.filePreview}>
+                    <View style={styles.fileInfo}>
+                      <MaterialIcons
+                        name="description"
+                        size={24}
+                        color={COLORS.primary}
+                        style={styles.fileIcon}
+                      />
+                      <View style={styles.fileDetails}>
+                        <Text style={styles.fileName} numberOfLines={1}>
+                          {file.name}
+                        </Text>
+                        <Text style={styles.fileSize}>
+                          {(file.size / 1024 / 1024).toFixed(2)} MB
+                        </Text>
+                      </View>
+                    </View>
                     <TouchableOpacity
                       style={styles.removeButton}
-                      onPress={() => removeImage(index)}>
+                      onPress={() => removeFile(index)}>
                       <Text style={styles.removeButtonText}>×</Text>
                     </TouchableOpacity>
                   </View>
@@ -254,12 +243,12 @@ const styles = StyleSheet.create({
   checkboxItem: {
     marginBottom: 5,
   },
-  imageSection: {
+  fileSection: {
     marginBottom: 30,
   },
-  imageButtons: {
+  fileButtons: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     marginBottom: 15,
   },
   iconButton: {
@@ -280,11 +269,8 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
   },
-  galleryButton: {
+  fileButton: {
     backgroundColor: COLORS.primary,
-  },
-  cameraButton: {
-    backgroundColor: COLORS.secondary,
   },
   iconButtonText: {
     color: 'white',
@@ -293,7 +279,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
     letterSpacing: 0.5,
   },
-  imagePreviewContainer: {
+  filePreviewContainer: {
     marginTop: 10,
   },
   previewTitle: {
@@ -302,36 +288,54 @@ const styles = StyleSheet.create({
     color: COLORS.dark,
     marginBottom: 10,
   },
-  imageGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+  fileList: {
     gap: 10,
   },
-  imagePreview: {
-    position: 'relative',
-    width: 80,
-    height: 80,
-  },
-  previewImage: {
-    width: '100%',
-    height: '100%',
+  filePreview: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#f5f5f5',
+    padding: 12,
     borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+  },
+  fileInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  fileIcon: {
+    marginRight: 12,
+  },
+  fileDetails: {
+    flex: 1,
+  },
+  fileName: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: COLORS.dark,
+    marginBottom: 2,
+  },
+  fileSize: {
+    fontSize: 12,
+    color: '#666',
   },
   removeButton: {
-    position: 'absolute',
-    top: -5,
-    right: -5,
     backgroundColor: COLORS.danger,
-    width: 20,
-    height: 20,
-    borderRadius: 10,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
+    marginLeft: 8,
   },
   removeButtonText: {
     color: 'white',
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: 'bold',
+    lineHeight: 16,
   },
 });
 
