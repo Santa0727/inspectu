@@ -163,25 +163,20 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
       (qs) => {
         const answer = form.find((y) => y.question_id === qs.id);
         if (answer) {
-          if (
-            qs.type === 'checkbox' ||
-            qs.type === 'compliance' ||
-            qs.type === 'radio'
-          ) {
-            return {
-              ...answer,
-              options: [
-                ...answer.options,
-                ...(qs.options
-                  ?.filter((x) => !answer.options?.some((y) => y.id === x.id))
-                  .map((x) => ({ id: x.id, value: false })) ?? []),
-              ],
-            };
-          } else {
-            return answer;
-          }
+          return {
+            ...answer,
+            options: [
+              ...answer.options,
+              ...(qs.options
+                ?.filter((x) => !answer.options?.some((y) => y.id === x.id))
+                .map((x) => ({ id: x.id, value: false })) ?? []),
+            ],
+          };
         }
-        let res: any = { question_id: qs.id };
+        let res: any = {
+          question_id: qs.id,
+          options: qs.options?.map((y) => ({ id: y.id, value: '' })),
+        };
         if (qs.type === 'checkbox') {
           res = {
             ...res,
@@ -196,7 +191,6 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
           res = {
             ...res,
             notes: '',
-            options: qs.options?.map((y) => ({ id: y.id, value: '' })),
           };
         }
         return res;
