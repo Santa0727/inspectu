@@ -83,7 +83,7 @@ const MyTaskModal = ({ visible, task, onClose, onSuccess }: Props) => {
           encoding: FileSystem.EncodingType.Base64,
         });
         const mimeType = file.mimeType || 'application/octet-stream';
-        const dataUri = `base64,${base64}`;
+        const dataUri = `data:${mimeType};base64,${base64}`;
 
         const newFile: ISelectedFile = {
           uri: file.uri,

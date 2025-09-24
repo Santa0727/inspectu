@@ -205,7 +205,7 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
     return {
       inspection_id: inspectID,
       questions,
-      signature: signature.includes(';') ? signature.split(';')[1] : signature,
+      signature,
     };
   };
   const updateForm = useCallback(
