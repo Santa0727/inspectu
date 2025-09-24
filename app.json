@@ -4,7 +4,7 @@
     "slug": "inspectU",
     "owner": "futurelab",
     "description": "inspectU",
-    "version": "1.7",
+    "version": "1.8",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -22,7 +22,7 @@
         "NSPhotoLibraryUsageDescription": "InspectU Pro needs access to your photo library so you can attach existing images to inspections and include them in reports.",
         "ITSAppUsesNonExemptEncryption": false
       },
-      "buildNumber": "1.7",
+      "buildNumber": "1.8",
       "bundleIdentifier": "inspectu.app"
     },
     "android": {
@@ -31,7 +31,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "inspectu.app",
-      "versionCode": 5
+      "versionCode": 6
     },
     "web": {
       "favicon": "./assets/favicon.png"
