@@ -202,7 +202,10 @@ const HomeScreen = ({ navigation }: Props) => {
       {visCreateTask && (
         <TaskModal
           visible={visCreateTask}
-          onClose={() => setVisCreateTask(false)}
+          onClose={() => {
+            loadData();
+            setVisCreateTask(false);
+          }}
           data={{ due_date: filter.date }}
         />
       )}
