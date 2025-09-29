@@ -112,9 +112,11 @@ const ScheduleScreen = ({ navigation }: Props) => {
         ))}
       </View>
       <View style={{ marginBottom: 15 }}>
-        <Text style={styles.title}>Upcoming Inspections</Text>
+        <Text style={styles.title}>{'Scheduled Inspections'}</Text>
         {Object.keys(groupedInspections).length === 0 ? (
-          <Text style={styles.no_inspections}>No upcoming inspections</Text>
+          <Text style={styles.no_inspections}>
+            {'No scheduled inspections'}
+          </Text>
         ) : (
           Object.entries(groupedInspections).map(
             ([siteName, siteInspections]) => (

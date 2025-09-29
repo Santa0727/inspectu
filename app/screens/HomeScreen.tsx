@@ -155,7 +155,7 @@ const HomeScreen = ({ navigation }: Props) => {
       <View style={styles.panel}>
         <View style={styles.panel_header}>
           <AntDesign name="clockcircle" size={24} color={COLORS.greyBlue} />
-          <Text style={styles.panel_label}>Schedule</Text>
+          <Text style={styles.panel_label}>{'Scheduled Inspections'}</Text>
         </View>
         <View style={{ minHeight: 100, paddingVertical: 10 }}>
           {upItems?.map((x) => (
