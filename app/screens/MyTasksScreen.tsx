@@ -71,6 +71,62 @@ const MyTasksScreen = ({ navigation }: Props) => {
     loadMyTasks();
   }, [loadMyTasks]);
 
+  const pendingTasks = tasks.filter((task) => task.status !== 'completed');
+  const completedTasks = tasks.filter((task) => task.status === 'completed');
+
+  const renderTaskCard = (task: ITask) => (
+    <TouchableOpacity
+      key={task.id}
+      style={[
+        styles.taskCard,
+        task.status !== 'completed' && styles.clickableCard,
+        loadingTaskId === task.id && styles.loadingCard,
+      ]}
+      onPress={() => task.status !== 'completed' && clickTask(task.id)}
+      disabled={task.status === 'completed' || loadingTaskId === task.id}>
+      <View style={styles.taskHeader}>
+        <Text style={styles.taskName}>{task.name}</Text>
+        <View
+          style={[
+            styles.statusBadge,
+            {
+              backgroundColor:
+                task.status === 'completed' ? COLORS.success : COLORS.pending,
+            },
+          ]}>
+          <Text style={styles.statusText}>
+            {task.status === 'completed' ? 'Completed' : 'Assigned'}
+          </Text>
+        </View>
+      </View>
+
+      <View style={styles.taskDetails}>
+        <View style={styles.dateRow}>
+          <Text style={styles.dateLabel}>Due Date:</Text>
+          <Text style={styles.dateValue}>
+            {moment(task.due_date).format('MM/DD/YYYY')}
+          </Text>
+        </View>
+
+        {task.status === 'completed' && task.date_submitted && (
+          <View style={styles.dateRow}>
+            <Text style={styles.dateLabel}>Completed:</Text>
+            <Text style={[styles.dateValue, styles.completedDate]}>
+              {moment(task.date_submitted).format('MM/DD/YYYY')}
+            </Text>
+          </View>
+        )}
+      </View>
+
+      {loadingTaskId === task.id && (
+        <View style={styles.loadingOverlay}>
+          <ActivityIndicator size="small" color={COLORS.secondary} />
+          <Text style={styles.loadingText}>Loading details...</Text>
+        </View>
+      )}
+    </TouchableOpacity>
+  );
+
   return (
     <MainContainer>
       <Text style={styles.screenTitle}>My Tasks</Text>
@@ -82,62 +138,22 @@ const MyTasksScreen = ({ navigation }: Props) => {
         <Text style={styles.emptyText}>No tasks found</Text>
       ) : (
         <View style={styles.listContainer}>
-          {tasks.map((task) => (
-            <TouchableOpacity
-              key={task.id}
-              style={[
-                styles.taskCard,
-                task.status !== 'completed' && styles.clickableCard,
-                loadingTaskId === task.id && styles.loadingCard,
-              ]}
-              onPress={() => task.status !== 'completed' && clickTask(task.id)}
-              disabled={
-                task.status === 'completed' || loadingTaskId === task.id
-              }>
-              <View style={styles.taskHeader}>
-                <Text style={styles.taskName}>{task.name}</Text>
-                <View
-                  style={[
-                    styles.statusBadge,
-                    {
-                      backgroundColor:
-                        task.status === 'completed'
-                          ? COLORS.success
-                          : COLORS.pending,
-                    },
-                  ]}>
-                  <Text style={styles.statusText}>
-                    {task.status === 'completed' ? 'Completed' : 'Assigned'}
-                  </Text>
-                </View>
-              </View>
-
-              <View style={styles.taskDetails}>
-                <View style={styles.dateRow}>
-                  <Text style={styles.dateLabel}>Due Date:</Text>
-                  <Text style={styles.dateValue}>
-                    {moment(task.due_date).format('MM/DD/YYYY')}
-                  </Text>
-                </View>
-
-                {task.status === 'completed' && task.date_submitted && (
-                  <View style={styles.dateRow}>
-                    <Text style={styles.dateLabel}>Completed:</Text>
-                    <Text style={[styles.dateValue, styles.completedDate]}>
-                      {moment(task.date_submitted).format('MM/DD/YYYY')}
-                    </Text>
-                  </View>
-                )}
-              </View>
-
-              {loadingTaskId === task.id && (
-                <View style={styles.loadingOverlay}>
-                  <ActivityIndicator size="small" color={COLORS.secondary} />
-                  <Text style={styles.loadingText}>Loading details...</Text>
-                </View>
-              )}
-            </TouchableOpacity>
-          ))}
+          {pendingTasks.length > 0 && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>
+                Pending Tasks ({pendingTasks.length})
+              </Text>
+              {pendingTasks.map(renderTaskCard)}
+            </View>
+          )}
+          {completedTasks.length > 0 && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>
+                Completed Tasks ({completedTasks.length})
+              </Text>
+              {completedTasks.map(renderTaskCard)}
+            </View>
+          )}
         </View>
       )}
       {!!detail && (
@@ -262,6 +278,16 @@ const styles = StyleSheet.create({
     color: COLORS.greyBlue,
     textAlign: 'center',
     marginTop: 40,
+  },
+  section: {
+    marginBottom: 24,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: COLORS.dark,
+    marginBottom: 12,
+    paddingLeft: 4,
   },
 });
 
