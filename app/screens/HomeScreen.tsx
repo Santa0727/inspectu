@@ -2,7 +2,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import MainContainer from '../components/container/MainContainer';
 import { HomeStackParamList } from '../navigation/AppStackParams';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { AntDesign } from '@expo/vector-icons';
+import { AntDesign, FontAwesome5 } from '@expo/vector-icons';
 import { COLORS } from '../config/constants';
 import { useCallback, useMemo, useState } from 'react';
 import { IInspection } from '../lib/manage.entities';
@@ -108,6 +108,10 @@ const HomeScreen = ({ navigation }: Props) => {
     })),
   ];
 
+  const filteredTasks = tasks?.filter(
+    (x) => !filter.date || x.due_date.slice(0, 10) === filter.date,
+  );
+
   return (
     <MainContainer>
       <View style={styles.panel}>
@@ -119,30 +123,36 @@ const HomeScreen = ({ navigation }: Props) => {
       </View>
       {!!filter.date && (
         <>
-          {tasks
-            ?.filter((x) => x.due_date.slice(0, 10) === filter.date)
-            .map((task) => (
-              <TouchableOpacity
-                key={task.id}
-                style={[
-                  styles.task_touch,
-                  task.status === 'completed' && styles.task_completed,
-                ]}
-                onPress={() =>
-                  task.status !== 'completed' &&
-                  task.assigned_to.some((x) => x.id === profile?.id)
-                    ? fetchMyTask(task.id)
-                    : setViewTask(task)
-                }>
-                <Text style={styles.task_name}>{task.name}</Text>
-                <Text style={styles.task_assigned}>
-                  {task.assigned_to.map((x) => x.name).join(', ')}
-                </Text>
-                <Text style={styles.task_categories}>
-                  {task.category.map((x) => x.name).join(', ')}
-                </Text>
-              </TouchableOpacity>
-            ))}
+          {!!filteredTasks && filteredTasks.length > 0 && (
+            <View style={styles.panel}>
+              <View style={[styles.panel_header, { marginBottom: 10 }]}>
+                <FontAwesome5 name="tasks" size={24} color={COLORS.greyBlue} />
+                <Text style={styles.panel_label}>{'My Tasks'}</Text>
+              </View>
+              {filteredTasks.map((task) => (
+                <TouchableOpacity
+                  key={task.id}
+                  style={[
+                    styles.task_touch,
+                    task.status === 'completed' && styles.task_completed,
+                  ]}
+                  onPress={() =>
+                    task.status !== 'completed' &&
+                    task.assigned_to.some((x) => x.id === profile?.id)
+                      ? fetchMyTask(task.id)
+                      : setViewTask(task)
+                  }>
+                  <Text style={styles.task_name}>{task.name}</Text>
+                  <Text style={styles.task_assigned}>
+                    {task.assigned_to.map((x) => x.name).join(', ')}
+                  </Text>
+                  <Text style={styles.task_categories}>
+                    {task.category.map((x) => x.name).join(', ')}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
           {profile?.user_permissions.includes('manage_tasks') && (
             <TouchButton
               style={{ margin: 10 }}
@@ -249,7 +259,7 @@ const styles = StyleSheet.create({
   },
   task_touch: {
     padding: 10,
-    marginHorizontal: 10,
+    marginHorizontal: 5,
     marginVertical: 5,
     borderColor: COLORS.blueGrey,
     borderWidth: 1,
