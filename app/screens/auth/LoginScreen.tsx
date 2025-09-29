@@ -16,6 +16,7 @@ import { isEmailFormat } from '../../lib/helper';
 import { COLORS } from '../../config/constants';
 import { useAppDispatch } from '../../store/hooks';
 import { login as authLogin } from '../../store/auth/authSlice';
+import appJson from '../../../app.json';
 
 const loginImage = require('../../images/login-logo.png');
 
@@ -66,6 +67,7 @@ const LoginScreen = ({ navigation }: Props) => {
         height: Dimensions.get('window').height - 39,
         backgroundColor: 'white',
       }}>
+      <Text style={styles.version}>{`v${appJson.expo.version}`}</Text>
       <View
         style={{
           height: Dimensions.get('window').height / 2 - 90,
@@ -151,6 +153,18 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
     fontWeight: '400',
     color: COLORS.red,
+  },
+  version: {
+    position: 'absolute',
+    top: 40,
+    right: 15,
+    fontSize: 16,
+    color: 'white',
+    backgroundColor: COLORS.red,
+    fontWeight: 'bold',
+    borderRadius: 20,
+    paddingHorizontal: 15,
+    paddingVertical: 4,
   },
 });
 
