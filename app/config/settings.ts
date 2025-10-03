@@ -1,1 +1,1 @@
-export const API_URL = 'https://www.inspectu.digitalmachine.co.nz';
+export const API_URL = 'https://inspectupro.com';
