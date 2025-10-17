@@ -80,7 +80,7 @@ export const sendRequest = async (
 
     return httpResponse({
       status: false,
-      data: null,
+      data: err,
       message: msg,
     });
   }
