@@ -27,6 +27,7 @@ interface QuestionProps {
   title: string;
   data: IInspectAnswer;
   options: IOption[];
+  corrective?: any;
   onConfirm: (d: IInspectAnswer) => void;
   onClose: () => void;
 }
@@ -37,6 +38,7 @@ const QuestionModal = ({
   title,
   options,
   data,
+  corrective,
   onConfirm,
   onClose,
 }: QuestionProps) => {
@@ -44,6 +46,9 @@ const QuestionModal = ({
   const [checked, setChecked] = useState(data.options ?? []);
   const [notes, setNotes] = useState(data.notes ?? '');
   const [values, setValues] = useState(data.options ?? []);
+  const [correctiveComment, setCorrectiveComment] = useState(
+    data.corrective_comment ?? '',
+  );
 
   const toggleCheck = (id: string, c: boolean) => {
     let tmp = checked.filter((x) => x.id !== id);
@@ -80,17 +85,49 @@ const QuestionModal = ({
     }
     setValues(tmp);
   };
+  const shouldShowCorrectiveComment = () => {
+    if (!corrective || !corrective.requires_comment_when) return false;
+
+    if (type === 'radio' && corrective.requires_comment_when.equals) {
+      return values.some(
+        (v) =>
+          v.id === corrective.requires_comment_when.equals && v.value === true,
+      );
+    }
+
+    if (
+      (type === 'compliance' || type === 'checkbox') &&
+      corrective.requires_comment_when.any_of
+    ) {
+      const selectedOptions = type === 'compliance' ? checked : values;
+      return corrective.requires_comment_when.any_of.some((optionId: string) =>
+        selectedOptions.some(
+          (option) => option.id === optionId && option.value === true,
+        ),
+      );
+    }
+
+    return false;
+  };
+
   const confirmClick = () => {
+    const baseData = {
+      ...data,
+      corrective_comment: shouldShowCorrectiveComment()
+        ? correctiveComment
+        : undefined,
+    };
+
     if (type === 'compliance') {
       onConfirm({
-        ...data,
+        ...baseData,
         options: checked,
         images,
         notes: notes ? notes : undefined,
       });
     } else {
       onConfirm({
-        ...data,
+        ...baseData,
         options: values,
       });
     }
@@ -183,6 +220,14 @@ const QuestionModal = ({
       ) : (
         <></>
       )}
+      {shouldShowCorrectiveComment() && (
+        <CommentBox
+          label="Corrective Comment"
+          style={styles.note}
+          value={correctiveComment}
+          onChange={setCorrectiveComment}
+        />
+      )}
     </Modal>
   );
 };
@@ -192,6 +237,7 @@ interface ISelectedData {
   options: IOption[];
   answer: IInspectAnswer;
   title: string;
+  corrective?: any;
 }
 
 interface CompliantProps {
@@ -286,6 +332,7 @@ const InspectStepForm = ({ form, setForm, data, isReview }: Props) => {
         options: q.options ?? [],
         answer,
         title: q.name ?? '',
+        corrective: q.corrective,
       });
     }
   };
@@ -329,6 +376,7 @@ const InspectStepForm = ({ form, setForm, data, isReview }: Props) => {
       options,
       answer,
       title: question?.name ?? '',
+      corrective: question?.corrective,
     });
     setQueID(undefined);
   };
@@ -389,6 +437,7 @@ const InspectStepForm = ({ form, setForm, data, isReview }: Props) => {
           title={selected.title}
           options={selected.options}
           data={selected.answer}
+          corrective={selected.corrective}
           onConfirm={confirmModal}
           onClose={() => {
             setQueID(undefined);

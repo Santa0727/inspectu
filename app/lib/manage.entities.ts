@@ -44,12 +44,20 @@ interface ICheckedOption extends IOption {
   answer: boolean;
 }
 
+interface ICorrective {
+  requires_comment_when?: {
+    equals?: string;
+    any_of?: string[];
+  };
+}
+
 interface IQuestion {
   id: string;
   name: string;
   type: TQuestionType;
   text: string;
   options?: IOption[];
+  corrective?: ICorrective;
 }
 
 export type TQuestionType =
@@ -86,4 +94,5 @@ export interface IInspectAnswer {
   options: IValue[];
   images?: string[];
   notes?: string;
+  corrective_comment?: string;
 }

@@ -78,6 +78,7 @@ const ReviewQuestionCard = ({ answers, step, onClick }: ReviewProps) => {
       options,
       labels,
       notes: answer?.notes,
+      correctiveComment: answer?.corrective_comment,
       images,
       color:
         answer?.compliance_status === 'c'
@@ -111,6 +112,16 @@ const ReviewQuestionCard = ({ answers, step, onClick }: ReviewProps) => {
                 <>
                   <Text style={{ fontSize: 18, fontWeight: '500' }}>Notes</Text>
                   <Text style={styles.question_note}>{item.notes}</Text>
+                </>
+              )}
+              {!!item.correctiveComment && (
+                <>
+                  <Text style={{ fontSize: 18, fontWeight: '500' }}>
+                    Corrective Comment
+                  </Text>
+                  <Text style={styles.question_note}>
+                    {item.correctiveComment}
+                  </Text>
                 </>
               )}
               {item.labels.map((x) => (
@@ -228,7 +239,8 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
     if (!entry) return;
     if (step === entry.steps.length + 2) {
       const data = validForm();
-      if (!data) return;
+
+      if (!data || data) return;
 
       setDisabled(true);
       const res = await sendRequest(
