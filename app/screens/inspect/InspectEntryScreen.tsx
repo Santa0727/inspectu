@@ -33,12 +33,19 @@ interface IEntry {
 interface ReviewProps {
   answers: IInspectAnswer[];
   step: IEntryStep;
+  errors?: any;
   onClick: () => void;
 }
 
-const ReviewQuestionCard = ({ answers, step, onClick }: ReviewProps) => {
+const ReviewQuestionCard = ({
+  answers,
+  step,
+  errors,
+  onClick,
+}: ReviewProps) => {
   const data = step.questions.map((question) => {
     const answer = answers.find((x) => x.question_id === question.id);
+    const hasError = errors?.questions?.[question.id];
     const options =
       question.type === 'compliance' ||
       question.type === 'checkbox' ||
@@ -80,14 +87,17 @@ const ReviewQuestionCard = ({ answers, step, onClick }: ReviewProps) => {
       notes: answer?.notes,
       correctiveComment: answer?.corrective_comment,
       images,
-      color:
-        answer?.compliance_status === 'c'
-          ? COLORS.success
-          : answer?.compliance_status === 'n/c'
-          ? COLORS.danger
-          : answer?.compliance_status === 'n/a'
-          ? COLORS.yellow
-          : 'black',
+      hasError,
+      errorMessages: hasError,
+      color: hasError
+        ? COLORS.danger
+        : answer?.compliance_status === 'c'
+        ? COLORS.success
+        : answer?.compliance_status === 'n/c'
+        ? COLORS.danger
+        : answer?.compliance_status === 'n/a'
+        ? COLORS.yellow
+        : 'black',
     };
   });
 
@@ -96,12 +106,29 @@ const ReviewQuestionCard = ({ answers, step, onClick }: ReviewProps) => {
       <Text style={{ fontSize: 20, fontWeight: '600', paddingLeft: 5 }}>
         {step.name}
       </Text>
-      <TouchableOpacity style={styles.card_container} onPress={onClick}>
+      <TouchableOpacity
+        style={[
+          styles.card_container,
+          data.some((item) => item.hasError) && {
+            borderColor: COLORS.danger,
+            borderWidth: 2,
+          },
+        ]}
+        onPress={onClick}>
         {data.map((item, i) => (
           <View key={item.id}>
             <Text style={[styles.question_name, { color: item.color }]}>
               {`${i + 1}) ${item.name}`}
             </Text>
+            {item.hasError && (
+              <View style={styles.error_container}>
+                {item.errorMessages?.map((errorMsg: string, idx: number) => (
+                  <Text key={idx} style={styles.error_text}>
+                    • {errorMsg}
+                  </Text>
+                ))}
+              </View>
+            )}
             <View style={styles.question_body}>
               {item.options.map((x) => (
                 <Text key={x.id} style={styles.question_option}>
@@ -168,6 +195,7 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
   const [form, setForm] = useState<IInspectAnswer[]>([]);
   const [signature, setSignature] = useState<string>('');
   const [disabled, setDisabled] = useState(false);
+  const [errors, setErrors] = useState<any>(undefined);
 
   const validForm = () => {
     const questions = (entry?.steps.flatMap((x) => x.questions) ?? []).map(
@@ -221,8 +249,11 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
       };
       AsyncStorage.setItem(storageKey, JSON.stringify(formData));
       setForm(data);
+      if (errors) {
+        setErrors(undefined);
+      }
     },
-    [signature, storageKey],
+    [signature, storageKey, errors],
   );
   const updateSignature = useCallback(
     (signatureData: string) => {
@@ -232,15 +263,27 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
       };
       AsyncStorage.setItem(storageKey, JSON.stringify(formData));
       setSignature(signatureData);
+      if (errors?.fields?.signature) {
+        setErrors((prev: any) => {
+          if (!prev) return undefined;
+          const newErrors = { ...prev };
+          if (newErrors.fields?.signature) {
+            delete newErrors.fields.signature;
+            if (Object.keys(newErrors.fields).length === 0) {
+              delete newErrors.fields;
+            }
+          }
+          return Object.keys(newErrors).length === 0 ? undefined : newErrors;
+        });
+      }
     },
-    [form, storageKey],
+    [form, storageKey, errors],
   );
   const nextClick = async () => {
     if (!entry) return;
     if (step === entry.steps.length + 2) {
       const data = validForm();
-
-      if (!data || data) return;
+      if (!data) return;
 
       setDisabled(true);
       const res = await sendRequest(
@@ -250,8 +293,13 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
       );
       if (!res.status) {
         alert(res.message ?? 'Server error');
+
+        const responseErrors: any = res.data?.errors ?? undefined;
+        setErrors(responseErrors);
+
         setStep(step - 1);
       } else {
+        setErrors(undefined);
         try {
           await AsyncStorage.removeItem(storageKey);
         } catch (e) {}
@@ -377,7 +425,22 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
                 <Text style={{ fontSize: 16, marginTop: 10, marginBottom: 20 }}>
                   Please provide your signature to complete the inspection.
                 </Text>
-                <SignaturePanel value={signature} onChange={updateSignature} />
+                {errors?.fields?.signature && (
+                  <View style={styles.error_container}>
+                    {errors.fields.signature.map(
+                      (errorMsg: string, idx: number) => (
+                        <Text key={idx} style={styles.error_text}>
+                          • {errorMsg}
+                        </Text>
+                      ),
+                    )}
+                  </View>
+                )}
+                <SignaturePanel
+                  value={signature}
+                  onChange={updateSignature}
+                  error={!!errors?.fields?.signature}
+                />
               </View>
             ) : step === entry.steps.length + 1 ? (
               <View>
@@ -391,6 +454,7 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
                     key={i}
                     answers={form}
                     step={x}
+                    errors={errors}
                     onClick={() => setStep(i + 1)}
                   />
                 ))}
@@ -407,6 +471,7 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
                   data={entry.steps[step - 1]}
                   form={form}
                   setForm={updateForm}
+                  errors={errors}
                 />
               </>
             )}
@@ -505,6 +570,19 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: 'white',
     padding: 15,
+  },
+  error_container: {
+    backgroundColor: '#ffebee',
+    padding: 8,
+    marginVertical: 5,
+    borderRadius: 4,
+    borderLeftWidth: 3,
+    borderLeftColor: COLORS.danger,
+  },
+  error_text: {
+    color: COLORS.danger,
+    fontSize: 14,
+    fontWeight: '500',
   },
 });
 

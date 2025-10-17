@@ -292,16 +292,21 @@ interface Props {
   form: IInspectAnswer[];
   setForm: (d: IInspectAnswer[]) => void;
   data: IEntryStep | IReviewStep;
+  errors?: any;
   isReview?: boolean;
 }
 
-const InspectStepForm = ({ form, setForm, data, isReview }: Props) => {
+const InspectStepForm = ({ form, setForm, data, errors, isReview }: Props) => {
   const [queID, setQueID] = useState<string>();
   const [selected, setSelected] = useState<ISelectedData>();
 
   const getColor = (id: string) => {
     const com = form.find((x) => x.question_id === id);
-    if (com?.compliance_status === 'c') {
+    const hasError = errors?.questions?.[id];
+
+    if (hasError) {
+      return COLORS.danger;
+    } else if (com?.compliance_status === 'c') {
       return COLORS.success;
     } else if (com?.compliance_status === 'n/c') {
       return COLORS.danger;
@@ -417,17 +422,30 @@ const InspectStepForm = ({ form, setForm, data, isReview }: Props) => {
           <Text style={styles.clear_txt}>{'Clear'}</Text>
         </TouchableOpacity>
         <View style={styles.questions}>
-          {questions.map((x, i) => (
-            <TouchableOpacity
-              key={x.id}
-              style={styles.question}
-              onPress={() => selectQuestion(x)}>
-              <Text style={styles.question_name}>{`${i + 1}. ${x.name}`}</Text>
-              <View
-                style={[styles.check_box, { backgroundColor: getColor(x.id) }]}
-              />
-            </TouchableOpacity>
-          ))}
+          {questions.map((x, i) => {
+            const hasError = errors?.questions?.[x.id];
+            return (
+              <TouchableOpacity
+                key={x.id}
+                style={[styles.question, hasError && styles.question_error]}
+                onPress={() => selectQuestion(x)}>
+                <Text style={styles.question_name}>
+                  {`${i + 1}. ${x.name}`}
+                </Text>
+                {hasError && (
+                  <View style={styles.error_indicator}>
+                    <Text style={styles.error_indicator_text}>!</Text>
+                  </View>
+                )}
+                <View
+                  style={[
+                    styles.check_box,
+                    { backgroundColor: getColor(x.id) },
+                  ]}
+                />
+              </TouchableOpacity>
+            );
+          })}
         </View>
       </View>
       {selected && (
@@ -533,6 +551,25 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderRadius: 4,
     backgroundColor: 'white',
+  },
+  question_error: {
+    borderColor: COLORS.danger,
+    borderWidth: 1,
+    backgroundColor: '#ffebee',
+  },
+  error_indicator: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: COLORS.danger,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 5,
+  },
+  error_indicator_text: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: 'bold',
   },
 });
 

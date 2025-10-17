@@ -13,9 +13,10 @@ import ReactSignature from 'react-native-signature-canvas';
 interface Props {
   value?: string | null;
   onChange?: (v: string) => void;
+  error?: boolean;
 }
 
-const SignaturePanel = ({ value, onChange }: Props) => {
+const SignaturePanel = ({ value, onChange, error }: Props) => {
   const [visible, setVisible] = useState(false);
 
   const handleSignDone = async (img: string) => {
@@ -27,10 +28,12 @@ const SignaturePanel = ({ value, onChange }: Props) => {
 
   return (
     <View>
-      <View style={styles.input_big}>
+      <View style={[styles.input_big, error && styles.error_border]}>
         <Text style={styles.input_small}>{'Signature'}</Text>
         <TouchableWithoutFeedback onPress={() => setVisible(true)}>
-          <Text style={styles.click_txt}>{'Click here to sign'}</Text>
+          <Text style={[styles.click_txt, error && styles.error_text_input]}>
+            {'Click here to sign'}
+          </Text>
         </TouchableWithoutFeedback>
         {!!value && (
           <View style={{ alignItems: 'center' }}>
@@ -115,6 +118,16 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
+  },
+  error_border: {
+    borderWidth: 2,
+    borderColor: '#f44336',
+    borderRadius: 8,
+    padding: 8,
+  },
+  error_text_input: {
+    borderColor: '#f44336',
+    borderWidth: 2,
   },
 });
 
