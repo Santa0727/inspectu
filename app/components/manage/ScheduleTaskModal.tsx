@@ -113,6 +113,7 @@ interface IList {
   id: string;
   name: string;
   text: string;
+  type: 'checkbox' | 'text';
 }
 
 const ToDoListForm = ({
@@ -127,6 +128,7 @@ const ToDoListForm = ({
     id: `task_${Date.now()}`,
     name: '',
     text: '',
+    type: 'checkbox',
   });
 
   const deleteItem = (index: number) => {
@@ -144,7 +146,12 @@ const ToDoListForm = ({
       return;
     }
     onChange([...values, newItem]);
-    setNewItem({ id: `task_${Date.now()}`, name: '', text: '' });
+    setNewItem({
+      id: `task_${Date.now()}`,
+      name: '',
+      text: '',
+      type: 'checkbox',
+    });
     setShow(false);
   };
 
@@ -176,6 +183,19 @@ const ToDoListForm = ({
             value={newItem.name}
             onChange={(v) => setNewItem({ ...newItem, name: v })}
             style={{ paddingHorizontal: 0 }}
+          />
+          <SingleSelect
+            style={{ marginVertical: 10 }}
+            label={'Type'}
+            showLabel={true}
+            options={[
+              { value: 'checkbox', label: 'Checkbox' },
+              { value: 'text', label: 'Text Input' },
+            ]}
+            value={newItem.type}
+            onChange={(v) =>
+              setNewItem({ ...newItem, type: v as 'checkbox' | 'text' })
+            }
           />
           <CommentBox
             label={'Description'}

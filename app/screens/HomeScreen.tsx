@@ -13,7 +13,7 @@ import InspectionModal from '../components/manage/InspectionModal';
 import Calendar from '../components/ui/Calendar';
 import SingleSelect from '../components/ui/SingleSelect';
 import TouchButton from '../components/ui/TouchButton';
-import TaskModal from '../components/manage/TaskModal';
+import ScheduleTaskModal from '../components/manage/ScheduleTaskModal';
 import { ITask } from '../lib/task.entities';
 import { useAppSelector } from '../store/hooks';
 import { selectProfile } from '../store/auth/authSlice';
@@ -210,7 +210,7 @@ const HomeScreen = ({ navigation }: Props) => {
         />
       )}
       {visCreateTask && (
-        <TaskModal
+        <ScheduleTaskModal
           visible={visCreateTask}
           onClose={() => {
             loadData();
@@ -220,7 +220,7 @@ const HomeScreen = ({ navigation }: Props) => {
         />
       )}
       {viewTask && (
-        <TaskModal
+        <ScheduleTaskModal
           visible={true}
           onClose={() => setViewTask(undefined)}
           taskData={viewTask}

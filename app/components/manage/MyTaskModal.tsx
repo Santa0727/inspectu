@@ -6,6 +6,7 @@ import * as FileSystem from 'expo-file-system';
 import { MaterialIcons } from '@expo/vector-icons';
 import Modal from '../ui/Modal';
 import Checkbox from '../ui/Checkbox';
+import Input from '../ui/Input';
 import { COLORS } from '../../config/constants';
 import { sendRequest } from '../../config/compose';
 
@@ -32,6 +33,7 @@ const makeHtml = (content: string, basePx = 22) => `
 interface IListItem {
   id: string;
   name: string;
+  type?: 'checkbox' | 'text';
 }
 
 interface ITaskDetail {
@@ -58,6 +60,7 @@ interface Props {
 
 const MyTaskModal = ({ visible, task, onClose, onSuccess }: Props) => {
   const [checkedItems, setCheckedItems] = useState<string[]>([]);
+  const [textInputs, setTextInputs] = useState<Record<string, string>>({});
   const [selectedFiles, setSelectedFiles] = useState<ISelectedFile[]>([]);
   const [submitting, setSubmitting] = useState(false);
 
@@ -67,6 +70,13 @@ const MyTaskModal = ({ visible, task, onClose, onSuccess }: Props) => {
     } else {
       setCheckedItems(checkedItems.filter((id) => id !== itemId));
     }
+  };
+
+  const handleTextInputChange = (itemId: string, text: string) => {
+    setTextInputs((prev) => ({
+      ...prev,
+      [itemId]: text,
+    }));
   };
   const pickFile = async () => {
     try {
@@ -110,10 +120,17 @@ const MyTaskModal = ({ visible, task, onClose, onSuccess }: Props) => {
     setSubmitting(true);
 
     try {
-      const taskList = task.task_list.map((item) => ({
-        id: item.id,
-        checked: checkedItems.includes(item.id),
-      }));
+      const taskList = task.task_list.map((item) => {
+        const itemType = item.type || 'checkbox';
+        return {
+          id: item.id,
+          answer:
+            itemType === 'checkbox'
+              ? checkedItems.includes(item.id)
+              : textInputs[item.id] || '',
+          type: itemType,
+        };
+      });
       const base64Files = selectedFiles.map((file) => file.base64);
       const requestData = {
         task_id: task.id.toString(),
@@ -130,6 +147,7 @@ const MyTaskModal = ({ visible, task, onClose, onSuccess }: Props) => {
           onSuccess();
         }
         setCheckedItems([]);
+        setTextInputs({});
         setSelectedFiles([]);
 
         onClose();
@@ -145,9 +163,11 @@ const MyTaskModal = ({ visible, task, onClose, onSuccess }: Props) => {
 
   const handleClose = () => {
     setCheckedItems([]);
+    setTextInputs({});
     setSelectedFiles([]);
     onClose();
   };
+
   return (
     <Modal
       visible={visible}
@@ -168,16 +188,33 @@ const MyTaskModal = ({ visible, task, onClose, onSuccess }: Props) => {
         </View>
 
         <View style={styles.taskListSection}>
-          {task.task_list.map((item) => (
-            <Checkbox
-              key={item.id}
-              value={checkedItems.includes(item.id)}
-              onChange={(checked) => handleCheckboxChange(item.id, checked)}
-              label={item.name}
-              style={styles.checkboxItem}
-              markPosition="right"
-            />
-          ))}
+          {task.task_list.map((item) => {
+            const itemType = item.type || 'checkbox';
+
+            if (itemType === 'text') {
+              return (
+                <View key={item.id} style={styles.textInputItem}>
+                  <Input
+                    label={item.name}
+                    value={textInputs[item.id] || ''}
+                    onChange={(text) => handleTextInputChange(item.id, text)}
+                    style={{ paddingHorizontal: 0, marginVertical: 5 }}
+                  />
+                </View>
+              );
+            }
+
+            return (
+              <Checkbox
+                key={item.id}
+                value={checkedItems.includes(item.id)}
+                onChange={(checked) => handleCheckboxChange(item.id, checked)}
+                label={item.name}
+                style={styles.checkboxItem}
+                markPosition="right"
+              />
+            );
+          })}
         </View>
 
         <View style={styles.fileSection}>
@@ -244,6 +281,9 @@ const styles = StyleSheet.create({
   },
   checkboxItem: {
     marginBottom: 5,
+  },
+  textInputItem: {
+    marginBottom: 10,
   },
   fileSection: {
     marginBottom: 30,
