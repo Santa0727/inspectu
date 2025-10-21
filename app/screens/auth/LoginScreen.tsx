@@ -72,6 +72,7 @@ const LoginScreen = ({ navigation }: Props) => {
         style={{
           height: Dimensions.get('window').height / 2 - 90,
           justifyContent: 'center',
+          paddingHorizontal: 20,
         }}>
         <View
           style={{
@@ -90,7 +91,8 @@ const LoginScreen = ({ navigation }: Props) => {
         style={{
           width: '100%',
           position: 'absolute',
-          bottom: 100,
+          bottom: 200,
+          paddingHorizontal: 25,
         }}>
         <Input
           label="Email"
@@ -124,12 +126,9 @@ const LoginScreen = ({ navigation }: Props) => {
           label="Sign In"
           onPress={confirmClick}
           disabled={disabled}
-          scheme="red"
-          style={{ marginVertical: 20, marginHorizontal: 10 }}
+          scheme="secondary"
+          style={{ marginVertical: 30, marginHorizontal: 10 }}
         />
-        <TouchableOpacity style={{ marginHorizontal: 10 }}>
-          <Text style={styles.link}>Forget password?</Text>
-        </TouchableOpacity>
       </View>
     </AppContainer>
   );
