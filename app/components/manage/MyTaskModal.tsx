@@ -7,6 +7,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import Modal from '../ui/Modal';
 import Checkbox from '../ui/Checkbox';
 import Input from '../ui/Input';
+import SignaturePanel from '../common/SignaturePanel';
 import { COLORS } from '../../config/constants';
 import { sendRequest } from '../../config/compose';
 
@@ -62,6 +63,7 @@ const MyTaskModal = ({ visible, task, onClose, onSuccess }: Props) => {
   const [checkedItems, setCheckedItems] = useState<string[]>([]);
   const [textInputs, setTextInputs] = useState<Record<string, string>>({});
   const [selectedFiles, setSelectedFiles] = useState<ISelectedFile[]>([]);
+  const [signature, setSignature] = useState<string>('');
   const [submitting, setSubmitting] = useState(false);
 
   const handleCheckboxChange = (itemId: string, checked: boolean) => {
@@ -136,6 +138,7 @@ const MyTaskModal = ({ visible, task, onClose, onSuccess }: Props) => {
         task_id: task.id.toString(),
         task_list: taskList,
         base64_files: base64Files,
+        ...(signature && { signature }),
       };
       const response = await sendRequest(
         'api/member/tasks/submit',
@@ -149,6 +152,7 @@ const MyTaskModal = ({ visible, task, onClose, onSuccess }: Props) => {
         setCheckedItems([]);
         setTextInputs({});
         setSelectedFiles([]);
+        setSignature('');
 
         onClose();
       } else {
@@ -165,6 +169,7 @@ const MyTaskModal = ({ visible, task, onClose, onSuccess }: Props) => {
     setCheckedItems([]);
     setTextInputs({});
     setSelectedFiles([]);
+    setSignature('');
     onClose();
   };
 
@@ -259,6 +264,10 @@ const MyTaskModal = ({ visible, task, onClose, onSuccess }: Props) => {
               </View>
             </View>
           )}
+        </View>
+
+        <View style={styles.signatureSection}>
+          <SignaturePanel value={signature} onChange={setSignature} />
         </View>
       </View>
     </Modal>
@@ -378,6 +387,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     lineHeight: 16,
+  },
+  signatureSection: {
+    marginBottom: 30,
   },
 });
 
