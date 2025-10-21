@@ -9,7 +9,19 @@ export interface ITask {
   category: IName[];
   owned_by: IName;
   school: IName;
+  date_submitted?: string;
   status: 'publish' | 'draft' | 'completed';
+}
+
+interface IListItem {
+  id: string;
+  name: string;
+  type?: 'checkbox' | 'text';
+}
+
+export interface ITaskDetail extends ITask {
+  intro: string;
+  task_list: IListItem[];
 }
 
 interface IMessage {

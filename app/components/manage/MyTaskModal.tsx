@@ -10,6 +10,7 @@ import Input from '../ui/Input';
 import SignaturePanel from '../common/SignaturePanel';
 import { COLORS } from '../../config/constants';
 import { sendRequest } from '../../config/compose';
+import { ITaskDetail } from '../../lib/task.entities';
 
 const makeHtml = (content: string, basePx = 22) => `
 <!doctype html>
@@ -30,19 +31,6 @@ const makeHtml = (content: string, basePx = 22) => `
 <body style="overflow:auto;">${content}</body>
 </html>
 `;
-
-interface IListItem {
-  id: string;
-  name: string;
-  type?: 'checkbox' | 'text';
-}
-
-interface ITaskDetail {
-  id: number;
-  name: string;
-  intro: string;
-  task_list: IListItem[];
-}
 
 interface ISelectedFile {
   uri: string;

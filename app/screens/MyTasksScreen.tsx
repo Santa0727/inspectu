@@ -13,24 +13,7 @@ import { sendRequest } from '../config/compose';
 import { COLORS } from '../config/constants';
 import moment from 'moment';
 import MyTaskModal from '../components/manage/MyTaskModal';
-
-interface ITask {
-  id: number;
-  name: string;
-  status: 'publish' | 'completed';
-  due_date: string;
-  date_submitted?: string;
-}
-
-interface IListItem {
-  id: string;
-  name: string;
-}
-
-interface ITaskDetail extends ITask {
-  intro: string;
-  task_list: IListItem[];
-}
+import { ITask, ITaskDetail } from '../lib/task.entities';
 
 type Props = NativeStackScreenProps<HomeStackParamList, 'MyTasks'>;
 

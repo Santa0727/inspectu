@@ -78,9 +78,7 @@ const MessagesScreen = ({ navigation }: Props) => {
               <View style={styles.conversationContent}>
                 <View style={styles.conversationHeader}>
                   <Text style={styles.userName}>{item.user.name}</Text>
-                  <Text style={styles.dateText}>
-                    {moment(item.created_at).format('MM-DD-YYYY')}
-                  </Text>
+                  <Text style={styles.dateText}>{item.created_at}</Text>
                 </View>
                 <View style={styles.conversationFooter}>
                   <Text style={styles.messageCount}>
