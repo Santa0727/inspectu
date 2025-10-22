@@ -11,18 +11,27 @@ import {
   selectHasNew,
   selectNotes,
 } from '../../store/ui/uiSlice';
+import { INote } from '../../lib/ui.entities';
+import { useNavigation } from '@react-navigation/native';
 
 interface ModalProps {
   onClose: () => void;
 }
 
 const NotesModal = ({ onClose }: ModalProps) => {
+  const navigator = useNavigation<any>();
   const notes = useAppSelector(selectNotes);
+
+  const clickNote = (note: INote) => {
+    if (note.data.link.includes('/messages')) {
+      navigator.navigate('Message');
+    }
+  };
 
   return (
     <Modal visible={true} title="Notifications" onClose={onClose}>
       {notes.map((note) => (
-        <TouchableOpacity key={note.id}>
+        <TouchableOpacity key={note.id} onPress={() => clickNote(note)}>
           <View style={styles.note_view}>
             <Text style={styles.note_txt}>{note.data.message}</Text>
             <Text style={styles.note_time}>
