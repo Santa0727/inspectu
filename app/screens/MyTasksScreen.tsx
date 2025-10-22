@@ -60,8 +60,17 @@ const MyTasksScreen = ({ navigation }: Props) => {
     loadMyTasks();
   }, [loadMyTasks]);
 
-  const pendingTasks = tasks.filter((task) => task.status !== 'completed');
-  const completedTasks = tasks.filter((task) => task.status === 'completed');
+  const overdueTasks = tasks.filter(
+    (x) =>
+      moment(x.due_date).isBefore(moment().startOf('day')) &&
+      x.status !== 'completed',
+  );
+  const pendingTasks = tasks.filter(
+    (x) =>
+      !moment(x.due_date).isBefore(moment().startOf('day')) &&
+      x.status !== 'completed',
+  );
+  const completedTasks = tasks.filter((x) => x.status === 'completed');
 
   const renderTaskCard = (task: ITask) => (
     <TouchableOpacity
@@ -93,7 +102,9 @@ const MyTasksScreen = ({ navigation }: Props) => {
         <View style={styles.dateRow}>
           <Text style={styles.dateLabel}>Due Date:</Text>
           <Text style={styles.dateValue}>
-            {moment(task.due_date).format('MM/DD/YYYY')}
+            {moment(task.due_date).isBefore(moment().startOf('day'))
+              ? `Overdue ${moment().diff(moment(task.due_date), 'days')} day(s)`
+              : moment(task.due_date).format('MM/DD/YYYY')}
           </Text>
         </View>
 
@@ -127,6 +138,14 @@ const MyTasksScreen = ({ navigation }: Props) => {
         <Text style={styles.emptyText}>No tasks found</Text>
       ) : (
         <View style={styles.listContainer}>
+          {overdueTasks.length > 0 && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>
+                Overdue Tasks ({overdueTasks.length})
+              </Text>
+              {overdueTasks.map(renderTaskCard)}
+            </View>
+          )}
           {pendingTasks.length > 0 && (
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>
