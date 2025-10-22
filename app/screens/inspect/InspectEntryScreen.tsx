@@ -18,6 +18,7 @@ import InspectStepForm from '../../components/manage/InspectStepForm';
 import ImageBox from '../../components/ui/ImageBox';
 import Input from '../../components/ui/Input';
 import SignaturePanel from '../../components/common/SignaturePanel';
+import TouchButton from '../../components/ui/TouchButton';
 import { MaterialIcons } from '@expo/vector-icons';
 import { HomeStackParamList } from '../../navigation/AppStackParams';
 
@@ -402,79 +403,116 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
               />
             </TouchableOpacity>
           </View>
-          <View style={{ padding: 10, minHeight: 300 }}>
-            {step === 0 ? (
-              <View style={styles.panel}>
-                <Text style={{ fontSize: 20, fontWeight: '600' }}>
-                  {'Read before you start'}
-                </Text>
-                <HTMLView style={{ marginTop: 10 }} value={entry.first} />
-              </View>
-            ) : step === entry.steps.length + 3 ? (
-              <View>
-                <Text style={{ fontSize: 24, fontWeight: '600' }}>
-                  {'Thank you for your submitting report'}
-                </Text>
-                <HTMLView style={{ marginTop: 10 }} value={entry.last} />
-              </View>
-            ) : step === entry.steps.length + 2 ? (
-              <View>
-                <Text style={{ fontSize: 24, fontWeight: '600' }}>
-                  Signature
-                </Text>
-                <Text style={{ fontSize: 16, marginTop: 10, marginBottom: 20 }}>
-                  Please provide your signature to complete the inspection.
-                </Text>
-                {errors?.fields?.signature && (
-                  <View style={styles.error_container}>
-                    {errors.fields.signature.map(
-                      (errorMsg: string, idx: number) => (
-                        <Text key={idx} style={styles.error_text}>
-                          • {errorMsg}
-                        </Text>
-                      ),
-                    )}
-                  </View>
-                )}
-                <SignaturePanel
-                  value={signature}
-                  onChange={updateSignature}
-                  error={!!errors?.fields?.signature}
-                />
-              </View>
-            ) : step === entry.steps.length + 1 ? (
-              <View>
-                <Text style={{ fontSize: 24, fontWeight: '600' }}>Review</Text>
-                <HTMLView
-                  style={{ marginTop: 10 }}
-                  value={entry.steps_intro ?? ''}
-                />
-                {entry.steps.map((x, i) => (
-                  <ReviewQuestionCard
-                    key={i}
-                    answers={form}
-                    step={x}
-                    errors={errors}
-                    onClick={() => setStep(i + 1)}
+          <View style={styles.content_container}>
+            <View style={styles.content_area}>
+              {step === 0 ? (
+                <View style={styles.panel}>
+                  <Text style={{ fontSize: 20, fontWeight: '600' }}>
+                    {'Read before you start'}
+                  </Text>
+                  <HTMLView style={{ marginTop: 10 }} value={entry.first} />
+                </View>
+              ) : step === entry.steps.length + 3 ? (
+                <View>
+                  <Text style={{ fontSize: 24, fontWeight: '600' }}>
+                    {'Thank you for your submitting report'}
+                  </Text>
+                  <HTMLView style={{ marginTop: 10 }} value={entry.last} />
+                </View>
+              ) : step === entry.steps.length + 2 ? (
+                <View>
+                  <Text style={{ fontSize: 24, fontWeight: '600' }}>
+                    Signature
+                  </Text>
+                  <Text
+                    style={{ fontSize: 16, marginTop: 10, marginBottom: 20 }}>
+                    Please provide your signature to complete the inspection.
+                  </Text>
+                  {errors?.fields?.signature && (
+                    <View style={styles.error_container}>
+                      {errors.fields.signature.map(
+                        (errorMsg: string, idx: number) => (
+                          <Text key={idx} style={styles.error_text}>
+                            • {errorMsg}
+                          </Text>
+                        ),
+                      )}
+                    </View>
+                  )}
+                  <SignaturePanel
+                    value={signature}
+                    onChange={updateSignature}
+                    error={!!errors?.fields?.signature}
                   />
-                ))}
-              </View>
-            ) : (
-              <>
-                {!!entry.steps_intro && (
+                </View>
+              ) : step === entry.steps.length + 1 ? (
+                <View>
+                  <Text style={{ fontSize: 24, fontWeight: '600' }}>
+                    Review
+                  </Text>
                   <HTMLView
-                    style={{ marginVertical: 20, marginHorizontal: 10 }}
+                    style={{ marginTop: 10 }}
                     value={entry.steps_intro ?? ''}
                   />
+                  {entry.steps.map((x, i) => (
+                    <ReviewQuestionCard
+                      key={i}
+                      answers={form}
+                      step={x}
+                      errors={errors}
+                      onClick={() => setStep(i + 1)}
+                    />
+                  ))}
+                </View>
+              ) : (
+                <>
+                  {!!entry.steps_intro && (
+                    <HTMLView
+                      style={{ marginVertical: 20, marginHorizontal: 10 }}
+                      value={entry.steps_intro ?? ''}
+                    />
+                  )}
+                  <InspectStepForm
+                    data={entry.steps[step - 1]}
+                    form={form}
+                    setForm={updateForm}
+                    errors={errors}
+                  />
+                </>
+              )}
+            </View>
+            <View style={styles.bottom_button_container}>
+              <View style={styles.button_row}>
+                {step > 0 && (
+                  <TouchButton
+                    label="Back"
+                    scheme="secondary"
+                    style={styles.back_button}
+                    onPress={() => setStep(step - 1)}
+                    disabled={disabled}
+                  />
                 )}
-                <InspectStepForm
-                  data={entry.steps[step - 1]}
-                  form={form}
-                  setForm={updateForm}
-                  errors={errors}
+                <TouchButton
+                  label={
+                    step === entry.steps.length + 3
+                      ? 'Finish'
+                      : step === entry.steps.length + 2
+                      ? 'Submit Inspection'
+                      : step === entry.steps.length + 1
+                      ? 'Continue to Signature'
+                      : step === 0
+                      ? 'Start Inspection'
+                      : 'Next'
+                  }
+                  scheme={
+                    step === entry.steps.length + 3 ? 'success' : 'primary'
+                  }
+                  style={styles.next_button}
+                  onPress={nextClick}
+                  disabled={disabled}
                 />
-              </>
-            )}
+              </View>
+            </View>
           </View>
         </>
       ) : (
@@ -583,6 +621,29 @@ const styles = StyleSheet.create({
     color: COLORS.danger,
     fontSize: 14,
     fontWeight: '500',
+  },
+  content_container: {
+    flex: 1,
+    padding: 10,
+  },
+  content_area: {
+    flex: 1,
+    minHeight: 300,
+  },
+  bottom_button_container: {
+    paddingTop: 20,
+    paddingBottom: 10,
+    paddingHorizontal: 5,
+  },
+  button_row: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  back_button: {
+    flex: 1,
+  },
+  next_button: {
+    flex: 1,
   },
 });
 
