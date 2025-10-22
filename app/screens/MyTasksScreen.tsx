@@ -13,6 +13,7 @@ import { sendRequest } from '../config/compose';
 import { COLORS } from '../config/constants';
 import moment from 'moment';
 import MyTaskModal from '../components/manage/MyTaskModal';
+import ViewCompletedTaskModal from '../components/manage/ViewCompletedTaskModal';
 import { ITask, ITaskDetail } from '../lib/task.entities';
 
 type Props = NativeStackScreenProps<HomeStackParamList, 'MyTasks'>;
@@ -21,6 +22,7 @@ const MyTasksScreen = ({ navigation }: Props) => {
   const [tasks, setTasks] = useState<ITask[]>([]);
   const [loading, setLoading] = useState(false);
   const [detail, setDetail] = useState<ITaskDetail>();
+  const [completedTaskDetail, setCompletedTaskDetail] = useState<any>();
   const [loadingTaskId, setLoadingTaskId] = useState<number | null>(null);
 
   const loadMyTasks = useCallback(async () => {
@@ -38,13 +40,17 @@ const MyTasksScreen = ({ navigation }: Props) => {
     }
   }, []);
 
-  const clickTask = async (taskId: number) => {
+  const clickTask = async (taskId: number, isCompleted: boolean = false) => {
     setLoadingTaskId(taskId);
     const response = await sendRequest(`api/member/tasks/${taskId}`, {}, 'GET');
     setLoadingTaskId(null);
 
     if (response.status) {
-      setDetail(response.data);
+      if (isCompleted) {
+        setCompletedTaskDetail(response.data);
+      } else {
+        setDetail(response.data);
+      }
     } else {
       alert(response.message ?? 'Failed to load task details');
     }
@@ -62,11 +68,11 @@ const MyTasksScreen = ({ navigation }: Props) => {
       key={task.id}
       style={[
         styles.taskCard,
-        task.status !== 'completed' && styles.clickableCard,
+        styles.clickableCard,
         loadingTaskId === task.id && styles.loadingCard,
       ]}
-      onPress={() => task.status !== 'completed' && clickTask(task.id)}
-      disabled={task.status === 'completed' || loadingTaskId === task.id}>
+      onPress={() => clickTask(task.id, task.status === 'completed')}
+      disabled={loadingTaskId === task.id}>
       <View style={styles.taskHeader}>
         <Text style={styles.taskName}>{task.name}</Text>
         <View
@@ -145,6 +151,13 @@ const MyTasksScreen = ({ navigation }: Props) => {
           task={detail}
           onClose={() => setDetail(undefined)}
           onSuccess={loadMyTasks}
+        />
+      )}
+      {!!completedTaskDetail && (
+        <ViewCompletedTaskModal
+          visible={true}
+          task={completedTaskDetail}
+          onClose={() => setCompletedTaskDetail(undefined)}
         />
       )}
     </MainContainer>
