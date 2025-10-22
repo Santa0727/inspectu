@@ -195,6 +195,8 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
   const [entry, setEntry] = useState<IEntry>();
   const [form, setForm] = useState<IInspectAnswer[]>([]);
   const [signature, setSignature] = useState<string>('');
+  const [representativeSignature, setRepresentativeSignature] =
+    useState<string>();
   const [disabled, setDisabled] = useState(false);
   const [errors, setErrors] = useState<any>(undefined);
 
@@ -240,6 +242,9 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
       inspection_id: inspectID,
       questions,
       signature,
+      representative_signature: representativeSignature
+        ? representativeSignature
+        : undefined,
     };
   };
   const updateForm = useCallback(
@@ -421,13 +426,12 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
                 </View>
               ) : step === entry.steps.length + 2 ? (
                 <View>
-                  <Text style={{ fontSize: 24, fontWeight: '600' }}>
-                    Signature
-                  </Text>
-                  <Text
-                    style={{ fontSize: 16, marginTop: 10, marginBottom: 20 }}>
-                    Please provide your signature to complete the inspection.
-                  </Text>
+                  <SignaturePanel
+                    title="Inspector Signature"
+                    value={signature}
+                    onChange={updateSignature}
+                    error={!!errors?.fields?.signature}
+                  />
                   {errors?.fields?.signature && (
                     <View style={styles.error_container}>
                       {errors.fields.signature.map(
@@ -440,8 +444,9 @@ const InspectEntryScreen = ({ navigation, route }: Props) => {
                     </View>
                   )}
                   <SignaturePanel
-                    value={signature}
-                    onChange={updateSignature}
+                    title={'Representative Signature'}
+                    value={representativeSignature}
+                    onChange={(s) => setRepresentativeSignature(s)}
                     error={!!errors?.fields?.signature}
                   />
                 </View>
