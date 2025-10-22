@@ -33,7 +33,7 @@ const InspectionCard = ({ data, onClick }: Props) => {
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <View style={[styles.item_dot, { backgroundColor: colorCode }]} />
           <Text style={styles.item_time}>
-            {moment(data.due_date).format('MMM D, YYYY')}
+            {moment(data.due_date).format('DD/MM/YYYY')}
           </Text>
         </View>
         <Text style={styles.status_txt}>
