@@ -6,34 +6,13 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import { WebView } from 'react-native-webview';
 import { MaterialIcons } from '@expo/vector-icons';
 import Modal from '../ui/Modal';
 import Checkbox from '../ui/Checkbox';
 import Input from '../ui/Input';
 import SignaturePanel from '../common/SignaturePanel';
 import { COLORS } from '../../config/constants';
-import moment from 'moment';
-
-const makeHtml = (content: string, basePx = 22) => `
-<!doctype html>
-<html>
-<head>
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<style>
-  :root { --base: ${basePx}px; }
-  html { -webkit-text-size-adjust: 100%; }
-  body { margin: 0; padding: 8px; line-height: 1.6; font-size: var(--base) !important; }
-  p, li, a, span, div { font-size: var(--base) !important; }
-  h1 { font-size: calc(var(--base) * 1.8) !important; }
-  h2 { font-size: calc(var(--base) * 1.5) !important; }
-  h3 { font-size: calc(var(--base) * 1.25) !important; }
-  img, video { max-width: 100%; height: auto; }
-</style>
-</head>
-<body style="overflow:auto;">${content}</body>
-</html>
-`;
+import TaskIntroView from './TaskIntroView';
 
 interface ITaskFile {
   path: string;
@@ -143,15 +122,7 @@ const ViewCompletedTaskModal = ({ visible, task, onClose }: Props) => {
         </View>
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Task Instructions</Text>
-          <View style={styles.webViewContainer}>
-            <WebView
-              source={{ html: makeHtml(task.intro) }}
-              style={styles.webView}
-              scalesPageToFit={false}
-              scrollEnabled={false}
-              showsVerticalScrollIndicator={false}
-            />
-          </View>
+          <TaskIntroView content={task.intro} />
         </View>
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Submitted Answers</Text>
@@ -266,16 +237,6 @@ const styles = StyleSheet.create({
   },
   completedStatus: {
     color: COLORS.success,
-  },
-  webViewContainer: {
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
-    borderRadius: 8,
-    overflow: 'hidden',
-  },
-  webView: {
-    height: 200,
-    backgroundColor: 'transparent',
   },
   answerItem: {
     marginBottom: 8,

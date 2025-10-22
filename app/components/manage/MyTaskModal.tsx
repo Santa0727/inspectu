@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Alert, TouchableOpacity } from 'react-native';
-import { WebView } from 'react-native-webview';
 import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -11,26 +10,7 @@ import SignaturePanel from '../common/SignaturePanel';
 import { COLORS } from '../../config/constants';
 import { sendRequest } from '../../config/compose';
 import { ITaskDetail } from '../../lib/task.entities';
-
-const makeHtml = (content: string, basePx = 22) => `
-<!doctype html>
-<html>
-<head>
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<style>
-  :root { --base: ${basePx}px; }
-  html { -webkit-text-size-adjust: 100%; }
-  body { margin: 0; padding: 8px; line-height: 1.6; font-size: var(--base) !important; }
-  p, li, a, span, div { font-size: var(--base) !important; }
-  h1 { font-size: calc(var(--base) * 1.8) !important; }
-  h2 { font-size: calc(var(--base) * 1.5) !important; }
-  h3 { font-size: calc(var(--base) * 1.25) !important; }
-  img, video { max-width: 100%; height: auto; }
-</style>
-</head>
-<body style="overflow:auto;">${content}</body>
-</html>
-`;
+import TaskIntroView from './TaskIntroView';
 
 interface ISelectedFile {
   uri: string;
@@ -170,16 +150,7 @@ const MyTaskModal = ({ visible, task, onClose, onSuccess }: Props) => {
       onConfirm={handleSubmit}
       disabled={submitting}>
       <View style={styles.container}>
-        <View style={styles.introSection}>
-          <WebView
-            source={{ html: makeHtml(task.intro) }}
-            style={styles.webView}
-            scalesPageToFit={false}
-            scrollEnabled={false}
-            showsVerticalScrollIndicator={false}
-          />
-        </View>
-
+        <TaskIntroView content={task.intro} />
         <View style={styles.taskListSection}>
           {task.task_list.map((item) => {
             const itemType = item.type || 'checkbox';
@@ -265,13 +236,6 @@ const MyTaskModal = ({ visible, task, onClose, onSuccess }: Props) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  introSection: {
-    marginBottom: 30,
-  },
-  webView: {
-    height: 300,
-    backgroundColor: 'transparent',
   },
   taskListSection: {
     marginBottom: 30,
