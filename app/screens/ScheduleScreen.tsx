@@ -11,6 +11,7 @@ import { COLORS } from '../config/constants';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { HomeStackParamList } from '../navigation/AppStackParams';
 import { IName } from '../lib/general.entities';
+import { FontAwesome } from '@expo/vector-icons';
 
 type Props = NativeStackScreenProps<HomeStackParamList, 'Schedule'>;
 
@@ -20,6 +21,7 @@ const ScheduleScreen = ({ navigation }: Props) => {
   const [districts, setDistricts] = useState<IName[]>([]);
   const [curSchool, setCurSchool] = useState<ISchool>();
   const [disabled, setDisabled] = useState(false);
+  const [selectedSchools, setSelectedSchools] = useState<number[]>([]);
 
   const loadData = useCallback(() => {
     (async () => {
@@ -59,6 +61,26 @@ const ScheduleScreen = ({ navigation }: Props) => {
     setDisabled(false);
   };
 
+  const toggleSchoolSelection = (schoolId: number) => {
+    setSelectedSchools((prev) => {
+      if (prev.includes(schoolId)) {
+        return prev.filter((id) => id !== schoolId);
+      } else {
+        return [...prev, schoolId];
+      }
+    });
+  };
+
+  const clearAllSelections = () => {
+    setSelectedSchools([]);
+  };
+
+  const selectAllSchools = () => {
+    if (schools) {
+      setSelectedSchools(schools.map((school) => school.id));
+    }
+  };
+
   const goToInspection = (inspection: IInspection) => {
     if (inspection.status === 'publish') {
       navigation.navigate('InspectEntry', { inspectID: inspection.id });
@@ -75,7 +97,14 @@ const ScheduleScreen = ({ navigation }: Props) => {
   const groupInspectionsBySite = () => {
     const grouped: { [key: string]: IInspection[] } = {};
 
-    inspections.forEach((inspection) => {
+    const filteredInspections =
+      selectedSchools.length > 0
+        ? inspections.filter((inspection) =>
+            selectedSchools.includes(inspection.school.id),
+          )
+        : inspections;
+
+    filteredInspections.forEach((inspection) => {
       const siteName = inspection.school?.name ?? 'Unknown Site';
       if (!grouped[siteName]) {
         grouped[siteName] = [];
@@ -100,19 +129,43 @@ const ScheduleScreen = ({ navigation }: Props) => {
   return (
     <MainContainer style={{ paddingHorizontal: 15, paddingVertical: 10 }}>
       <View style={{ marginBottom: 15 }}>
-        <Text style={styles.title}>Sites</Text>
+        <View style={styles.sites_header}>
+          <Text style={styles.title}>Sites</Text>
+        </View>
         {schools?.map((x) => (
-          <TouchableOpacity
-            key={x.id}
-            style={styles.site_btn}
-            disabled={disabled}
-            onPress={() => clickSchool(x.id)}>
-            <Text style={styles.site_name}>{x.name}</Text>
-          </TouchableOpacity>
+          <View key={x.id} style={styles.site_container}>
+            <TouchableOpacity
+              style={styles.site_btn}
+              disabled={disabled}
+              onPress={() => clickSchool(x.id)}>
+              <Text style={styles.site_name}>{x.name}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.checkbox_btn}
+              onPress={() => toggleSchoolSelection(x.id)}>
+              <FontAwesome
+                name={
+                  selectedSchools.includes(x.id) ? 'check-square-o' : 'square-o'
+                }
+                size={24}
+                color={
+                  selectedSchools.includes(x.id)
+                    ? COLORS.primary
+                    : COLORS.greyBlue
+                }
+              />
+            </TouchableOpacity>
+          </View>
         ))}
       </View>
       <View style={{ marginBottom: 15 }}>
-        <Text style={styles.title}>{'Scheduled Inspections'}</Text>
+        <Text style={styles.title}>
+          {selectedSchools.length > 0
+            ? `Scheduled Inspections (${selectedSchools.length} site${
+                selectedSchools.length > 1 ? 's' : ''
+              } selected)`
+            : 'Scheduled Inspections (All Sites)'}
+        </Text>
         {Object.keys(groupedInspections).length === 0 ? (
           <Text style={styles.no_inspections}>
             {'No scheduled inspections'}
@@ -166,13 +219,30 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginBottom: 10,
   },
-  site_btn: {
+  sites_header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  site_container: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
     borderColor: COLORS.blueGrey,
     borderWidth: 1,
     borderRadius: 10,
     backgroundColor: '#ffffff',
-    marginBottom: 10,
+  },
+  site_btn: {
     padding: 15,
+    flex: 1,
+    marginRight: 10,
+  },
+  checkbox_btn: {
+    padding: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   site_name: {
     color: COLORS.dark,
